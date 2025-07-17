@@ -1,3 +1,11 @@
+# kas.coffee
+
+This project uses Prettier and ESLint for code formatting and linting. To format the codebase, run:
+
+```
+npm run format
+```
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
