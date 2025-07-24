@@ -37,9 +37,12 @@ const socialPlatforms = [
   { value: 'website', label: 'Website', icon: Globe },
 ];
 
-export function SocialLinksForm({ socials: initialSocials, isLoading, onSuccess: _onSuccess }: SocialLinksFormProps) {
+export function SocialLinksForm({ socials: initialSocials, isLoading, onSuccess }: SocialLinksFormProps) {
   // Mock form since we're not connected to database
   const socials = initialSocials || [];
+  
+  // Suppress unused parameter warning - onSuccess will be used when form is implemented
+  void onSuccess;
 
   const getPlatformIcon = (platform: string) => {
     const platformData = socialPlatforms.find(p => p.value === platform);
