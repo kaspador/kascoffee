@@ -18,8 +18,8 @@ BEGIN
       id text PRIMARY KEY,
       expires_at timestamp NOT NULL,
       token text NOT NULL UNIQUE,
-      created_at timestamp NOT NULL,
-      updated_at timestamp NOT NULL,
+      created_at timestamp NOT NULL DEFAULT NOW(),
+      updated_at timestamp NOT NULL DEFAULT NOW(),
       ip_address text,
       user_agent text,
       user_id text NOT NULL REFERENCES "user"(id) ON DELETE CASCADE
@@ -44,8 +44,8 @@ BEGIN
       refresh_token_expires_at timestamp,
       scope text,
       password text,
-      created_at timestamp NOT NULL,
-      updated_at timestamp NOT NULL
+      created_at timestamp NOT NULL DEFAULT NOW(),
+      updated_at timestamp NOT NULL DEFAULT NOW()
     );
     RAISE NOTICE 'Created account table';
   EXCEPTION 
