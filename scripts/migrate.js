@@ -14,10 +14,15 @@ async function runMigration() {
     
     // Read and execute the nuclear fix migration
     const nuclearFixSQL = readFileSync(join(__dirname, 'nuclear-fix.sql'), 'utf8');
+    const addExpiresAtSQL = readFileSync(join(__dirname, 'add-expires-at-back.sql'), 'utf8');
     
     console.log('Running nuclear fix migration - recreating Better Auth tables...');
     await sql.unsafe(nuclearFixSQL);
     console.log('✓ Nuclear fix migration completed - Better Auth tables recreated');
+    
+    console.log('Adding back expires_at field...');
+    await sql.unsafe(addExpiresAtSQL);
+    console.log('✓ expires_at field added back');
     
     console.log('All migrations completed successfully!');
     
