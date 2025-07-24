@@ -18,6 +18,8 @@ export async function GET(request: NextRequest) {
 			providerId: string;
 			accountId: string;
 			userId: string;
+			hasPassword: string;
+			createdAt: Date | null;
 		}> = [];
 
 		if (email) {
@@ -30,12 +32,16 @@ export async function GET(request: NextRequest) {
 			}).from(user).where(eq(user.email, email)).limit(1);
 
 			if (specificUser.length > 0) {
-				specificAccounts = await db.select({
-					id: account.id,
-					providerId: account.providerId,
-					accountId: account.accountId,
-					userId: account.userId
-				}).from(account).where(eq(account.userId, specificUser[0].id));
+				const rawAccounts = await db.select().from(account).where(eq(account.userId, specificUser[0].id));
+				
+				specificAccounts = rawAccounts.map(acc => ({
+					id: acc.id,
+					providerId: acc.providerId,
+					accountId: acc.accountId,
+					userId: acc.userId,
+					hasPassword: acc.password ? 'yes' : 'no',
+					createdAt: acc.createdAt
+				}));
 			}
 		}
 
