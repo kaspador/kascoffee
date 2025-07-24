@@ -53,7 +53,7 @@ export function RichTextEditor({
 		],
 		content,
 		editable,
-		immediatelyRender: false, // Fix SSR hydration mismatch
+		shouldRerenderOnTransaction: false, // TipTap v3 equivalent of immediatelyRender: false
 		onUpdate: ({ editor }) => {
 			onChange(editor.getHTML());
 		},
