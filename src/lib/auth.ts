@@ -8,6 +8,7 @@ import * as schema from '@/lib/db/schema';
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
 		provider: 'pg',
+		// Fixed timestamp handling for Better Auth compatibility
 		schema: {
 			user: schema.users,
 			session: schema.sessions,
