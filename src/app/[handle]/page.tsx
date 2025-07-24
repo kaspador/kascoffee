@@ -86,13 +86,14 @@ async function getUserPage(handle: string): Promise<UserPageData | null> {
 }
 
 interface PageProps {
-	params: {
+	params: Promise<{
 		handle: string;
-	};
+	}>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-	const userPage = await getUserPage(params.handle);
+	const { handle } = await params;
+	const userPage = await getUserPage(handle);
 
 	if (!userPage) {
 		return {
@@ -119,7 +120,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function UserProfilePage({ params }: PageProps) {
-	const userPage = await getUserPage(params.handle);
+	const { handle } = await params;
+	const userPage = await getUserPage(handle);
 
 	if (!userPage) {
 		notFound();
