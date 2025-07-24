@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Coffee, Mail, ArrowLeft, AlertCircle, CheckCircle } from 'lucide-react';
-import { forgetPassword } from '@/lib/auth-client';
+import { requestPasswordReset } from '@/lib/auth-client';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -23,7 +23,7 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      const result = await forgetPassword({
+      const result = await requestPasswordReset({
         email,
         redirectTo: '/auth/reset-password',
       });
