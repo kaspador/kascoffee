@@ -38,6 +38,7 @@ export async function GET(request: NextRequest) {
 		if (!userPage) {
 			// Create default user page if it doesn't exist
 			const newUserPage = await db.insert(userPages).values({
+				id: crypto.randomUUID(),
 				userId: session.user.id,
 				handle: session.user.email?.split('@')[0]?.toLowerCase().replace(/[^a-z0-9]/g, '') || `user-${session.user.id.slice(0, 8)}`,
 				displayName: session.user.name || 'New User',
@@ -46,7 +47,9 @@ export async function GET(request: NextRequest) {
 				kaspaAddress: '',
 				backgroundColor: '#70C7BA',
 				foregroundColor: '#ffffff',
-				isActive: true
+				isActive: true,
+				createdAt: new Date(),
+				updatedAt: new Date()
 			}).returning();
 
 			return NextResponse.json({ userPage: newUserPage[0] });

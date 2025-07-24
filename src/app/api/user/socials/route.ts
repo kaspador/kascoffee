@@ -60,11 +60,14 @@ export async function POST(request: NextRequest) {
 
 		// Create new social link
 		const newSocial = await db.insert(socials).values({
+			id: crypto.randomUUID(),
 			userId: session.user.id,
 			platform: validatedData.platform,
 			url: validatedData.url,
 			username: validatedData.username || '',
-			isVisible: validatedData.isVisible
+			isVisible: validatedData.isVisible,
+			createdAt: new Date(),
+			updatedAt: new Date()
 		}).returning();
 
 		return NextResponse.json({ social: newSocial[0] });
