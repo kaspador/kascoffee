@@ -8,11 +8,12 @@ import * as schema from '@/lib/db/schema';
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
 		provider: 'pg',
-		// Fixed timestamp handling for Better Auth compatibility
+		// Use Better Auth's exact schema requirements
 		schema: {
-			user: schema.users,
-			session: schema.sessions,
-			account: schema.accounts
+			user: schema.user,
+			session: schema.session,
+			account: schema.account,
+			verification: schema.verification
 		}
 	}),
 	secret: process.env.BETTER_AUTH_SECRET || 'fallback-secret-for-development',
