@@ -1,15 +1,15 @@
-# Database Configuration
-DATABASE_URL="postgresql://username:password@hostname:port/database"
+# Database
+DATABASE_URL="postgresql://user:password@host:port/database"
 
-# Authentication
-BETTER_AUTH_SECRET="your-32-character-secret-key-here"
-BETTER_AUTH_URL="https://your-app.railway.app"
+# Better Auth Configuration
+BETTER_AUTH_SECRET="your-secure-random-secret-key-here"
+BETTER_AUTH_URL="https://your-domain.com"
 
-# Social Auth (Optional)
-GOOGLE_CLIENT_ID="your-google-client-id"
-GOOGLE_CLIENT_SECRET="your-google-client-secret"
+# Social Providers (Optional)
 GITHUB_CLIENT_ID="your-github-client-id"
 GITHUB_CLIENT_SECRET="your-github-client-secret"
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
 
 # Directus Configuration
 DIRECTUS_URL="https://your-directus.railway.app"

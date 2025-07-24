@@ -16,8 +16,8 @@ export const auth = betterAuth({
 			verification: schema.verification
 		}
 	}),
-	secret: process.env.BETTER_AUTH_SECRET || 'fallback-secret-for-development',
-	baseURL: process.env.BETTER_AUTH_URL || 'https://kas.coffee',
+	secret: process.env.BETTER_AUTH_SECRET || process.env.AUTH_SECRET || 'fallback-secret-for-development-only-not-for-production',
+	baseURL: process.env.BETTER_AUTH_URL || (typeof window !== 'undefined' ? window.location.origin : 'https://kas.coffee'),
 	trustedOrigins: [
 		'http://localhost:3000', 
 		'http://localhost:3001',
@@ -30,7 +30,9 @@ export const auth = betterAuth({
 	},
 	emailAndPassword: {
 		enabled: true,
-		requireEmailVerification: false // Disable for development
+		requireEmailVerification: false, // Disable for development
+		minPasswordLength: 6,
+		maxPasswordLength: 128
 	},
 	socialProviders: {
 		github: {
@@ -41,6 +43,14 @@ export const auth = betterAuth({
 			clientId: process.env.GOOGLE_CLIENT_ID || '',
 			clientSecret: process.env.GOOGLE_CLIENT_SECRET || ''
 		}
+	},
+	logger: {
+		level: 'error'
+	},
+	rateLimit: {
+		enabled: true,
+		window: 60,
+		max: 100
 	}
 });
 
