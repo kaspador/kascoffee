@@ -15,6 +15,7 @@ async function runMigration() {
     // Read and execute the nuclear fix migration
     const nuclearFixSQL = readFileSync(join(__dirname, 'nuclear-fix.sql'), 'utf8');
     const addExpiresAtSQL = readFileSync(join(__dirname, 'add-expires-at-back.sql'), 'utf8');
+    const sessionTokenTriggerSQL = readFileSync(join(__dirname, 'session-token-trigger.sql'), 'utf8');
     
     console.log('Running nuclear fix migration - recreating Better Auth tables...');
     await sql.unsafe(nuclearFixSQL);
@@ -23,6 +24,10 @@ async function runMigration() {
     console.log('Adding back expires_at field...');
     await sql.unsafe(addExpiresAtSQL);
     console.log('✓ expires_at field added back');
+    
+    console.log('Adding session token auto-generation trigger...');
+    await sql.unsafe(sessionTokenTriggerSQL);
+    console.log('✓ Session token trigger added');
     
     console.log('All migrations completed successfully!');
     
