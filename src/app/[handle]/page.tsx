@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,7 +10,7 @@ import { FaTwitter, FaDiscord, FaTelegram, FaGlobe, FaGithub } from 'react-icons
 import parse from 'html-react-parser';
 import QRCodeDisplay from '@/components/qr-code-display';
 import { db } from '@/lib/db';
-import { userPages, socials, users } from '@/lib/db/schema';
+import { userPages, socials } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
 interface UserPageData {
@@ -164,7 +165,7 @@ export default async function UserProfilePage({ params }: PageProps) {
 			<div className="relative z-10 container mx-auto px-4 py-8 md:py-12">
 				{/* Navigation */}
 				<div className="flex justify-between items-center mb-8">
-					<a 
+					<Link 
 						href="/"
 						className="inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 hover:bg-white/10 transition-all duration-300 font-semibold"
 						style={{ 
@@ -174,7 +175,7 @@ export default async function UserProfilePage({ params }: PageProps) {
 					>
 						<Coffee className="w-4 h-4" />
 						kas.coffee
-					</a>
+					</Link>
 					
 					<div className="flex items-center gap-2">
 						<Button

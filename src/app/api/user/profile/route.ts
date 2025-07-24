@@ -101,7 +101,7 @@ export async function PUT(request: NextRequest) {
 		}
 
 		// Update the user page
-		const updateData: any = {
+		const updateData: Record<string, unknown> = {
 			...validatedData,
 			...(sanitizedLongDescription !== undefined && { longDescription: sanitizedLongDescription }),
 			updatedAt: new Date()

@@ -37,7 +37,7 @@ const socialPlatforms = [
   { value: 'website', label: 'Website', icon: Globe },
 ];
 
-export function SocialLinksForm({ socials: initialSocials, isLoading, onSuccess }: SocialLinksFormProps) {
+export function SocialLinksForm({ socials: initialSocials, isLoading, onSuccess: _onSuccess }: SocialLinksFormProps) {
   // Mock form since we're not connected to database
   const socials = initialSocials || [];
 

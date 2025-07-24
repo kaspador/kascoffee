@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ProfileForm } from '@/components/dashboard/profile-form';
 import { ThemeCustomization } from '@/components/dashboard/theme-customization';
 import { SocialLinksForm } from '@/components/dashboard/social-links-form';
-import { ExternalLink, User, Palette, Link as LinkIcon, Settings, Eye, Copy, LogOut, Coffee, Sparkles, TrendingUp, Users } from 'lucide-react';
+import { User, Palette, Link as LinkIcon, Settings, Eye, Copy, LogOut, Coffee, Sparkles, TrendingUp, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useSession, signOut } from '@/lib/auth-client';
 
@@ -35,7 +35,7 @@ export default function DashboardPage() {
 	const { data: session, isPending } = useSession();
 	const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 	const [profileLoading, setProfileLoading] = useState(false);
-	const [socials, setSocials] = useState<any>(null);
+	const [socials, setSocials] = useState<{socials: Array<{id: string; platform: string; url: string; username: string; isVisible: boolean}>} | null>(null);
 	const router = useRouter();
 
 	// Function to fetch profile data from API
