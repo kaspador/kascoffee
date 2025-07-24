@@ -15,6 +15,7 @@ async function runMigration() {
     // Read and execute the SQL migrations
     const expiresAtSQL = readFileSync(join(__dirname, 'add-expires-at.sql'), 'utf8');
     const restoreDefaultsSQL = readFileSync(join(__dirname, 'restore-defaults.sql'), 'utf8');
+    const fixSessionSQL = readFileSync(join(__dirname, 'fix-session-table.sql'), 'utf8');
     
     console.log('Running migration to add expires_at column...');
     await sql.unsafe(expiresAtSQL);
@@ -23,6 +24,10 @@ async function runMigration() {
     console.log('Running migration to restore timestamp defaults...');
     await sql.unsafe(restoreDefaultsSQL);
     console.log('✓ Restored defaults migration completed');
+    
+    console.log('Running migration to fix session table...');
+    await sql.unsafe(fixSessionSQL);
+    console.log('✓ Session table fix migration completed');
     
     console.log('All migrations completed successfully!');
     
