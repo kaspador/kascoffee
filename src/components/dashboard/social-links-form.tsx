@@ -27,6 +27,7 @@ interface Social {
 interface SocialLinksFormProps {
   socials: Social[];
   isLoading: boolean;
+  onSuccess?: () => void;
 }
 
 const socialPlatforms = [
@@ -36,7 +37,7 @@ const socialPlatforms = [
   { value: 'website', label: 'Website', icon: Globe },
 ];
 
-export function SocialLinksForm({ socials: initialSocials, isLoading }: SocialLinksFormProps) {
+export function SocialLinksForm({ socials: initialSocials, isLoading, onSuccess }: SocialLinksFormProps) {
   // Mock form since we're not connected to database
   const socials = initialSocials || [];
 

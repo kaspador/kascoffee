@@ -15,8 +15,13 @@ export const auth = betterAuth({
 		}
 	}),
 	secret: process.env.BETTER_AUTH_SECRET || 'fallback-secret-for-development',
-	baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
-	trustedOrigins: ['http://localhost:3000', 'http://localhost:3001'],
+	baseURL: process.env.BETTER_AUTH_URL || 'https://kas.coffee',
+	trustedOrigins: [
+		'http://localhost:3000', 
+		'http://localhost:3001',
+		'https://kas.coffee',
+		'https://*.kas.coffee'
+	],
 	session: {
 		expiresIn: 60 * 60 * 24 * 7, // 7 days
 		updateAge: 60 * 60 * 24 // 1 day

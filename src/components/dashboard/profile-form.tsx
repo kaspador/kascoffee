@@ -7,102 +7,75 @@ import { z } from 'zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import { RichTextEditor } from '@/components/rich-text-editor';
-import { Loader2, Check, AlertCircle } from 'lucide-react';
 import { validateKaspaAddress } from '@/lib/utils/kaspa-validation';
-import type { UserPage } from '@/lib/db/schema';
 
-const profileSchema = z.object({
-	handle: z
-		.string()
-		.min(3, 'Handle must be at least 3 characters')
-		.max(50, 'Handle must be less than 50 characters')
-		.regex(/^[a-z0-9_-]+$/, 'Handle must be lowercase alphanumeric with underscores and hyphens only'),
-	displayName: z
-		.string()
-		.min(1, 'Display name is required')
-		.max(100, 'Display name must be less than 100 characters'),
-	shortDescription: z
-		.string()
-		.max(300, 'Short description must be less than 300 characters')
-		.optional(),
-	longDescription: z.string().optional(),
-	kaspaAddress: z
-		.string()
-		.min(1, 'Kaspa address is required')
-		.refine(validateKaspaAddress, 'Invalid Kaspa address'),
-	profileImage: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-	backgroundImage: z.string().url('Must be a valid URL').optional().or(z.literal(''))
+// Zod schema for form validation
+const profileFormSchema = z.object({
+	handle: z.string().min(1, 'Handle is required').max(50, 'Handle must be less than 50 characters'),
+	displayName: z.string().min(1, 'Display name is required').max(100, 'Display name must be less than 100 characters'),
+	kaspaAddress: z.string().refine(
+		(address) => validateKaspaAddress(address),
+		'Please enter a valid Kaspa address'
+	),
+	shortDescription: z.string().max(300, 'Short description must be less than 300 characters').optional(),
+	profileImage: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
+	backgroundImage: z.string().url('Please enter a valid URL').optional().or(z.literal(''))
 });
 
-type ProfileFormData = z.infer<typeof profileSchema>;
+type ProfileFormData = z.infer<typeof profileFormSchema>;
 
 interface ProfileFormProps {
-	userPage?: UserPage;
+	userPage?: {
+		handle: string;
+		id: string;
+		displayName: string;
+		createdAt: Date;
+		updatedAt: Date;
+		userId: string;
+		shortDescription: string | null;
+		longDescription: string | null;
+		kaspaAddress: string;
+		profileImage: string | null;
+		backgroundImage: string | null;
+		backgroundColor: string;
+		foregroundColor: string;
+		isActive: boolean;
+		viewCount: number | null;
+	};
 	isLoading?: boolean;
+	onSuccess?: () => void;
 }
 
-// Helper function to get mock session from localStorage
-function getMockSessionHeader() {
-	if (typeof window === 'undefined') return null;
-	
-	const sessionData = localStorage.getItem('kas-coffee-session');
-	if (!sessionData) return null;
-	
-	try {
-		const session = JSON.parse(sessionData);
-		const expires = new Date(session.expires);
-		
-		if (expires <= new Date()) {
-			localStorage.removeItem('kas-coffee-session');
-			return null;
-		}
-		
-		return `Bearer ${sessionData}`;
-	} catch {
-		localStorage.removeItem('kas-coffee-session');
-		return null;
-	}
-}
-
-export function ProfileForm({ userPage, isLoading }: ProfileFormProps) {
+export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps) {
 	const [longDescription, setLongDescription] = useState(userPage?.longDescription || '');
 	const queryClient = useQueryClient();
 
 	const {
 		register,
 		handleSubmit,
-		formState: { errors },
 		watch,
-		setValue
+		formState: { errors }
 	} = useForm<ProfileFormData>({
-		resolver: zodResolver(profileSchema),
+		resolver: zodResolver(profileFormSchema),
 		defaultValues: {
 			handle: userPage?.handle || '',
 			displayName: userPage?.displayName || '',
-			shortDescription: userPage?.shortDescription || '',
-			longDescription: userPage?.longDescription || '',
 			kaspaAddress: userPage?.kaspaAddress || '',
+			shortDescription: userPage?.shortDescription || '',
 			profileImage: userPage?.profileImage || '',
 			backgroundImage: userPage?.backgroundImage || ''
 		}
 	});
 
 	const updateProfileMutation = useMutation({
-		mutationFn: async (data: ProfileFormData) => {
-			const authHeader = getMockSessionHeader();
-			if (!authHeader) {
-				throw new Error('Please sign in again');
-			}
-
+		mutationFn: async (data: ProfileFormData & { longDescription: string }) => {
 			const response = await fetch('/api/user/profile', {
 				method: 'PUT',
 				headers: { 
 					'Content-Type': 'application/json',
-					'Authorization': authHeader
 				},
 				body: JSON.stringify(data)
 			});
@@ -115,6 +88,7 @@ export function ProfileForm({ userPage, isLoading }: ProfileFormProps) {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['profile'] });
+			onSuccess?.();
 		}
 	});
 
@@ -126,190 +100,188 @@ export function ProfileForm({ userPage, isLoading }: ProfileFormProps) {
 
 	if (isLoading) {
 		return (
-			<div className="space-y-4">
+			<div className="space-y-6">
 				<div className="animate-pulse">
-					<div className="h-4 bg-muted rounded w-1/4 mb-2"></div>
-					<div className="h-10 bg-muted rounded"></div>
+					<div className="h-4 bg-slate-700 rounded w-1/4 mb-2"></div>
+					<div className="h-12 bg-slate-700 rounded"></div>
 				</div>
 				<div className="animate-pulse">
-					<div className="h-4 bg-muted rounded w-1/4 mb-2"></div>
-					<div className="h-10 bg-muted rounded"></div>
+					<div className="h-4 bg-slate-700 rounded w-1/4 mb-2"></div>
+					<div className="h-12 bg-slate-700 rounded"></div>
 				</div>
 				<div className="animate-pulse">
-					<div className="h-4 bg-muted rounded w-1/4 mb-2"></div>
-					<div className="h-20 bg-muted rounded"></div>
+					<div className="h-4 bg-slate-700 rounded w-1/4 mb-2"></div>
+					<div className="h-24 bg-slate-700 rounded"></div>
 				</div>
 			</div>
 		);
 	}
 
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+		<form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
 			{updateProfileMutation.error && (
-				<div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md dark:bg-red-950 dark:text-red-400 dark:border-red-800">
+				<div className="p-4 text-sm text-red-400 bg-red-900/20 border border-red-500/30 rounded-xl backdrop-blur-sm">
 					{updateProfileMutation.error.message}
 				</div>
 			)}
 
-			{updateProfileMutation.isSuccess && (
-				<div className="p-3 text-sm text-[#70C7BA] bg-[#70C7BA]/10 border border-[#70C7BA]/30 rounded-md dark:bg-[#70C7BA]/10 dark:text-[#70C7BA] dark:border-[#70C7BA]/30 flex items-center gap-2">
-					<Check className="h-4 w-4" />
-					Profile updated successfully!
-				</div>
-			)}
-
-			<div className="grid md:grid-cols-2 gap-6">
-				{/* Basic Information */}
-				<Card>
-					<CardHeader>
-						<CardTitle className="text-lg">Basic Information</CardTitle>
-					</CardHeader>
-					<CardContent className="space-y-4">
+			{/* Basic Information Section */}
+			<div className="space-y-6">
+				<div>
+					<h3 className="text-lg font-kaspa-header font-bold text-[#70C7BA] mb-4 flex items-center gap-2">
+						✨ Basic Information
+					</h3>
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 						<div className="space-y-2">
-							<Label htmlFor="handle">Handle *</Label>
+							<Label htmlFor="handle" className="text-gray-300 font-kaspa-body font-semibold">
+								Handle *
+							</Label>
 							<Input
 								id="handle"
-								placeholder="your-unique-handle"
 								{...register('handle')}
-								disabled={updateProfileMutation.isPending}
+								placeholder="your-unique-handle"
+								className="bg-slate-800/50 border-[#70C7BA]/30 text-white placeholder:text-gray-500 focus:border-[#70C7BA] focus:ring-[#70C7BA]/20 rounded-xl font-kaspa-body transition-all duration-300"
 							/>
 							{errors.handle && (
-								<p className="text-sm text-red-600 flex items-center gap-1">
-									<AlertCircle className="h-3 w-3" />
-									{errors.handle.message}
-								</p>
+								<p className="text-red-400 text-sm font-kaspa-body">{errors.handle.message}</p>
 							)}
-							<p className="text-xs text-muted-foreground">
-								This will be your unique URL: kas.coffee/{watch('handle')}
+							<p className="text-xs text-gray-500 font-kaspa-body">
+								This will be your unique URL: kas.coffee/your-handle
 							</p>
 						</div>
 
 						<div className="space-y-2">
-							<Label htmlFor="displayName">Display Name *</Label>
+							<Label htmlFor="displayName" className="text-gray-300 font-kaspa-body font-semibold">
+								Display Name *
+							</Label>
 							<Input
 								id="displayName"
-								placeholder="Your Name"
 								{...register('displayName')}
-								disabled={updateProfileMutation.isPending}
+								placeholder="Your Name"
+								className="bg-slate-800/50 border-[#70C7BA]/30 text-white placeholder:text-gray-500 focus:border-[#70C7BA] focus:ring-[#70C7BA]/20 rounded-xl font-kaspa-body transition-all duration-300"
 							/>
 							{errors.displayName && (
-								<p className="text-sm text-red-600 flex items-center gap-1">
-									<AlertCircle className="h-3 w-3" />
-									{errors.displayName.message}
-								</p>
+								<p className="text-red-400 text-sm font-kaspa-body">{errors.displayName.message}</p>
 							)}
 						</div>
 
-						<div className="space-y-2">
-							<Label htmlFor="kaspaAddress">Kaspa Address *</Label>
+						<div className="space-y-2 md:col-span-2">
+							<Label htmlFor="kaspaAddress" className="text-gray-300 font-kaspa-body font-semibold">
+								Kaspa Address *
+							</Label>
 							<Input
 								id="kaspaAddress"
-								placeholder="kaspa:qqr..."
 								{...register('kaspaAddress')}
-								disabled={updateProfileMutation.isPending}
+								placeholder="kaspa:qq..."
+								className="bg-slate-800/50 border-[#70C7BA]/30 text-white placeholder:text-gray-500 focus:border-[#70C7BA] focus:ring-[#70C7BA]/20 rounded-xl font-kaspa-body transition-all duration-300"
 							/>
 							{errors.kaspaAddress && (
-								<p className="text-sm text-red-600 flex items-center gap-1">
-									<AlertCircle className="h-3 w-3" />
-									{errors.kaspaAddress.message}
-								</p>
+								<p className="text-red-400 text-sm font-kaspa-body">{errors.kaspaAddress.message}</p>
 							)}
-							<p className="text-xs text-muted-foreground">
+							<p className="text-xs text-gray-500 font-kaspa-body">
 								Your Kaspa wallet address where donations will be sent
 							</p>
 						</div>
-					</CardContent>
-				</Card>
-
-				{/* Images */}
-				<Card>
-					<CardHeader>
-						<CardTitle className="text-lg">Images</CardTitle>
-					</CardHeader>
-					<CardContent className="space-y-4">
-						<div className="space-y-2">
-							<Label htmlFor="profileImage">Profile Image URL</Label>
-							<Input
-								id="profileImage"
-								placeholder="https://example.com/image.jpg"
-								{...register('profileImage')}
-								disabled={updateProfileMutation.isPending}
-							/>
-							{errors.profileImage && (
-								<p className="text-sm text-red-600 flex items-center gap-1">
-									<AlertCircle className="h-3 w-3" />
-									{errors.profileImage.message}
-								</p>
-							)}
-						</div>
-
-						<div className="space-y-2">
-							<Label htmlFor="backgroundImage">Background Image URL</Label>
-							<Input
-								id="backgroundImage"
-								placeholder="https://example.com/background.jpg"
-								{...register('backgroundImage')}
-								disabled={updateProfileMutation.isPending}
-							/>
-							{errors.backgroundImage && (
-								<p className="text-sm text-red-600 flex items-center gap-1">
-									<AlertCircle className="h-3 w-3" />
-									{errors.backgroundImage.message}
-								</p>
-							)}
-						</div>
-					</CardContent>
-				</Card>
+					</div>
+				</div>
 			</div>
 
-			{/* Descriptions */}
-			<Card>
-				<CardHeader>
-					<CardTitle className="text-lg">Descriptions</CardTitle>
-				</CardHeader>
-				<CardContent className="space-y-6">
-					<div className="space-y-2">
-						<Label htmlFor="shortDescription">
-							Short Description ({shortDescriptionLength}/300)
-						</Label>
-						<Textarea
-							id="shortDescription"
-							placeholder="A brief description about yourself..."
-							{...register('shortDescription')}
-							disabled={updateProfileMutation.isPending}
-							maxLength={300}
-						/>
-						{errors.shortDescription && (
-							<p className="text-sm text-red-600 flex items-center gap-1">
-								<AlertCircle className="h-3 w-3" />
-								{errors.shortDescription.message}
-							</p>
-						)}
-					</div>
+			{/* Images Section */}
+			<div className="space-y-6">
+				<div>
+					<h3 className="text-lg font-kaspa-header font-bold text-[#49EACB] mb-4 flex items-center gap-2">
+						🖼️ Images
+					</h3>
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<div className="space-y-2">
+							<Label htmlFor="profileImage" className="text-gray-300 font-kaspa-body font-semibold">
+								Profile Image URL
+							</Label>
+							<Input
+								id="profileImage"
+								{...register('profileImage')}
+								placeholder="https://example.com/image.jpg"
+								className="bg-slate-800/50 border-[#49EACB]/30 text-white placeholder:text-gray-500 focus:border-[#49EACB] focus:ring-[#49EACB]/20 rounded-xl font-kaspa-body transition-all duration-300"
+							/>
+							{errors.profileImage && (
+								<p className="text-red-400 text-sm font-kaspa-body">{errors.profileImage.message}</p>
+							)}
+						</div>
 
-					<div className="space-y-2">
-						<Label>Long Description</Label>
-						<RichTextEditor
-							content={longDescription}
-							onChange={(content) => {
-								setLongDescription(content);
-								setValue('longDescription', content);
-							}}
-							placeholder="Tell your story, explain your work, add links..."
-							editable={!updateProfileMutation.isPending}
-						/>
+						<div className="space-y-2">
+							<Label htmlFor="backgroundImage" className="text-gray-300 font-kaspa-body font-semibold">
+								Background Image URL
+							</Label>
+							<Input
+								id="backgroundImage"
+								{...register('backgroundImage')}
+								placeholder="https://example.com/background.jpg"
+								className="bg-slate-800/50 border-[#49EACB]/30 text-white placeholder:text-gray-500 focus:border-[#49EACB] focus:ring-[#49EACB]/20 rounded-xl font-kaspa-body transition-all duration-300"
+							/>
+							{errors.backgroundImage && (
+								<p className="text-red-400 text-sm font-kaspa-body">{errors.backgroundImage.message}</p>
+							)}
+						</div>
 					</div>
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 
-			<Button
-				type="submit"
-				disabled={updateProfileMutation.isPending}
-				className="w-full md:w-auto bg-gradient-to-r from-[#70C7BA] to-[#49EACB] hover:from-[#49EACB] hover:to-[#70C7BA] text-white font-semibold rounded-xl shadow-lg hover:shadow-[#70C7BA]/25 transition-all duration-300"
-			>
-				{updateProfileMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-				Save Profile
-			</Button>
+			{/* Descriptions Section */}
+			<div className="space-y-6">
+				<div>
+					<h3 className="text-lg font-kaspa-header font-bold text-[#70C7BA] mb-4 flex items-center gap-2">
+						📝 Descriptions
+					</h3>
+					<div className="space-y-6">
+						<div className="space-y-2">
+							<Label htmlFor="shortDescription" className="text-gray-300 font-kaspa-body font-semibold">
+								Short Description ({shortDescriptionLength}/300)
+							</Label>
+							<Textarea
+								id="shortDescription"
+								{...register('shortDescription')}
+								placeholder="A brief description about yourself..."
+								className="bg-slate-800/50 border-[#70C7BA]/30 text-white placeholder:text-gray-500 focus:border-[#70C7BA] focus:ring-[#70C7BA]/20 rounded-xl font-kaspa-body transition-all duration-300 min-h-[100px]"
+								maxLength={300}
+							/>
+							{errors.shortDescription && (
+								<p className="text-red-400 text-sm font-kaspa-body">{errors.shortDescription.message}</p>
+							)}
+						</div>
+
+						<div className="space-y-2">
+							<Label className="text-gray-300 font-kaspa-body font-semibold">
+								Long Description (Rich Text)
+							</Label>
+							<div className="bg-slate-800/50 border border-[#70C7BA]/30 rounded-xl overflow-hidden transition-all duration-300 focus-within:border-[#70C7BA]">
+								<RichTextEditor
+									content={longDescription}
+									onChange={setLongDescription}
+									placeholder="Tell your supporters more about yourself and what you're working on..."
+								/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			{/* Submit Button */}
+			<div className="flex justify-end pt-6 border-t border-[#70C7BA]/20">
+				<Button
+					type="submit"
+					disabled={updateProfileMutation.isPending}
+					className="bg-gradient-to-r from-[#70C7BA] to-[#49EACB] hover:from-[#5ba8a0] hover:to-[#3dd4b4] text-white px-8 py-3 font-kaspa-subheader font-bold rounded-xl shadow-lg hover:shadow-[#70C7BA]/25 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+				>
+					{updateProfileMutation.isPending ? (
+						<>
+							<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+							Saving Profile...
+						</>
+					) : (
+						'💾 Save Profile'
+					)}
+				</Button>
+			</div>
 		</form>
 	);
 } 
