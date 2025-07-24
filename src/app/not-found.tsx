@@ -12,8 +12,8 @@ export default function NotFound() {
 					<CardTitle className="text-2xl">Page Not Found</CardTitle>
 				</CardHeader>
 				<CardContent className="text-center space-y-4">
-					<p className="text-muted-foreground">
-						The page you're looking for doesn't exist or has been moved.
+					<p className="text-lg text-gray-400 mb-8">
+						Sorry, we couldn&apos;t find the page you&apos;re looking for.
 					</p>
 					<div className="flex flex-col sm:flex-row gap-2 justify-center">
 						<Button asChild variant="default">

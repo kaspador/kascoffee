@@ -8,7 +8,6 @@ import { Separator } from './ui/separator';
 import {
 	Bold,
 	Italic,
-	Underline,
 	Strikethrough,
 	Code,
 	Heading1,
@@ -54,6 +53,7 @@ export function RichTextEditor({
 		],
 		content,
 		editable,
+		immediatelyRender: false, // Fix SSR hydration mismatch
 		onUpdate: ({ editor }) => {
 			onChange(editor.getHTML());
 		},

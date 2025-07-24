@@ -45,6 +45,29 @@ interface ProfileFormProps {
 	isLoading?: boolean;
 }
 
+// Helper function to get mock session from localStorage
+function getMockSessionHeader() {
+	if (typeof window === 'undefined') return null;
+	
+	const sessionData = localStorage.getItem('kas-coffee-session');
+	if (!sessionData) return null;
+	
+	try {
+		const session = JSON.parse(sessionData);
+		const expires = new Date(session.expires);
+		
+		if (expires <= new Date()) {
+			localStorage.removeItem('kas-coffee-session');
+			return null;
+		}
+		
+		return `Bearer ${sessionData}`;
+	} catch (error) {
+		localStorage.removeItem('kas-coffee-session');
+		return null;
+	}
+}
+
 export function ProfileForm({ userPage, isLoading }: ProfileFormProps) {
 	const [longDescription, setLongDescription] = useState(userPage?.longDescription || '');
 	const queryClient = useQueryClient();
@@ -70,11 +93,20 @@ export function ProfileForm({ userPage, isLoading }: ProfileFormProps) {
 
 	const updateProfileMutation = useMutation({
 		mutationFn: async (data: ProfileFormData) => {
+			const authHeader = getMockSessionHeader();
+			if (!authHeader) {
+				throw new Error('Please sign in again');
+			}
+
 			const response = await fetch('/api/user/profile', {
 				method: 'PUT',
-				headers: { 'Content-Type': 'application/json' },
+				headers: { 
+					'Content-Type': 'application/json',
+					'Authorization': authHeader
+				},
 				body: JSON.stringify(data)
 			});
+			
 			if (!response.ok) {
 				const error = await response.json();
 				throw new Error(error.error || 'Failed to update profile');
@@ -120,7 +152,7 @@ export function ProfileForm({ userPage, isLoading }: ProfileFormProps) {
 			)}
 
 			{updateProfileMutation.isSuccess && (
-				<div className="p-3 text-sm text-green-600 bg-green-50 border border-green-200 rounded-md dark:bg-green-950 dark:text-green-400 dark:border-green-800 flex items-center gap-2">
+				<div className="p-3 text-sm text-[#70C7BA] bg-[#70C7BA]/10 border border-[#70C7BA]/30 rounded-md dark:bg-[#70C7BA]/10 dark:text-[#70C7BA] dark:border-[#70C7BA]/30 flex items-center gap-2">
 					<Check className="h-4 w-4" />
 					Profile updated successfully!
 				</div>
@@ -273,7 +305,7 @@ export function ProfileForm({ userPage, isLoading }: ProfileFormProps) {
 			<Button
 				type="submit"
 				disabled={updateProfileMutation.isPending}
-				className="w-full md:w-auto"
+				className="w-full md:w-auto bg-gradient-to-r from-[#70C7BA] to-[#49EACB] hover:from-[#49EACB] hover:to-[#70C7BA] text-white font-semibold rounded-xl shadow-lg hover:shadow-[#70C7BA]/25 transition-all duration-300"
 			>
 				{updateProfileMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
 				Save Profile

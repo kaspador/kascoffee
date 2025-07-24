@@ -1,256 +1,239 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { signIn, signUp } from '@/lib/auth-client';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { FaGoogle, FaGithub, FaTwitter } from 'react-icons/fa';
-import { Coffee, Loader2 } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-
-const signUpSchema = z.object({
-	name: z.string().min(2, 'Name must be at least 2 characters'),
-	email: z.string().email('Please enter a valid email address'),
-	password: z.string().min(6, 'Password must be at least 6 characters'),
-	confirmPassword: z.string()
-}).refine((data) => data.password === data.confirmPassword, {
-	message: "Passwords don't match",
-	path: ["confirmPassword"]
-});
-
-type SignUpFormData = z.infer<typeof signUpSchema>;
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Coffee, Mail, Lock, User, ArrowLeft, Github, AlertCircle } from "lucide-react";
+import { FaGoogle } from "react-icons/fa";
+import { signUp, signIn } from "@/lib/auth-client";
 
 export default function SignUpPage() {
 	const [isLoading, setIsLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-	const [success, setSuccess] = useState(false);
+	const [name, setName] = useState("");
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+	const [error, setError] = useState("");
 	const router = useRouter();
 
-	const {
-		register,
-		handleSubmit,
-		formState: { errors }
-	} = useForm<SignUpFormData>({
-		resolver: zodResolver(signUpSchema)
-	});
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setError("");
+		setIsLoading(true);
 
-	const handleOAuthSignIn = async (provider: 'google' | 'github' | 'twitter') => {
 		try {
-			setIsLoading(true);
-			setError(null);
-			await signIn.social({
-				provider,
-				callbackURL: '/dashboard'
-			});
-		} catch (err) {
-			setError('Failed to sign in. Please try again.');
-			console.error('OAuth sign in error:', err);
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
-	const onSubmit = async (data: SignUpFormData) => {
-		try {
-			setIsLoading(true);
-			setError(null);
-			
 			const result = await signUp.email({
-				email: data.email,
-				password: data.password,
-				name: data.name,
-				callbackURL: '/dashboard'
+				email,
+				password,
+				name,
 			});
 
 			if (result.error) {
-				setError(result.error.message || 'Failed to create account');
-				return;
+				setError(result.error.message || "Failed to create account");
+			} else {
+				// Redirect to onboarding on successful signup
+				router.push("/onboarding");
 			}
-
-			setSuccess(true);
-			// Optional: Auto-redirect after successful registration
-			setTimeout(() => {
-				router.push('/dashboard');
-			}, 2000);
 		} catch (err) {
-			setError('Failed to create account. Please try again.');
-			console.error('Email sign up error:', err);
+			setError("An unexpected error occurred. Please try again.");
+			console.error("Sign up error:", err);
 		} finally {
 			setIsLoading(false);
 		}
 	};
 
-	if (success) {
-		return (
-			<div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950 dark:to-amber-950">
-				<Card className="w-full max-w-md">
-					<CardContent className="text-center py-8">
-						<div className="text-6xl mb-4">🎉</div>
-						<h2 className="text-2xl font-bold mb-2">Welcome to kas.coffee!</h2>
-						<p className="text-muted-foreground mb-4">
-							Your account has been created successfully. Redirecting to your dashboard...
-						</p>
-						<Button asChild>
-							<Link href="/dashboard">Go to Dashboard</Link>
-						</Button>
-					</CardContent>
-				</Card>
-			</div>
-		);
-	}
+	const handleGoogleSignUp = async () => {
+		setIsLoading(true);
+		try {
+			await signIn.social({
+				provider: "google",
+				callbackURL: "/onboarding",
+			});
+		} catch (err) {
+			setError("Failed to sign up with Google");
+			console.error("Google sign up error:", err);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const handleGithubSignUp = async () => {
+		setIsLoading(true);
+		try {
+			await signIn.social({
+				provider: "github",
+				callbackURL: "/onboarding",
+			});
+		} catch (err) {
+			setError("Failed to sign up with GitHub");
+			console.error("GitHub sign up error:", err);
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
 	return (
-		<div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950 dark:to-amber-950">
-			<div className="w-full max-w-md space-y-6">
-				<div className="text-center">
-					<Link href="/" className="inline-flex items-center gap-2 text-2xl font-bold">
-						<Coffee className="h-8 w-8" />
-						kas.coffee
-					</Link>
-					<p className="text-muted-foreground mt-2">Create your account and start receiving support</p>
+		<div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden flex items-center justify-center p-6">
+			{/* Animated background */}
+			<div className="absolute inset-0 bg-gradient-to-r from-[#70C7BA]/10 via-[#49EACB]/10 to-[#70C7BA]/10 animate-pulse"></div>
+			<div className="absolute top-20 left-20 w-72 h-72 bg-[#70C7BA]/20 rounded-full blur-3xl animate-pulse"></div>
+			<div className="absolute bottom-20 right-20 w-96 h-96 bg-[#49EACB]/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+
+			<div className="relative z-10 w-full max-w-md">
+				{/* Back to home */}
+				<div className="mb-8">
+					<Button variant="ghost" asChild className="text-white/80 hover:text-[#70C7BA] hover:bg-[#70C7BA]/10 rounded-full">
+						<Link href="/" className="flex items-center gap-2">
+							<ArrowLeft className="w-4 h-4" />
+							Back to Home
+						</Link>
+					</Button>
 				</div>
 
-				<Card>
-					<CardHeader>
-						<CardTitle className="text-center">Create Account</CardTitle>
+				<Card className="bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
+					<CardHeader className="text-center space-y-4">
+						{/* Logo */}
+						<div className="flex items-center justify-center gap-3 mb-4">
+							<div className="relative">
+								<Coffee className="h-10 w-10 text-[#70C7BA]" />
+								<div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-[#49EACB] to-[#70C7BA] rounded-full animate-pulse"></div>
+							</div>
+							<span className="text-2xl font-bold bg-gradient-to-r from-[#70C7BA] to-[#49EACB] bg-clip-text text-transparent">
+								kas.coffee
+							</span>
+						</div>
+						
+						<CardTitle className="text-2xl font-bold text-white">Create Your Account</CardTitle>
+						<CardDescription className="text-gray-400">
+							Start accepting Kaspa donations with your personalized page
+						</CardDescription>
 					</CardHeader>
-					<CardContent className="space-y-4">
+
+					<CardContent className="space-y-6">
+						{/* Error Message */}
 						{error && (
-							<div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md dark:bg-red-950 dark:text-red-400 dark:border-red-800">
-								{error}
+							<div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 flex items-center gap-2">
+								<AlertCircle className="w-4 h-4 text-red-400" />
+								<span className="text-red-400 text-sm">{error}</span>
 							</div>
 						)}
 
-						{/* OAuth Providers */}
-						<div className="grid gap-2">
+						{/* Social Login Buttons */}
+						<div className="space-y-3">
 							<Button
 								variant="outline"
-								onClick={() => handleOAuthSignIn('google')}
+								className="w-full border-white/20 bg-white/5 hover:bg-white/10 text-white rounded-xl h-12"
 								disabled={isLoading}
-								className="w-full"
+								onClick={handleGoogleSignUp}
 							>
-								<FaGoogle className="mr-2 h-4 w-4" />
+								<FaGoogle className="w-5 h-5 mr-3" />
 								Continue with Google
 							</Button>
 							<Button
 								variant="outline"
-								onClick={() => handleOAuthSignIn('github')}
+								className="w-full border-white/20 bg-white/5 hover:bg-white/10 text-white rounded-xl h-12"
 								disabled={isLoading}
-								className="w-full"
+								onClick={handleGithubSignUp}
 							>
-								<FaGithub className="mr-2 h-4 w-4" />
+								<Github className="w-5 h-5 mr-3" />
 								Continue with GitHub
-							</Button>
-							<Button
-								variant="outline"
-								onClick={() => handleOAuthSignIn('twitter')}
-								disabled={isLoading}
-								className="w-full"
-							>
-								<FaTwitter className="mr-2 h-4 w-4" />
-								Continue with X
 							</Button>
 						</div>
 
 						<div className="relative">
 							<div className="absolute inset-0 flex items-center">
-								<Separator />
+								<Separator className="w-full bg-white/20" />
 							</div>
 							<div className="relative flex justify-center text-xs uppercase">
-								<span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+								<span className="bg-gradient-to-r from-slate-950 to-slate-900 px-2 text-gray-400">
+									Or continue with email
+								</span>
 							</div>
 						</div>
 
 						{/* Email/Password Form */}
-						<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+						<form className="space-y-4" onSubmit={handleSubmit}>
 							<div className="space-y-2">
-								<Label htmlFor="name">Full Name</Label>
-								<Input
-									id="name"
-									type="text"
-									placeholder="Enter your full name"
-									{...register('name')}
-									disabled={isLoading}
-								/>
-								{errors.name && (
-									<p className="text-sm text-red-600">{errors.name.message}</p>
-								)}
+								<Label htmlFor="name" className="text-white font-medium">Full Name</Label>
+								<div className="relative">
+									<User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+									<Input
+										id="name"
+										placeholder="Enter your full name"
+										value={name}
+										onChange={(e) => setName(e.target.value)}
+										className="pl-10 bg-white/5 border-white/20 text-white placeholder:text-gray-400 rounded-xl h-12 focus:border-[#70C7BA] focus:ring-[#70C7BA]"
+										required
+										disabled={isLoading}
+									/>
+								</div>
 							</div>
 
 							<div className="space-y-2">
-								<Label htmlFor="email">Email</Label>
-								<Input
-									id="email"
-									type="email"
-									placeholder="Enter your email"
-									{...register('email')}
-									disabled={isLoading}
-								/>
-								{errors.email && (
-									<p className="text-sm text-red-600">{errors.email.message}</p>
-								)}
+								<Label htmlFor="email" className="text-white font-medium">Email</Label>
+								<div className="relative">
+									<Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+									<Input
+										id="email"
+										type="email"
+										placeholder="Enter your email"
+										value={email}
+										onChange={(e) => setEmail(e.target.value)}
+										className="pl-10 bg-white/5 border-white/20 text-white placeholder:text-gray-400 rounded-xl h-12 focus:border-[#70C7BA] focus:ring-[#70C7BA]"
+										required
+										disabled={isLoading}
+									/>
+								</div>
 							</div>
 
 							<div className="space-y-2">
-								<Label htmlFor="password">Password</Label>
-								<Input
-									id="password"
-									type="password"
-									placeholder="Enter your password"
-									{...register('password')}
-									disabled={isLoading}
-								/>
-								{errors.password && (
-									<p className="text-sm text-red-600">{errors.password.message}</p>
-								)}
+								<Label htmlFor="password" className="text-white font-medium">Password</Label>
+								<div className="relative">
+									<Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+									<Input
+										id="password"
+										type="password"
+										placeholder="Create a password"
+										value={password}
+										onChange={(e) => setPassword(e.target.value)}
+										className="pl-10 bg-white/5 border-white/20 text-white placeholder:text-gray-400 rounded-xl h-12 focus:border-[#70C7BA] focus:ring-[#70C7BA]"
+										required
+										minLength={6}
+										disabled={isLoading}
+									/>
+								</div>
 							</div>
 
-							<div className="space-y-2">
-								<Label htmlFor="confirmPassword">Confirm Password</Label>
-								<Input
-									id="confirmPassword"
-									type="password"
-									placeholder="Confirm your password"
-									{...register('confirmPassword')}
-									disabled={isLoading}
-								/>
-								{errors.confirmPassword && (
-									<p className="text-sm text-red-600">{errors.confirmPassword.message}</p>
-								)}
-							</div>
-
-							<Button type="submit" className="w-full" disabled={isLoading}>
-								{isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-								Create Account
+							<Button
+								type="submit"
+								className="w-full bg-gradient-to-r from-[#70C7BA] to-[#49EACB] hover:from-[#49EACB] hover:to-[#70C7BA] text-white font-semibold rounded-xl h-12 shadow-lg hover:shadow-[#70C7BA]/25 transition-all duration-300"
+								disabled={isLoading || !name || !email || !password}
+							>
+								{isLoading ? "Creating Account..." : "Create Account"}
 							</Button>
 						</form>
 
-						<div className="text-center text-sm">
-							<span className="text-muted-foreground">Already have an account? </span>
-							<Link href="/auth/signin" className="text-primary hover:underline">
-								Sign in
-							</Link>
+						<div className="text-center">
+							<p className="text-gray-400 text-sm">
+								Already have an account?{" "}
+								<Link href="/auth/signin" className="text-[#70C7BA] hover:text-[#49EACB] font-medium transition-colors">
+									Sign in here
+								</Link>
+							</p>
+						</div>
+
+						<div className="text-center text-xs text-gray-500">
+							By creating an account, you agree to our{" "}
+							<Link href="/terms" className="text-[#70C7BA] hover:underline">Terms of Service</Link>
+							{" "}and{" "}
+							<Link href="/privacy" className="text-[#70C7BA] hover:underline">Privacy Policy</Link>
 						</div>
 					</CardContent>
 				</Card>
-
-				<p className="text-center text-xs text-muted-foreground">
-					By creating an account, you agree to our{' '}
-					<Link href="/terms" className="hover:underline">
-						Terms of Service
-					</Link>{' '}
-					and{' '}
-					<Link href="/privacy" className="hover:underline">
-						Privacy Policy
-					</Link>
-				</p>
 			</div>
 		</div>
 	);

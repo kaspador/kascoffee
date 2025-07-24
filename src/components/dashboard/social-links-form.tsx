@@ -1,239 +1,178 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Plus, Trash2, Check, AlertCircle } from 'lucide-react';
-import { FaTwitter, FaDiscord, FaTelegram, FaGlobe } from 'react-icons/fa';
-import type { Social } from '@/lib/db/schema';
+import { 
+  Plus, 
+  Trash2, 
+  ExternalLink,
+  Twitter,
+  Github,
+  Globe,
+  MessageCircle
+} from 'lucide-react';
 
-const socialSchema = z.object({
-	platform: z.enum(['twitter', 'discord', 'telegram', 'website']),
-	url: z.string().url('Must be a valid URL'),
-	username: z.string().max(100).optional(),
-	isVisible: z.boolean().default(true)
-});
-
-const socialLinksSchema = z.object({
-	socials: z.array(socialSchema)
-});
-
-type SocialLinksFormData = z.infer<typeof socialLinksSchema>;
-
-interface SocialLinksFormProps {
-	socials: Social[];
-	isLoading?: boolean;
+interface Social {
+  id: string;
+  platform: string;
+  url: string;
+  username?: string | null;
+  isVisible: boolean;
 }
 
-const socialIcons = {
-	twitter: FaTwitter,
-	discord: FaDiscord,
-	telegram: FaTelegram,
-	website: FaGlobe
-};
+interface SocialLinksFormProps {
+  socials: Social[];
+  isLoading: boolean;
+}
 
-const socialLabels = {
-	twitter: 'Twitter/X',
-	discord: 'Discord',
-	telegram: 'Telegram',
-	website: 'Website'
-};
+const socialPlatforms = [
+  { value: 'twitter', label: 'Twitter', icon: Twitter },
+  { value: 'github', label: 'GitHub', icon: Github },
+  { value: 'discord', label: 'Discord', icon: MessageCircle },
+  { value: 'website', label: 'Website', icon: Globe },
+];
 
-export function SocialLinksForm({ socials, isLoading }: SocialLinksFormProps) {
-	const queryClient = useQueryClient();
+export function SocialLinksForm({ socials: initialSocials, isLoading }: SocialLinksFormProps) {
+  // Mock form since we're not connected to database
+  const socials = initialSocials || [];
 
-	const {
-		control,
-		register,
-		handleSubmit,
-		formState: { errors },
-		watch,
-		setValue
-	} = useForm<SocialLinksFormData>({
-		resolver: zodResolver(socialLinksSchema),
-		defaultValues: {
-			socials: socials.length > 0 ? socials : [{ platform: 'twitter', url: '', username: '', isVisible: true }]
-		}
-	});
+  const getPlatformIcon = (platform: string) => {
+    const platformData = socialPlatforms.find(p => p.value === platform);
+    const Icon = platformData?.icon || Globe;
+    return <Icon className="w-4 h-4" />;
+  };
 
-	const { fields, append, remove } = useFieldArray({
-		control,
-		name: 'socials'
-	});
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-20 bg-muted/50 rounded-lg animate-pulse" />
+        ))}
+      </div>
+    );
+  }
 
-	const updateSocialsMutation = useMutation({
-		mutationFn: async (data: SocialLinksFormData) => {
-			const response = await fetch('/api/user/socials', {
-				method: 'PUT',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(data)
-			});
-			if (!response.ok) {
-				const error = await response.json();
-				throw new Error(error.error || 'Failed to update social links');
-			}
-			return response.json();
-		},
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['socials'] });
-		}
-	});
+  return (
+    <div className="space-y-6">
+      <div className="text-sm text-muted-foreground">
+        Connect your social media accounts to appear on your donation page
+      </div>
 
-	const onSubmit = (data: SocialLinksFormData) => {
-		// Filter out empty URLs
-		const filteredSocials = data.socials.filter(social => social.url.trim() !== '');
-		updateSocialsMutation.mutate({ socials: filteredSocials });
-	};
+      {/* Existing Socials */}
+      {socials.length > 0 && (
+        <div className="space-y-4">
+          <h4 className="font-medium">Your Social Links</h4>
+          {socials.map((social) => (
+            <Card key={social.id}>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {getPlatformIcon(social.platform)}
+                    <div>
+                      <div className="font-medium capitalize">{social.platform}</div>
+                      <div className="text-sm text-muted-foreground truncate max-w-xs">
+                        {social.url}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={social.isVisible ? 'default' : 'secondary'}>
+                      {social.isVisible ? 'Visible' : 'Hidden'}
+                    </Badge>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => window.open(social.url, '_blank')}
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
-	const addSocialLink = () => {
-		append({ platform: 'twitter', url: '', username: '', isVisible: true });
-	};
+      {/* Add New Social */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Add Social Link</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="platform">Platform</Label>
+              <Select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select platform" />
+                </SelectTrigger>
+                <SelectContent>
+                  {socialPlatforms.map((platform) => (
+                    <SelectItem key={platform.value} value={platform.value}>
+                      <div className="flex items-center gap-2">
+                        <platform.icon className="w-4 h-4" />
+                        {platform.label}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="username">Username (optional)</Label>
+              <Input
+                id="username"
+                placeholder="@username"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <Label htmlFor="url">URL</Label>
+            <Input
+              id="url"
+              type="url"
+              placeholder="https://..."
+            />
+          </div>
 
-	if (isLoading) {
-		return (
-			<div className="space-y-4">
-				{[1, 2, 3].map((i) => (
-					<div key={i} className="animate-pulse">
-						<div className="h-4 bg-muted rounded w-1/4 mb-2"></div>
-						<div className="h-10 bg-muted rounded"></div>
-					</div>
-				))}
-			</div>
-		);
-	}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="isVisible"
+                defaultChecked
+                className="rounded"
+              />
+              <Label htmlFor="isVisible" className="text-sm">
+                Show on donation page
+              </Label>
+            </div>
+            <Button>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Social Link
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
-	return (
-		<form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-			{updateSocialsMutation.error && (
-				<div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md dark:bg-red-950 dark:text-red-400 dark:border-red-800">
-					{updateSocialsMutation.error.message}
-				</div>
-			)}
-
-			{updateSocialsMutation.isSuccess && (
-				<div className="p-3 text-sm text-green-600 bg-green-50 border border-green-200 rounded-md dark:bg-green-950 dark:text-green-400 dark:border-green-800 flex items-center gap-2">
-					<Check className="h-4 w-4" />
-					Social links updated successfully!
-				</div>
-			)}
-
-			<div className="space-y-4">
-				{fields.map((field, index) => {
-					const platform = watch(`socials.${index}.platform`);
-					const Icon = socialIcons[platform];
-
-					return (
-						<Card key={field.id}>
-							<CardHeader className="pb-3">
-								<CardTitle className="flex items-center justify-between">
-									<div className="flex items-center gap-2">
-										<Icon className="h-4 w-4" />
-										{socialLabels[platform]}
-									</div>
-									{fields.length > 1 && (
-										<Button
-											type="button"
-											variant="outline"
-											size="sm"
-											onClick={() => remove(index)}
-											disabled={updateSocialsMutation.isPending}
-										>
-											<Trash2 className="h-4 w-4" />
-										</Button>
-									)}
-								</CardTitle>
-							</CardHeader>
-							<CardContent className="space-y-4">
-								<div className="grid md:grid-cols-2 gap-4">
-									<div className="space-y-2">
-										<Label>Platform</Label>
-										<Select
-											value={platform}
-											onValueChange={(value) => setValue(`socials.${index}.platform` as const, value as any)}
-											disabled={updateSocialsMutation.isPending}
-										>
-											<SelectTrigger>
-												<SelectValue />
-											</SelectTrigger>
-											<SelectContent>
-												<SelectItem value="twitter">Twitter/X</SelectItem>
-												<SelectItem value="discord">Discord</SelectItem>
-												<SelectItem value="telegram">Telegram</SelectItem>
-												<SelectItem value="website">Website</SelectItem>
-											</SelectContent>
-										</Select>
-									</div>
-
-									<div className="space-y-2">
-										<Label>Username (optional)</Label>
-										<Input
-											placeholder="@username"
-											{...register(`socials.${index}.username`)}
-											disabled={updateSocialsMutation.isPending}
-										/>
-									</div>
-								</div>
-
-								<div className="space-y-2">
-									<Label>URL *</Label>
-									<Input
-										placeholder="https://twitter.com/username"
-										{...register(`socials.${index}.url`)}
-										disabled={updateSocialsMutation.isPending}
-									/>
-									{errors.socials?.[index]?.url && (
-										<p className="text-sm text-red-600 flex items-center gap-1">
-											<AlertCircle className="h-3 w-3" />
-											{errors.socials[index]?.url?.message}
-										</p>
-									)}
-								</div>
-
-								<div className="flex items-center space-x-2">
-									<input
-										type="checkbox"
-										id={`visible-${index}`}
-										{...register(`socials.${index}.isVisible`)}
-										disabled={updateSocialsMutation.isPending}
-										className="h-4 w-4"
-									/>
-									<Label htmlFor={`visible-${index}`} className="text-sm">
-										Show on profile page
-									</Label>
-								</div>
-							</CardContent>
-						</Card>
-					);
-				})}
-			</div>
-
-			<div className="flex gap-3">
-				<Button
-					type="button"
-					variant="outline"
-					onClick={addSocialLink}
-					disabled={updateSocialsMutation.isPending}
-					className="flex items-center gap-2"
-				>
-					<Plus className="h-4 w-4" />
-					Add Social Link
-				</Button>
-
-				<Button
-					type="submit"
-					disabled={updateSocialsMutation.isPending}
-				>
-					{updateSocialsMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-					Save Social Links
-				</Button>
-			</div>
-		</form>
-	);
+      {socials.length === 0 && (
+        <div className="text-center py-8 text-muted-foreground">
+          No social links added yet. Add your first social link above.
+        </div>
+      )}
+    </div>
+  );
 } 

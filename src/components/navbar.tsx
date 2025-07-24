@@ -1,173 +1,100 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { useSession, signOut } from '@/lib/auth-client';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ThemeToggle } from '@/components/theme-toggle';
-import { Coffee, Menu, X, User, Settings, LogOut } from 'lucide-react';
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Coffee, Menu, X } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { useState } from "react";
 
 export function Navbar() {
 	const [isOpen, setIsOpen] = useState(false);
-	const { data: session } = useSession();
-
-	const handleSignOut = async () => {
-		await signOut();
-	};
 
 	return (
-		<nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-			<div className="container mx-auto px-4">
-				<div className="flex items-center justify-between h-16">
+		<nav className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-xl border-b border-white/10">
+			<div className="max-w-7xl mx-auto px-6 py-4">
+				<div className="flex items-center justify-between">
 					{/* Logo */}
-					<Link href="/" className="flex items-center gap-2 font-bold text-xl hover:opacity-80 transition-opacity">
-						<Coffee className="h-6 w-6" />
-						kas.coffee
+					<Link href="/" className="flex items-center gap-3 group">
+						<div className="relative">
+							<Coffee className="h-8 w-8 text-[#70C7BA] group-hover:scale-110 transition-transform" />
+							<div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-[#49EACB] to-[#70C7BA] rounded-full animate-pulse"></div>
+						</div>
+						<span className="text-2xl font-bold bg-gradient-to-r from-[#70C7BA] to-[#49EACB] bg-clip-text text-transparent">
+							kas.coffee
+						</span>
 					</Link>
 
 					{/* Desktop Navigation */}
-					<div className="hidden md:flex items-center gap-6">
-						<Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
+					<div className="hidden md:flex items-center gap-8">
+						<Link href="/about" className="text-white/80 hover:text-[#70C7BA] transition-colors font-medium">
 							About
 						</Link>
-						
-						<ThemeToggle />
-
-						{session ? (
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<Button variant="ghost" className="relative h-10 w-10 rounded-full">
-										<Avatar>
-											<AvatarImage src={session.user.image || undefined} />
-											<AvatarFallback>
-												{session.user.name?.charAt(0) || session.user.email?.charAt(0)}
-											</AvatarFallback>
-										</Avatar>
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent className="w-56" align="end" forceMount>
-									<div className="flex items-center justify-start gap-2 p-2">
-										<div className="flex flex-col space-y-1 leading-none">
-											{session.user.name && (
-												<p className="font-medium">{session.user.name}</p>
-											)}
-											{session.user.email && (
-												<p className="w-[200px] truncate text-sm text-muted-foreground">
-													{session.user.email}
-												</p>
-											)}
-										</div>
-									</div>
-									<DropdownMenuSeparator />
-									<DropdownMenuItem asChild>
-										<Link href="/dashboard" className="flex items-center gap-2">
-											<User className="h-4 w-4" />
-											Dashboard
-										</Link>
-									</DropdownMenuItem>
-									<DropdownMenuItem asChild>
-										<Link href="/dashboard" className="flex items-center gap-2">
-											<Settings className="h-4 w-4" />
-											Settings
-										</Link>
-									</DropdownMenuItem>
-									<DropdownMenuSeparator />
-									<DropdownMenuItem
-										className="flex items-center gap-2 text-red-600 focus:text-red-600"
-										onClick={handleSignOut}
-									>
-										<LogOut className="h-4 w-4" />
-										Sign Out
-									</DropdownMenuItem>
-								</DropdownMenuContent>
-							</DropdownMenu>
-						) : (
-							<div className="flex items-center gap-2">
-								<Button variant="ghost" asChild>
-									<Link href="/auth/signin">Sign In</Link>
-								</Button>
-								<Button asChild>
-									<Link href="/auth/signup">Get Started</Link>
-								</Button>
-							</div>
-						)}
+						<Link href="/docs" className="text-white/80 hover:text-[#70C7BA] transition-colors font-medium">
+							Docs
+						</Link>
+						<Link href="/examples" className="text-white/80 hover:text-[#70C7BA] transition-colors font-medium">
+							Examples
+						</Link>
 					</div>
 
-					{/* Mobile menu button */}
+					{/* Desktop Actions */}
+					<div className="hidden md:flex items-center gap-4">
+						<ThemeToggle />
+						<Button variant="ghost" asChild className="text-white/80 hover:text-[#70C7BA] hover:bg-[#70C7BA]/10">
+							<Link href="/auth/signin">Sign In</Link>
+						</Button>
+						<Button asChild className="bg-gradient-to-r from-[#70C7BA] to-[#49EACB] hover:from-[#49EACB] hover:to-[#70C7BA] text-white font-semibold rounded-full px-6">
+							<Link href="/auth/signup">Get Started</Link>
+						</Button>
+					</div>
+
+					{/* Mobile Menu Button */}
 					<div className="md:hidden flex items-center gap-2">
 						<ThemeToggle />
 						<Button
 							variant="ghost"
-							size="icon"
+							size="sm"
 							onClick={() => setIsOpen(!isOpen)}
-							aria-label="Toggle menu"
+							className="text-white hover:text-[#70C7BA] hover:bg-[#70C7BA]/10"
 						>
 							{isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
 						</Button>
 					</div>
 				</div>
 
-				{/* Mobile Navigation */}
+				{/* Mobile Menu */}
 				{isOpen && (
-					<div className="md:hidden border-t py-4">
-						<div className="space-y-4">
-							<Link
-								href="/about"
-								className="block px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+					<div className="md:hidden mt-4 pb-4 border-t border-white/10">
+						<div className="flex flex-col gap-4 mt-4">
+							<Link 
+								href="/about" 
+								className="text-white/80 hover:text-[#70C7BA] transition-colors font-medium"
 								onClick={() => setIsOpen(false)}
 							>
 								About
 							</Link>
-							
-							{session ? (
-								<div className="space-y-2">
-									<div className="px-3 py-2 text-sm">
-										<p className="font-medium">{session.user.name}</p>
-										<p className="text-muted-foreground">{session.user.email}</p>
-									</div>
-									<Link
-										href="/dashboard"
-										className="block px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
-										onClick={() => setIsOpen(false)}
-									>
-										Dashboard
-									</Link>
-									<button
-										onClick={() => {
-											handleSignOut();
-											setIsOpen(false);
-										}}
-										className="block w-full text-left px-3 py-2 text-red-600 hover:text-red-700 transition-colors"
-									>
-										Sign Out
-									</button>
-								</div>
-							) : (
-								<div className="space-y-2">
-									<Link
-										href="/auth/signin"
-										className="block px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
-										onClick={() => setIsOpen(false)}
-									>
-										Sign In
-									</Link>
-									<Link
-										href="/auth/signup"
-										className="block px-3 py-2 bg-primary text-primary-foreground rounded-md mx-3"
-										onClick={() => setIsOpen(false)}
-									>
-										Get Started
-									</Link>
-								</div>
-							)}
+							<Link 
+								href="/docs" 
+								className="text-white/80 hover:text-[#70C7BA] transition-colors font-medium"
+								onClick={() => setIsOpen(false)}
+							>
+								Docs
+							</Link>
+							<Link 
+								href="/examples" 
+								className="text-white/80 hover:text-[#70C7BA] transition-colors font-medium"
+								onClick={() => setIsOpen(false)}
+							>
+								Examples
+							</Link>
+							<div className="flex flex-col gap-2 mt-4">
+								<Button variant="ghost" asChild className="text-white/80 hover:text-[#70C7BA] hover:bg-[#70C7BA]/10 justify-start">
+									<Link href="/auth/signin" onClick={() => setIsOpen(false)}>Sign In</Link>
+								</Button>
+								<Button asChild className="bg-gradient-to-r from-[#70C7BA] to-[#49EACB] hover:from-[#49EACB] hover:to-[#70C7BA] text-white font-semibold rounded-full justify-start">
+									<Link href="/auth/signup" onClick={() => setIsOpen(false)}>Get Started</Link>
+								</Button>
+							</div>
 						</div>
 					</div>
 				)}

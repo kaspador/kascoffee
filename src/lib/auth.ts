@@ -2,9 +2,8 @@ import 'server-only';
 
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { github, google, twitter } from 'better-auth/plugins/oauth';
-import { db } from './db';
-import * as schema from './db/schema';
+import { db } from '@/lib/db';
+import * as schema from '@/lib/db/schema';
 
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
@@ -15,31 +14,25 @@ export const auth = betterAuth({
 			account: schema.accounts
 		}
 	}),
-	plugins: [
-		google({
-			clientId: process.env.GOOGLE_CLIENT_ID!,
-			clientSecret: process.env.GOOGLE_CLIENT_SECRET!
-		}),
-		github({
-			clientId: process.env.GITHUB_CLIENT_ID!,
-			clientSecret: process.env.GITHUB_CLIENT_SECRET!
-		}),
-		twitter({
-			clientId: process.env.TWITTER_CLIENT_ID!,
-			clientSecret: process.env.TWITTER_CLIENT_SECRET!
-		})
-	],
+	secret: process.env.BETTER_AUTH_SECRET || 'fallback-secret-for-development',
+	baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
+	trustedOrigins: ['http://localhost:3000', 'http://localhost:3001'],
 	session: {
 		expiresIn: 60 * 60 * 24 * 7, // 7 days
 		updateAge: 60 * 60 * 24 // 1 day
 	},
-	user: {
-		additionalFields: {
-			handle: {
-				type: 'string',
-				required: false,
-				unique: true
-			}
+	emailAndPassword: {
+		enabled: true,
+		requireEmailVerification: false // Disable for development
+	},
+	socialProviders: {
+		github: {
+			clientId: process.env.GITHUB_CLIENT_ID || '',
+			clientSecret: process.env.GITHUB_CLIENT_SECRET || ''
+		},
+		google: {
+			clientId: process.env.GOOGLE_CLIENT_ID || '',
+			clientSecret: process.env.GOOGLE_CLIENT_SECRET || ''
 		}
 	}
 });
