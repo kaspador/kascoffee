@@ -16,7 +16,7 @@ function getMockSession(request: Request) {
 		}
 
 		return sessionData;
-	} catch (_error) {
+	} catch {
 		return null;
 	}
 }
