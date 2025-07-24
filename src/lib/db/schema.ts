@@ -64,8 +64,8 @@ export const account = pgTable("account", {
   scope: text("scope"),
   password: text("password"),
   expiresAt: timestamp("expires_at"),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
+  createdAt: timestamp("created_at").$defaultFn(() => new Date()).notNull(),
+  updatedAt: timestamp("updated_at").$defaultFn(() => new Date()).notNull(),
 });
 
 export const verification = pgTable("verification", {

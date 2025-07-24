@@ -12,12 +12,19 @@ async function runMigration() {
 
     const sql = postgres(process.env.DATABASE_URL);
     
-    // Read and execute the SQL migration
-    const migrationSQL = readFileSync(join(__dirname, 'add-expires-at.sql'), 'utf8');
-    console.log('Running migration to add expires_at column...');
+    // Read and execute the SQL migrations
+    const expiresAtSQL = readFileSync(join(__dirname, 'add-expires-at.sql'), 'utf8');
+    const defaultsSQL = readFileSync(join(__dirname, 'add-defaults.sql'), 'utf8');
     
-    await sql.unsafe(migrationSQL);
-    console.log('Migration completed successfully!');
+    console.log('Running migration to add expires_at column...');
+    await sql.unsafe(expiresAtSQL);
+    console.log('✓ expires_at column migration completed');
+    
+    console.log('Running migration to add default values...');
+    await sql.unsafe(defaultsSQL);
+    console.log('✓ Default values migration completed');
+    
+    console.log('All migrations completed successfully!');
     
     await sql.end();
     process.exit(0);
