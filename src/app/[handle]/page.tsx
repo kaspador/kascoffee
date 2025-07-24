@@ -1,6 +1,5 @@
 "use client";
 
-import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -283,7 +282,7 @@ export default function UserProfilePage({ params }: PageProps) {
 											Connect
 										</h2>
 										<div className="flex flex-wrap gap-3">
-											{userPage.socials.map((social: any) => {
+											{userPage.socials.map((social: UserPageData['socials'][0]) => {
 												const IconComponent = socialIconMap[social.platform as keyof typeof socialIconMap] || FaGlobe;
 												return (
 													<Badge
