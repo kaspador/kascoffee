@@ -10,22 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Coffee, Mail, Lock, ArrowLeft, Github, AlertCircle } from "lucide-react";
 import { FaGoogle } from "react-icons/fa";
-
-// Mock user data for demo
-const DEMO_USERS = [
-	{
-		email: "demo@kas.coffee",
-		password: "demo123",
-		name: "Demo User",
-		id: "demo-user-1"
-	},
-	{
-		email: "test@example.com",
-		password: "password",
-		name: "Test User", 
-		id: "test-user-1"
-	}
-];
+import { signIn } from "@/lib/auth-client";
 
 export default function SignInPage() {
 	const [isLoading, setIsLoading] = useState(false);
@@ -39,33 +24,19 @@ export default function SignInPage() {
 		setError("");
 		setIsLoading(true);
 
-		// Simulate API delay
-		await new Promise(resolve => setTimeout(resolve, 1000));
-
 		try {
-			// Mock authentication logic
-			const user = DEMO_USERS.find(u => u.email === email && u.password === password);
-			
-			if (!user) {
-				setError("Invalid email or password");
-				return;
-			}
+			const result = await signIn.email({
+				email,
+				password,
+			});
 
-			// Store mock session in localStorage
-			const mockSession = {
-				user: {
-					id: user.id,
-					email: user.email,
-					name: user.name,
-					image: null
-				},
-				expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days
-			};
-			
-			localStorage.setItem('kas-coffee-session', JSON.stringify(mockSession));
-			
-			// Redirect to dashboard on successful login
-			router.push("/dashboard");
+			if (result.error) {
+				// Show specific error message from Better Auth
+				setError(result.error.message || "Invalid email or password");
+			} else {
+				// Redirect to dashboard on successful login
+				router.push("/dashboard");
+			}
 		} catch (err) {
 			setError("An unexpected error occurred. Please try again.");
 			console.error("Sign in error:", err);
@@ -77,21 +48,10 @@ export default function SignInPage() {
 	const handleGoogleSignIn = async () => {
 		setIsLoading(true);
 		try {
-			// Mock Google login
-			await new Promise(resolve => setTimeout(resolve, 1500));
-			
-			const mockSession = {
-				user: {
-					id: "google-user-1",
-					email: "google@example.com",
-					name: "Google User",
-					image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face"
-				},
-				expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-			};
-			
-			localStorage.setItem('kas-coffee-session', JSON.stringify(mockSession));
-			router.push("/dashboard");
+			await signIn.social({
+				provider: "google",
+				callbackURL: "/dashboard",
+			});
 		} catch (err) {
 			setError("Failed to sign in with Google");
 			console.error("Google sign in error:", err);
@@ -103,21 +63,10 @@ export default function SignInPage() {
 	const handleGithubSignIn = async () => {
 		setIsLoading(true);
 		try {
-			// Mock GitHub login
-			await new Promise(resolve => setTimeout(resolve, 1500));
-			
-			const mockSession = {
-				user: {
-					id: "github-user-1",
-					email: "github@example.com",
-					name: "GitHub User",
-					image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face"
-				},
-				expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-			};
-			
-			localStorage.setItem('kas-coffee-session', JSON.stringify(mockSession));
-			router.push("/dashboard");
+			await signIn.social({
+				provider: "github",
+				callbackURL: "/dashboard",
+			});
 		} catch (err) {
 			setError("Failed to sign in with GitHub");
 			console.error("GitHub sign in error:", err);
@@ -258,15 +207,11 @@ export default function SignInPage() {
 							</Button>
 						</form>
 
-						{/* Demo Account Info */}
+						{/* Info */}
 						<div className="bg-[#70C7BA]/10 border border-[#70C7BA]/30 rounded-xl p-4">
-							<h4 className="text-[#70C7BA] font-semibold text-sm mb-2">Demo Accounts</h4>
-							<p className="text-gray-400 text-xs mb-2">Try the app with these credentials:</p>
-							<div className="space-y-1 text-gray-300 text-xs">
-								<p><strong>Email:</strong> demo@kas.coffee<br/><strong>Password:</strong> demo123</p>
-								<p><strong>Email:</strong> test@example.com<br/><strong>Password:</strong> password</p>
-							</div>
-							<p className="text-gray-400 text-xs mt-2">Or try the social login buttons above!</p>
+							<h4 className="text-[#70C7BA] font-semibold text-sm mb-2">New to kas.coffee?</h4>
+							<p className="text-gray-400 text-xs mb-2">Create your account to start accepting Kaspa donations with a personalized page.</p>
+							<p className="text-gray-400 text-xs">You can also sign in with Google or GitHub for quick access!</p>
 						</div>
 
 						<div className="text-center">
