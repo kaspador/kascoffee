@@ -25,10 +25,10 @@ export const users = pgTable('user', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull(),
 	email: varchar('email', { length: 255 }).notNull().unique(),
-	emailVerified: timestamp('emailVerified'),
+	emailVerified: timestamp('emailVerified', { mode: 'date' }),
 	image: text('image'),
-	createdAt: timestamp('createdAt').defaultNow().notNull(),
-	updatedAt: timestamp('updatedAt').defaultNow().notNull()
+	createdAt: timestamp('createdAt', { mode: 'date' }).defaultNow().notNull(),
+	updatedAt: timestamp('updatedAt', { mode: 'date' }).defaultNow().notNull()
 });
 
 // User pages table (separate from auth users)
@@ -48,8 +48,8 @@ export const userPages = pgTable('user_page', {
 	foregroundColor: varchar('foreground_color', { length: 7 }).default('#000000'),
 	isActive: boolean('is_active').default(true).notNull(),
 	viewCount: bigint('view_count', { mode: 'number' }).default(0),
-	createdAt: timestamp('created_at').defaultNow().notNull(),
-	updatedAt: timestamp('updated_at').defaultNow().notNull()
+	createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+	updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull()
 });
 
 // Social links table
@@ -62,8 +62,8 @@ export const socials = pgTable('social', {
 	url: text('url').notNull(),
 	username: varchar('username', { length: 100 }),
 	isVisible: boolean('is_visible').default(true).notNull(),
-	createdAt: timestamp('created_at').defaultNow().notNull(),
-	updatedAt: timestamp('updated_at').defaultNow().notNull()
+	createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+	updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull()
 });
 
 // Sessions table (for Better Auth)
@@ -72,10 +72,10 @@ export const sessions = pgTable('session', {
 	userId: uuid('user_id')
 		.references(() => users.id, { onDelete: 'cascade' })
 		.notNull(),
-	expiresAt: timestamp('expires_at').notNull(),
+	expiresAt: timestamp('expires_at', { mode: 'date' }).notNull(),
 	ipAddress: text('ip_address'),
 	userAgent: text('user_agent'),
-	createdAt: timestamp('created_at').defaultNow().notNull()
+	createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull()
 });
 
 // Accounts table (for OAuth)
@@ -89,10 +89,10 @@ export const accounts = pgTable('account', {
 	accessToken: text('access_token'),
 	refreshToken: text('refresh_token'),
 	idToken: text('id_token'),
-	expiresAt: timestamp('expires_at'),
+	expiresAt: timestamp('expires_at', { mode: 'date' }),
 	password: text('password'),
-	createdAt: timestamp('created_at').defaultNow().notNull(),
-	updatedAt: timestamp('updated_at').defaultNow().notNull()
+	createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+	updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull()
 });
 
 // Relations
