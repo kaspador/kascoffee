@@ -1,21 +1,13 @@
-import 'server-only';
-
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from './schema';
 
-// Use a fallback for development when no database is configured
-const databaseUrl = process.env.DATABASE_URL || 'postgresql://fallback:fallback@localhost:5432/fallback';
+const connectionString = process.env.DATABASE_URL!;
 
-let client: ReturnType<typeof postgres>;
-let db: ReturnType<typeof drizzle>;
+// For production, disable prefetch as it's not supported for "Transaction" pool mode
+const client = postgres(connectionString, { 
+  prepare: false,
+  max: 1,
+});
 
-try {
-	client = postgres(databaseUrl);
-	db = drizzle(client, { schema });
-} catch {
-	console.warn('Database connection failed - running in development mode with mock data');
-	// Database will be null/undefined, components will use mock data
-}
-
-export { db }; 
+export const db = drizzle(client, { schema }); 
