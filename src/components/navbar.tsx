@@ -15,8 +15,8 @@ export function Navbar() {
 				<div className="flex items-center justify-between">
 					{/* Logo */}
 					<Link href="/" className="flex items-center gap-3 group">
-						<div className="relative">
-							<Coffee className="h-8 w-8 text-[#70C7BA] group-hover:scale-110 transition-transform" />
+						<div className="relative coffee-container">
+							<Coffee className="h-8 w-8 text-[#70C7BA] coffee-icon group-hover:scale-110 transition-all duration-300" />
 							<div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-[#49EACB] to-[#70C7BA] rounded-full animate-pulse"></div>
 						</div>
 						<span className="text-2xl font-bold bg-gradient-to-r from-[#70C7BA] to-[#49EACB] bg-clip-text text-transparent">

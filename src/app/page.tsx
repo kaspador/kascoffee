@@ -26,8 +26,8 @@ export default function LandingPage() {
 
 						{/* Main Logo */}
 						<div className="flex items-center justify-center gap-6 mb-8">
-							<div className="relative">
-								<Coffee className="h-20 w-20 text-[#70C7BA] drop-shadow-lg" />
+							<div className="relative coffee-container">
+								<Coffee className="h-20 w-20 text-[#70C7BA] coffee-icon drop-shadow-lg hover:scale-110 transition-all duration-300 cursor-pointer" />
 								<div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-[#49EACB] to-[#70C7BA] rounded-full animate-bounce"></div>
 							</div>
 							<h1 className="text-7xl md:text-8xl lg:text-9xl font-black leading-tight">

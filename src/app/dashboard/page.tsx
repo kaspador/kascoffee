@@ -197,8 +197,8 @@ export default function DashboardPage() {
 				<div className="container mx-auto px-4 py-4">
 					<div className="flex items-center justify-between">
 						<Link href="/" className="flex items-center gap-3 font-bold text-xl group">
-							<div className="relative">
-								<Coffee className="h-8 w-8 text-[#70C7BA] group-hover:text-[#49EACB] transition-colors" />
+							<div className="relative coffee-container">
+								<Coffee className="h-8 w-8 text-[#70C7BA] coffee-icon group-hover:text-[#49EACB] transition-all duration-300" />
 								<div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-[#49EACB] to-[#70C7BA] rounded-full animate-pulse"></div>
 							</div>
 							<span className="bg-gradient-to-r from-[#70C7BA] to-[#49EACB] bg-clip-text text-transparent">
