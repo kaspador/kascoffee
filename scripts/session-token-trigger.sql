@@ -1,6 +1,9 @@
 -- Add trigger to auto-generate session tokens as fallback
 DO $$ 
 BEGIN
+  -- Enable pgcrypto extension for random bytes
+  CREATE EXTENSION IF NOT EXISTS pgcrypto;
+  
   -- Create a function to generate session tokens
   CREATE OR REPLACE FUNCTION generate_session_token()
   RETURNS TRIGGER AS $func$
