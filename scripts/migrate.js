@@ -30,10 +30,16 @@ async function runMigration() {
     await sql.unsafe(sessionTokenTriggerSQL);
     console.log('✓ Session token trigger added');
 
-    console.log('Fixing missing credential accounts for existing users...');
+        console.log('Fixing missing credential accounts for existing users...');
     await sql.unsafe(fixMissingAccountsSQL);
     console.log('✓ Missing credential accounts fixed');
-    
+
+    // Fix kaspaAddress column
+    const fixKaspaAddressSQL = readFileSync(join(__dirname, 'fix-kaspa-address-nullable.sql'), 'utf8');
+    console.log('Making kaspaAddress column nullable...');
+    await sql.unsafe(fixKaspaAddressSQL);
+    console.log('✓ kaspaAddress column fixed');
+
     console.log('All migrations completed successfully!');
     
     await sql.end();

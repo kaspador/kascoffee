@@ -14,7 +14,7 @@ const updateProfileSchema = z.object({
 	displayName: z.string().min(1).max(100).optional(),
 	shortDescription: z.string().max(300).optional(),
 	longDescription: z.string().optional(),
-	kaspaAddress: z.string().refine((val) => !val || validateKaspaAddress(val), 'Invalid Kaspa address').optional(),
+	kaspaAddress: z.string().nullable().refine((val) => !val || validateKaspaAddress(val), 'Invalid Kaspa address').optional(),
 	backgroundColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Must be a valid hex color').optional(),
 	foregroundColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Must be a valid hex color').optional(),
 	profileImage: z.string().url('Must be a valid URL').optional().or(z.literal('')),
@@ -38,14 +38,17 @@ export async function GET(request: NextRequest) {
 
 		if (!userPage) {
 			// Create default user page if it doesn't exist
+			const baseHandle = session.user.email?.split('@')[0]?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'user';
+			const uniqueHandle = `${baseHandle}-${session.user.id.slice(0, 8)}`;
+			
 			const newUserPage = await db.insert(userPages).values({
 				id: randomUUID(),
 				userId: session.user.id,
-				handle: session.user.email?.split('@')[0]?.toLowerCase().replace(/[^a-z0-9]/g, '') || `user-${session.user.id.slice(0, 8)}`,
+				handle: uniqueHandle,
 				displayName: session.user.name || 'New User',
 				shortDescription: 'Welcome to my donation page!',
 				longDescription: '',
-				kaspaAddress: '',
+				kaspaAddress: null, // Use null instead of empty string
 				backgroundColor: '#70C7BA',
 				foregroundColor: '#ffffff',
 				isActive: true,

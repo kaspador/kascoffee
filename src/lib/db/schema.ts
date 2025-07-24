@@ -91,7 +91,7 @@ export const userPages = pgTable('user_page', {
 	displayName: text('display_name').notNull(),
 	shortDescription: varchar('short_description', { length: 300 }),
 	longDescription: text('long_description'),
-	kaspaAddress: varchar('kaspa_address', { length: 255 }).notNull(),
+	kaspaAddress: varchar('kaspa_address', { length: 255 }),
 	profileImage: text('profile_image'),
 	backgroundImage: text('background_image'),
 	backgroundColor: varchar('background_color', { length: 7 }).default('#ffffff'),
