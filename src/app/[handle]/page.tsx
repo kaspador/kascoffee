@@ -1,3 +1,5 @@
+"use client";
+
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -9,9 +11,7 @@ import { ExternalLink, Copy, Coffee, Heart, Star, Share2 } from 'lucide-react';
 import { FaTwitter, FaDiscord, FaTelegram, FaGlobe, FaGithub } from 'react-icons/fa';
 import parse from 'html-react-parser';
 import QRCodeDisplay from '@/components/qr-code-display';
-import { db } from '@/lib/db';
-import { userPages, socials } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { useEffect, useState } from 'react';
 
 interface UserPageData {
 	id: string;
@@ -38,47 +38,17 @@ interface UserPageData {
 	}>;
 }
 
-async function getUserPage(handle: string): Promise<UserPageData | null> {
+async function fetchUserPage(handle: string): Promise<UserPageData | null> {
 	try {
-		// Get user page from database
-		const userPage = await db.query.userPages.findFirst({
-			where: eq(userPages.handle, handle),
-			with: {
-				user: true
-			}
+		const response = await fetch(`/api/user-page/${handle}`, {
+			cache: 'no-store' // Disable caching to ensure fresh data
 		});
-
-		if (!userPage || !userPage.isActive) {
+		
+		if (!response.ok) {
 			return null;
 		}
-
-		// Get user's social links
-		const userSocials = await db.query.socials.findMany({
-			where: eq(socials.userId, userPage.userId)
-		});
-
-		// Increment view count
-		await db
-			.update(userPages)
-			.set({ 
-				viewCount: (userPage.viewCount || 0) + 1,
-				updatedAt: new Date()
-			})
-			.where(eq(userPages.id, userPage.id));
-
-		return {
-			...userPage,
-			backgroundColor: userPage.backgroundColor || '#0f172a',
-			foregroundColor: userPage.foregroundColor || '#ffffff',
-			viewCount: userPage.viewCount || 0,
-			socials: userSocials.filter(social => social.isVisible).map(social => ({
-				id: social.id,
-				platform: social.platform,
-				url: social.url,
-				username: social.username || '',
-				isVisible: social.isVisible
-			}))
-		};
+		
+		return await response.json();
 	} catch (error) {
 		console.error('Error fetching user page:', error);
 		return null;
@@ -91,37 +61,42 @@ interface PageProps {
 	}>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-	const { handle } = await params;
-	const userPage = await getUserPage(handle);
+// Note: generateMetadata removed since Client Components can't export it
+// Metadata will be handled differently for Client Components
 
-	if (!userPage) {
-		return {
-			title: 'Page Not Found - kas.coffee',
-			description: 'This donation page does not exist.',
-		};
+export default function UserProfilePage({ params }: PageProps) {
+	const [userPage, setUserPage] = useState<UserPageData | null>(null);
+	const [loading, setLoading] = useState(true);
+	const [handle, setHandle] = useState<string>('');
+
+	useEffect(() => {
+		async function loadParams() {
+			const resolvedParams = await params;
+			setHandle(resolvedParams.handle);
+		}
+		loadParams();
+	}, [params]);
+
+	useEffect(() => {
+		if (!handle) return;
+
+		async function loadUserPage() {
+			setLoading(true);
+			const data = await fetchUserPage(handle);
+			setUserPage(data);
+			setLoading(false);
+		}
+
+		loadUserPage();
+	}, [handle]);
+
+	if (loading) {
+		return (
+			<div className="min-h-screen bg-slate-950 flex items-center justify-center">
+				<div className="text-white text-xl">Loading...</div>
+			</div>
+		);
 	}
-
-	return {
-		title: `${userPage.displayName} - kas.coffee`,
-		description: userPage.shortDescription || `Support ${userPage.displayName} with Kaspa donations`,
-		openGraph: {
-			title: `${userPage.displayName} - kas.coffee`,
-			description: userPage.shortDescription || `Support ${userPage.displayName} with Kaspa donations`,
-			images: userPage.profileImage ? [userPage.profileImage] : [],
-		},
-		twitter: {
-			card: 'summary_large_image',
-			title: `${userPage.displayName} - kas.coffee`,
-			description: userPage.shortDescription || `Support ${userPage.displayName} with Kaspa donations`,
-			images: userPage.profileImage ? [userPage.profileImage] : [],
-		},
-	};
-}
-
-export default async function UserProfilePage({ params }: PageProps) {
-	const { handle } = await params;
-	const userPage = await getUserPage(handle);
 
 	if (!userPage) {
 		notFound();
@@ -308,7 +283,7 @@ export default async function UserProfilePage({ params }: PageProps) {
 											Connect
 										</h2>
 										<div className="flex flex-wrap gap-3">
-											{userPage.socials.map((social) => {
+											{userPage.socials.map((social: any) => {
 												const IconComponent = socialIconMap[social.platform as keyof typeof socialIconMap] || FaGlobe;
 												return (
 													<Badge
