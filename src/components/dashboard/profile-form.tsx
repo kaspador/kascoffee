@@ -62,7 +62,7 @@ function getMockSessionHeader() {
 		}
 		
 		return `Bearer ${sessionData}`;
-	} catch (error) {
+	} catch (_error) {
 		localStorage.removeItem('kas-coffee-session');
 		return null;
 	}

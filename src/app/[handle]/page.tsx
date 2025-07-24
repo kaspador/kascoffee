@@ -261,7 +261,7 @@ export default function UserProfilePage() {
 			<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
 				<div className="text-center text-white">
 					<h1 className="text-4xl font-bold mb-4">User Not Found</h1>
-					<p className="text-gray-400">This donation page doesn't exist.</p>
+					<p className="text-gray-400">This donation page doesn&apos;t exist.</p>
 				</div>
 			</div>
 		);

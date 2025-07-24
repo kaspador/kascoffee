@@ -32,7 +32,7 @@ function getMockSession(request: Request) {
 		}
 
 		return sessionData;
-	} catch (error) {
+	} catch (_error) {
 		return null;
 	}
 }
@@ -120,7 +120,7 @@ export async function PUT(request: NextRequest) {
 		const updatedUserPage = {
 			...existingUserPage,
 			...Object.fromEntries(
-				Object.entries(validatedData).filter(([_, value]) => value !== undefined)
+				Object.entries(validatedData).filter(([, value]) => value !== undefined)
 			),
 			longDescription: sanitizedLongDescription !== undefined ? sanitizedLongDescription : existingUserPage.longDescription,
 			updatedAt: new Date()

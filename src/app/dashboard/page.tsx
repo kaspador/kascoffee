@@ -59,7 +59,7 @@ function getMockSessionHeader() {
 		}
 		
 		return `Bearer ${sessionData}`;
-	} catch (error) {
+	} catch (_error) {
 		localStorage.removeItem('kas-coffee-session');
 		return null;
 	}
@@ -138,9 +138,9 @@ export default function DashboardPage() {
 	}, [router]);
 
 	// Function to refresh profile data (called after updates)
-	const refreshProfile = () => {
-		fetchProfile();
-	};
+	// const refreshProfile = () => {
+	// 	fetchProfile();
+	// };
 
 	// Convert UserProfile to the format expected by components
 	const convertProfileForComponents = (profile: UserProfile | null) => {
