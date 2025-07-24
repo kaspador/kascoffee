@@ -7,6 +7,6 @@
     "numReplicas": 1,
     "sleepApplication": false,
     "restartPolicyType": "ON_FAILURE",
-    "preDeployCommand": ["npm run db:migrate"]
+    "preDeployCommand": ["npm run db:push"]
   }
 } 
