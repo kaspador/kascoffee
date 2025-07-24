@@ -126,11 +126,17 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 			)}
 
 			{/* Basic Information Section */}
-			<div className="space-y-6">
+			<div className="space-y-8">
 				<div>
-					<h3 className="text-lg font-kaspa-header font-bold text-[#70C7BA] mb-4 flex items-center gap-2">
-						✨ Basic Information
-					</h3>
+					<div className="flex items-center gap-3 mb-6">
+						<div className="w-10 h-10 bg-[#70C7BA]/20 rounded-xl flex items-center justify-center">
+							<span className="text-xl">✨</span>
+						</div>
+						<div>
+							<h3 className="text-xl font-kaspa-header font-bold text-[#70C7BA]">Basic Information</h3>
+							<p className="text-gray-400 text-sm font-kaspa-body">Essential details for your donation page</p>
+						</div>
+					</div>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 						<div className="space-y-2">
 							<Label htmlFor="handle" className="text-gray-300 font-kaspa-body font-semibold">
@@ -187,11 +193,17 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 			</div>
 
 			{/* Images Section */}
-			<div className="space-y-6">
+			<div className="space-y-8">
 				<div>
-					<h3 className="text-lg font-kaspa-header font-bold text-[#49EACB] mb-4 flex items-center gap-2">
-						🖼️ Images
-					</h3>
+					<div className="flex items-center gap-3 mb-6">
+						<div className="w-10 h-10 bg-[#49EACB]/20 rounded-xl flex items-center justify-center">
+							<span className="text-xl">🖼️</span>
+						</div>
+						<div>
+							<h3 className="text-xl font-kaspa-header font-bold text-[#49EACB]">Images</h3>
+							<p className="text-gray-400 text-sm font-kaspa-body">Add visual elements to your donation page</p>
+						</div>
+					</div>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 						<div className="space-y-2">
 							<Label htmlFor="profileImage" className="text-gray-300 font-kaspa-body font-semibold">
@@ -227,11 +239,17 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 			</div>
 
 			{/* Descriptions Section */}
-			<div className="space-y-6">
+			<div className="space-y-8">
 				<div>
-					<h3 className="text-lg font-kaspa-header font-bold text-[#70C7BA] mb-4 flex items-center gap-2">
-						📝 Descriptions
-					</h3>
+					<div className="flex items-center gap-3 mb-6">
+						<div className="w-10 h-10 bg-[#70C7BA]/20 rounded-xl flex items-center justify-center">
+							<span className="text-xl">📝</span>
+						</div>
+						<div>
+							<h3 className="text-xl font-kaspa-header font-bold text-[#70C7BA]">Descriptions</h3>
+							<p className="text-gray-400 text-sm font-kaspa-body">Tell your story and connect with supporters</p>
+						</div>
+					</div>
 					<div className="space-y-6">
 						<div className="space-y-2">
 							<Label htmlFor="shortDescription" className="text-gray-300 font-kaspa-body font-semibold">
@@ -266,19 +284,22 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 			</div>
 
 			{/* Submit Button */}
-			<div className="flex justify-end pt-6 border-t border-[#70C7BA]/20">
+			<div className="flex flex-col sm:flex-row gap-4 sm:justify-end pt-8 border-t border-[#70C7BA]/20">
 				<Button
 					type="submit"
 					disabled={updateProfileMutation.isPending}
-					className="bg-gradient-to-r from-[#70C7BA] to-[#49EACB] hover:from-[#5ba8a0] hover:to-[#3dd4b4] text-white px-8 py-3 font-kaspa-subheader font-bold rounded-xl shadow-lg hover:shadow-[#70C7BA]/25 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+					className="w-full sm:w-auto bg-gradient-to-r from-[#70C7BA] to-[#49EACB] hover:from-[#5ba8a0] hover:to-[#3dd4b4] text-white px-8 py-4 font-kaspa-subheader font-bold rounded-xl shadow-lg hover:shadow-[#70C7BA]/25 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
 				>
 					{updateProfileMutation.isPending ? (
 						<>
-							<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+							<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
 							Saving Profile...
 						</>
 					) : (
-						'💾 Save Profile'
+						<>
+							<span className="text-lg mr-2">💾</span>
+							Save Profile
+						</>
 					)}
 				</Button>
 			</div>
