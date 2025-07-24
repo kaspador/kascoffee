@@ -59,13 +59,13 @@ const config: Config = {
 				}
 			},
 			fontFamily: {
-				// Official Kaspa typography from https://kaspa.org/media-kit/
-				'kaspa-header': ['Rubik', 'sans-serif'], // Header font
-				'kaspa-subheader': ['Oswald', 'sans-serif'], // Sub-header font
-				'kaspa-body': ['Lato', 'sans-serif'], // Body font
+				// Official Kaspa typography with proper CSS variables
+				'kaspa-header': ['var(--font-kaspa-header)', 'Rubik', 'sans-serif'], // Header font
+				'kaspa-subheader': ['var(--font-kaspa-subheader)', 'Oswald', 'sans-serif'], // Sub-header font
+				'kaspa-body': ['var(--font-kaspa-body)', 'Lato', 'sans-serif'], // Body font
 				// Keep existing defaults
-				sans: ['var(--font-geist-sans)', 'sans-serif'],
-				mono: ['var(--font-geist-mono)', 'monospace']
+				sans: ['var(--font-kaspa-body)', 'Lato', 'sans-serif'],
+				mono: ['monospace']
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
