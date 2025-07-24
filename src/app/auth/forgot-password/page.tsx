@@ -129,10 +129,10 @@ export default function ForgotPasswordPage() {
             <div className="bg-[#70C7BA]/10 border border-[#70C7BA]/30 rounded-xl p-4">
               <h4 className="text-[#70C7BA] font-semibold text-sm mb-2">What happens next?</h4>
               <p className="text-gray-400 text-xs mb-2">
-                We'll send you a secure link to reset your password. The link will expire in 1 hour for security.
+                We&apos;ll send you a secure link to reset your password. The link will expire in 1 hour for security.
               </p>
               <p className="text-gray-400 text-xs">
-                Don't see the email? Check your spam folder or try again with a different email address.
+                Don&apos;t see the email? Check your spam folder or try again with a different email address.
               </p>
             </div>
           </CardContent>
