@@ -40,6 +40,12 @@ async function runMigration() {
     await sql.unsafe(fixKaspaAddressSQL);
     console.log('✓ kaspaAddress column fixed');
 
+    // Fix NULL password accounts
+    const fixNullPasswordsSQL = readFileSync(join(__dirname, 'fix-null-passwords.sql'), 'utf8');
+    console.log('Fixing NULL password accounts...');
+    await sql.unsafe(fixNullPasswordsSQL);
+    console.log('✓ NULL password accounts removed');
+
     console.log('All migrations completed successfully!');
     
     await sql.end();
