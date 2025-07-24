@@ -12,22 +12,12 @@ async function runMigration() {
 
     const sql = postgres(process.env.DATABASE_URL);
     
-    // Read and execute the SQL migrations
-    const expiresAtSQL = readFileSync(join(__dirname, 'add-expires-at.sql'), 'utf8');
-    const restoreDefaultsSQL = readFileSync(join(__dirname, 'restore-defaults.sql'), 'utf8');
-    const fixSessionSQL = readFileSync(join(__dirname, 'fix-session-table.sql'), 'utf8');
+    // Read and execute the nuclear fix migration
+    const nuclearFixSQL = readFileSync(join(__dirname, 'nuclear-fix.sql'), 'utf8');
     
-    console.log('Running migration to add expires_at column...');
-    await sql.unsafe(expiresAtSQL);
-    console.log('✓ expires_at column migration completed');
-    
-    console.log('Running migration to restore timestamp defaults...');
-    await sql.unsafe(restoreDefaultsSQL);
-    console.log('✓ Restored defaults migration completed');
-    
-    console.log('Running migration to fix session table...');
-    await sql.unsafe(fixSessionSQL);
-    console.log('✓ Session table fix migration completed');
+    console.log('Running nuclear fix migration - recreating Better Auth tables...');
+    await sql.unsafe(nuclearFixSQL);
+    console.log('✓ Nuclear fix migration completed - Better Auth tables recreated');
     
     console.log('All migrations completed successfully!');
     
