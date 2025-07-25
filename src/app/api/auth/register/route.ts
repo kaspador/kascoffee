@@ -24,8 +24,7 @@ export async function POST(request: NextRequest) {
         password,
         first_name,
         last_name,
-        status: 'active',
-        role: null // Will use default role
+        status: 'active'
       }),
     });
 
