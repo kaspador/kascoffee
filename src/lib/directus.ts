@@ -83,13 +83,25 @@ export const DirectusAPI = {
   // User Pages
   async getUserPage(handle: string): Promise<UserPage | null> {
     try {
+      console.log(`DirectusAPI.getUserPage: Searching for handle "${handle}"`);
+      
       const pages = await directus.request(readItems('user_pages', {
-        filter: { handle },
+        filter: { handle: { _eq: handle } }, // Use exact match to be explicit
         limit: 1
       })) as unknown[];
-      return (pages[0] as UserPage) || null;
+      
+      console.log(`DirectusAPI.getUserPage: Found ${pages.length} pages for handle "${handle}"`);
+      
+      if (pages.length > 0) {
+        const page = pages[0] as UserPage;
+        console.log(`DirectusAPI.getUserPage: Page found - ID: ${page.id}, Active: ${page.is_active}, Handle: ${page.handle}`);
+        return page;
+      }
+      
+      console.log(`DirectusAPI.getUserPage: No page found for handle "${handle}"`);
+      return null;
     } catch (error: unknown) {
-      console.error('Error fetching user page:', error);
+      console.error(`DirectusAPI.getUserPage: Error fetching user page for handle "${handle}":`, error);
       return null;
     }
   },
@@ -112,6 +124,18 @@ export const DirectusAPI = {
 
   async updateUserPage(id: string, data: Partial<UserPage>) {
     return await directus.request(updateItem('user_pages', id, data));
+  },
+
+  async getAllUserPages(): Promise<UserPage[]> {
+    try {
+      console.log('DirectusAPI.getAllUserPages: Fetching all user pages');
+      const pages = await directus.request(readItems('user_pages')) as unknown[];
+      console.log(`DirectusAPI.getAllUserPages: Found ${pages.length} total pages`);
+      return pages as UserPage[];
+    } catch (error: unknown) {
+      console.error('DirectusAPI.getAllUserPages: Error fetching all user pages:', error);
+      return [];
+    }
   },
 
   // Socials

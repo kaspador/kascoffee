@@ -6,12 +6,23 @@ export async function GET(
   { params }: { params: Promise<{ handle: string }> }
 ) {
   try {
-    const { handle } = await params;
+    const { handle: rawHandle } = await params;
+    
+    // Normalize handle to match how it's stored (lowercase)
+    const handle = rawHandle.toLowerCase().trim();
+    
+    console.log(`Looking up user page for handle: "${handle}"`);
 
     // Get user page from Directus
     const userPage = await DirectusAPI.getUserPage(handle);
+    
+    console.log(`User page found:`, userPage ? 'Yes' : 'No');
+    if (userPage) {
+      console.log(`User page active:`, userPage.is_active);
+    }
 
     if (!userPage || !userPage.is_active) {
+      console.log(`User page not found or inactive for handle: "${handle}"`);
       return NextResponse.json({ error: 'User page not found' }, { status: 404 });
     }
 
@@ -19,9 +30,11 @@ export async function GET(
     let userSocials: Social[] = [];
     try {
       userSocials = await DirectusAPI.getUserSocials(userPage.user_id);
+      console.log(`Found ${userSocials.length} social links for user`);
     } catch {
       // Socials collection may not exist yet, proceed without socials
       userSocials = [];
+      console.log(`No social links found or socials collection doesn't exist`);
     }
 
     // TODO: Implement view count increment in Directus
@@ -42,6 +55,7 @@ export async function GET(
       }))
     };
 
+    console.log(`Successfully returning user page data for: "${handle}"`);
     return NextResponse.json(userData);
   } catch (error) {
     console.error('Error fetching user page:', error);
