@@ -53,18 +53,14 @@ async function fetchUserPage(handle: string): Promise<UserPageData | null> {
 		
 		if (!response.ok) {
 			console.error('Frontend: API error:', response.status, response.statusText);
-			// For other errors (500, etc.), we should retry or show a different error
-			// For now, let's not call notFound() for server errors
 			throw new Error(`API Error: ${response.status}`);
 		}
 		
 		const data = await response.json();
-		console.log('Frontend: Successfully fetched user page data');
+		console.log('Frontend: Successfully fetched user page data', data);
 		return data;
 	} catch (error) {
 		console.error('Frontend: Error fetching user page:', error);
-		// Don't return null for network errors - this would trigger notFound incorrectly
-		// Instead, we'll handle this in the component
 		throw error;
 	}
 }
@@ -92,7 +88,7 @@ export default function UserProfilePage({ params }: PageProps) {
 	useEffect(() => {
 		if (!handle) return;
 
-				async function loadUserPage() {
+		async function loadUserPage() {
 			setLoading(true);
 			console.log('Frontend: Loading user page for handle:', handle);
 			try {
@@ -101,8 +97,6 @@ export default function UserProfilePage({ params }: PageProps) {
 				setUserPage(data);
 			} catch (error) {
 				console.error('Frontend: Error loading user page:', error);
-				// For network errors or API errors, set userPage to null
-				// The component will handle showing appropriate error
 				setUserPage(null);
 			} finally {
 				setLoading(false);
@@ -134,11 +128,9 @@ export default function UserProfilePage({ params }: PageProps) {
 					url: window.location.href,
 				});
 			} catch {
-				// User cancelled share or error occurred
 				handleCopyAddress();
 			}
 		} else {
-			// Fallback: copy URL to clipboard
 			try {
 				await navigator.clipboard.writeText(window.location.href);
 			} catch (err) {
@@ -149,17 +141,15 @@ export default function UserProfilePage({ params }: PageProps) {
 
 	if (loading) {
 		return (
-			<div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+			<div className="min-h-screen bg-gray-50 flex items-center justify-center">
 				<div className="text-center">
-					<Coffee className="w-12 h-12 mx-auto mb-4 text-[#70C7BA] animate-pulse" />
-					<div className="text-white text-xl">Loading...</div>
+					<Coffee className="w-16 h-16 mx-auto mb-4 text-[#70C7BA] animate-pulse" />
+					<div className="text-gray-800 text-xl font-semibold">Loading profile...</div>
 				</div>
 			</div>
 		);
 	}
 
-	// Only call notFound if we're sure the page doesn't exist
-	// Don't call it on API errors or temporary issues
 	if (!userPage) {
 		console.error('Frontend: User page data is null, calling notFound for handle:', handle);
 		notFound();
@@ -174,68 +164,67 @@ export default function UserProfilePage({ params }: PageProps) {
 	};
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative">
-			{/* Animated background with Kaspa colors */}
-			<div className="absolute inset-0 bg-gradient-to-r from-[#70C7BA]/10 via-[#49EACB]/10 to-[#70C7BA]/10 animate-pulse"></div>
-			<div className="absolute top-20 left-20 w-72 h-72 bg-[#70C7BA]/20 rounded-full blur-3xl animate-pulse"></div>
-			<div className="absolute bottom-20 right-20 w-96 h-96 bg-[#49EACB]/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-			
-			<div className="relative z-10 container mx-auto px-4 py-6 max-w-6xl">
-				{/* Header */}
-				<div className="flex justify-between items-center mb-8">
+		<div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+			{/* Header */}
+			<div className="bg-white shadow-sm border-b border-gray-200">
+				<div className="container mx-auto px-4 py-4 flex justify-between items-center max-w-4xl">
 					<Link
 						href="/"
 						className="flex items-center gap-2 text-[#70C7BA] hover:text-[#49EACB] transition-colors font-semibold"
 					>
 						<Coffee className="w-5 h-5" />
-						<span>kas.coffee</span>
+						<span className="text-lg font-bold">kas.coffee</span>
 					</Link>
 					
 					<Button
 						variant="outline"
 						size="sm"
 						onClick={handleShare}
-						className="border-[#70C7BA]/40 text-[#70C7BA] hover:bg-[#70C7BA]/10 bg-transparent"
+						className="border-[#70C7BA] text-[#70C7BA] hover:bg-[#70C7BA] hover:text-white"
 					>
 						<Share2 className="w-4 h-4 mr-2" />
 						Share
 					</Button>
 				</div>
+			</div>
 
+			<div className="container mx-auto px-4 py-8 max-w-4xl">
 				{/* Profile Header */}
-				<div className="text-center mb-12">
-					<Avatar className="w-32 h-32 mx-auto mb-6 border-4 border-[#70C7BA] shadow-xl shadow-[#70C7BA]/25">
-						<AvatarImage src={userPage.profileImage || undefined} alt={userPage.displayName || userPage.handle} />
-						<AvatarFallback className="text-3xl font-bold bg-gradient-to-br from-[#70C7BA] to-[#49EACB] text-white">
-							{(userPage.displayName || userPage.handle)?.charAt(0)?.toUpperCase() || 'U'}
-						</AvatarFallback>
-					</Avatar>
+				<div className="text-center mb-8">
+					<div className="relative inline-block mb-6">
+						<Avatar className="w-32 h-32 border-4 border-[#70C7BA] shadow-lg">
+							<AvatarImage 
+								src={userPage.profileImage || undefined} 
+								alt={userPage.displayName || userPage.handle}
+								className="object-cover"
+							/>
+							<AvatarFallback className="text-3xl font-bold bg-gradient-to-br from-[#70C7BA] to-[#49EACB] text-white">
+								{(userPage.displayName || userPage.handle)?.charAt(0)?.toUpperCase() || 'U'}
+							</AvatarFallback>
+						</Avatar>
+					</div>
 					
-					<h1 className="text-4xl md:text-6xl font-black mb-4">
-						<span className="bg-gradient-to-r from-white via-[#70C7BA] to-[#49EACB] bg-clip-text text-transparent">
-							{userPage.displayName || userPage.handle}
-						</span>
+					<h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
+						{userPage.displayName || userPage.handle}
 					</h1>
 					
-					<Badge 
-						className="mb-6 px-4 py-2 text-lg bg-gradient-to-r from-[#70C7BA]/20 to-[#49EACB]/20 border border-[#70C7BA]/30 text-[#70C7BA]"
-					>
+					<Badge className="mb-4 px-4 py-2 text-base bg-[#70C7BA] text-white hover:bg-[#5ba8a0]">
 						@{userPage.handle}
 					</Badge>
 					
 					{userPage.shortDescription && (
-						<p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-6">
+						<p className="text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed mb-6">
 							{userPage.shortDescription}
 						</p>
 					)}
 
-					{/* Stats Row */}
-					<div className="flex justify-center items-center gap-6 mb-8">
-						<div className="flex items-center gap-2 text-gray-400">
+					{/* Stats */}
+					<div className="flex justify-center items-center gap-6 text-gray-600 mb-8">
+						<div className="flex items-center gap-2">
 							<Eye className="w-4 h-4" />
 							<span>{userPage.viewCount || 0} views</span>
 						</div>
-						<div className="w-1 h-1 bg-gray-600 rounded-full"></div>
+						<div className="w-1 h-1 bg-gray-400 rounded-full"></div>
 						<div className="flex items-center gap-2 text-[#70C7BA]">
 							<Zap className="w-4 h-4" />
 							<span>Powered by Kaspa</span>
@@ -245,8 +234,8 @@ export default function UserProfilePage({ params }: PageProps) {
 
 				{/* Social Links */}
 				{userPage.socials.length > 0 && (
-					<div className="flex justify-center mb-12">
-						<div className="flex flex-wrap justify-center gap-4">
+					<div className="flex justify-center mb-8">
+						<div className="flex flex-wrap justify-center gap-3">
 							{userPage.socials.map((social) => {
 								const IconComponent = socialIconMap[social.platform as keyof typeof socialIconMap] || FaGlobe;
 								return (
@@ -255,11 +244,11 @@ export default function UserProfilePage({ params }: PageProps) {
 										href={social.url}
 										target="_blank"
 										rel="noopener noreferrer"
-										className="group"
 									>
 										<Button
 											variant="outline"
-											className="border-[#70C7BA]/40 text-white hover:bg-[#70C7BA]/20 bg-gradient-to-r from-[#70C7BA]/10 to-[#49EACB]/10 backdrop-blur-xl transition-all duration-300 group-hover:scale-105"
+											size="sm"
+											className="border-gray-300 text-gray-700 hover:bg-[#70C7BA] hover:text-white hover:border-[#70C7BA] transition-all"
 										>
 											<IconComponent className="w-4 h-4 mr-2" />
 											{social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}
@@ -272,27 +261,21 @@ export default function UserProfilePage({ params }: PageProps) {
 					</div>
 				)}
 
-				{/* Main Content Grid */}
-				<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+				{/* Main Content */}
+				<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 					{/* Left Column - About */}
-					<div className="space-y-6">
+					<div className="lg:col-span-2">
 						{userPage.longDescription && (
-							<Card className="border-[#70C7BA]/30 bg-gradient-to-br from-slate-900/95 to-slate-800/95 backdrop-blur-xl">
+							<Card className="bg-white shadow-lg border border-gray-200">
 								<CardContent className="p-8">
 									<div className="flex items-center gap-3 mb-6">
 										<User className="w-6 h-6 text-[#70C7BA]" />
-										<h2 className="text-2xl font-bold text-white">
+										<h2 className="text-2xl font-bold text-gray-900">
 											About {userPage.displayName || userPage.handle}
 										</h2>
 									</div>
 									<div 
-										className="prose prose-lg max-w-none text-gray-300 leading-relaxed"
-										style={{ 
-											'--tw-prose-body': '#d1d5db',
-											'--tw-prose-headings': '#ffffff',
-											'--tw-prose-links': '#70C7BA',
-											'--tw-prose-strong': '#ffffff',
-										} as React.CSSProperties}
+										className="prose prose-lg max-w-none text-gray-700 leading-relaxed"
 										dangerouslySetInnerHTML={{ __html: userPage.longDescription }}
 									/>
 								</CardContent>
@@ -302,24 +285,24 @@ export default function UserProfilePage({ params }: PageProps) {
 
 					{/* Right Column - Support */}
 					<div className="space-y-6">
-						<Card className="border-[#70C7BA]/30 bg-gradient-to-br from-slate-900/95 to-slate-800/95 backdrop-blur-xl">
-							<CardContent className="p-8">
-								<div className="text-center mb-8">
-									<div className="inline-flex items-center gap-3 bg-gradient-to-r from-[#70C7BA]/20 to-[#49EACB]/20 backdrop-blur-xl border border-[#70C7BA]/30 rounded-full px-6 py-3 mb-6">
-										<Coffee className="w-6 h-6 text-[#70C7BA]" />
-										<span className="text-[#70C7BA] font-semibold">Support with Kaspa</span>
+						<Card className="bg-white shadow-lg border border-gray-200">
+							<CardContent className="p-6">
+								<div className="text-center mb-6">
+									<div className="inline-flex items-center gap-3 bg-[#70C7BA] text-white rounded-full px-4 py-2 mb-4">
+										<Coffee className="w-5 h-5" />
+										<span className="font-semibold">Support with Kaspa</span>
 									</div>
-									<h2 className="text-3xl font-bold text-white mb-2">
+									<h2 className="text-2xl font-bold text-gray-900 mb-2">
 										Buy me a coffee
 									</h2>
-									<p className="text-gray-400">
+									<p className="text-gray-600">
 										Send Kaspa donations to show your support
 									</p>
 								</div>
 								
-								{/* Donation Tabs */}
+								{/* Wallet Address and QR */}
 								<Tabs defaultValue="qr" className="w-full">
-									<TabsList className="grid w-full grid-cols-2 mb-6 bg-slate-800 border-[#70C7BA]/30">
+									<TabsList className="grid w-full grid-cols-2 mb-6 bg-gray-100">
 										<TabsTrigger value="qr" className="data-[state=active]:bg-[#70C7BA] data-[state=active]:text-white">
 											<QrCode className="w-4 h-4 mr-2" />
 											QR Code
@@ -330,29 +313,29 @@ export default function UserProfilePage({ params }: PageProps) {
 										</TabsTrigger>
 									</TabsList>
 									
-									<TabsContent value="qr" className="space-y-6">
+									<TabsContent value="qr" className="space-y-4">
 										<div className="flex justify-center">
-											<div className="bg-white p-6 rounded-xl shadow-lg">
-												<QRCodeDisplay address={userPage.kaspaAddress} size={200} />
+											<div className="bg-white p-4 rounded-lg border border-gray-200 shadow-inner">
+												<QRCodeDisplay address={userPage.kaspaAddress} size={180} />
 											</div>
 										</div>
-										<p className="text-center text-gray-400 text-sm">
+										<p className="text-center text-gray-500 text-sm">
 											Scan with your Kaspa wallet app
 										</p>
 									</TabsContent>
 									
-									<TabsContent value="address" className="space-y-6">
-										<div className="p-4 rounded-lg border border-[#70C7BA]/30 bg-slate-800/50 font-mono text-sm text-gray-300 break-all text-center">
+									<TabsContent value="address" className="space-y-4">
+										<div className="p-4 rounded-lg border border-gray-200 bg-gray-50 font-mono text-sm text-gray-900 break-all text-center">
 											{userPage.kaspaAddress}
 										</div>
 									</TabsContent>
 								</Tabs>
 								
 								{/* Action Buttons */}
-								<div className="flex flex-col gap-4 mt-8">
+								<div className="flex flex-col gap-3 mt-6">
 									<Button
 										onClick={handleCopyAddress}
-										className="w-full bg-gradient-to-r from-[#70C7BA] to-[#49EACB] hover:from-[#49EACB] hover:to-[#70C7BA] text-white font-semibold py-3 rounded-full shadow-lg hover:shadow-[#70C7BA]/25 transition-all duration-300"
+										className="w-full bg-[#70C7BA] hover:bg-[#5ba8a0] text-white font-semibold py-3"
 									>
 										<Copy className="w-4 h-4 mr-2" />
 										{copied ? 'Address Copied!' : 'Copy Kaspa Address'}
@@ -367,11 +350,23 @@ export default function UserProfilePage({ params }: PageProps) {
 												: `kaspa:${userPage.kaspaAddress}`;
 											window.open(kaspaUrl, '_blank');
 										}}
-										className="w-full border-[#70C7BA]/40 text-[#70C7BA] hover:bg-[#70C7BA]/10 py-3 rounded-full transition-all duration-300"
+										className="w-full border-[#70C7BA] text-[#70C7BA] hover:bg-[#70C7BA] hover:text-white py-3"
 									>
 										<ExternalLink className="w-4 h-4 mr-2" />
 										Open in Wallet
 									</Button>
+								</div>
+							</CardContent>
+						</Card>
+
+						{/* Wallet Address Card */}
+						<Card className="bg-gray-900 text-white shadow-lg">
+							<CardContent className="p-4">
+								<div className="text-center">
+									<p className="text-gray-400 text-sm mb-2">Kaspa Address</p>
+									<p className="font-mono text-xs break-all text-gray-200">
+										{userPage.kaspaAddress}
+									</p>
 								</div>
 							</CardContent>
 						</Card>
