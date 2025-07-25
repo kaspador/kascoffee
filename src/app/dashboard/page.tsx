@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,7 +33,7 @@ interface UserProfile {
 
 export default function DashboardPage() {
 	// Temporarily skip auth check - will implement with Directus
-	const session = { user: { name: 'User' } };
+	const session = useMemo(() => ({ user: { name: 'User' } }), []);
 	const isPending = false;
 	const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 	const [profileLoading, setProfileLoading] = useState(false);

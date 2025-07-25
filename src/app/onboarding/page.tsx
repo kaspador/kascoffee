@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 // Temporarily disabled - will implement with Directus auth
-import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

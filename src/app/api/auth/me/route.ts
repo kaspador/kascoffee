@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { DirectusAPI } from '@/lib/directus';
 
 export async function GET() {
