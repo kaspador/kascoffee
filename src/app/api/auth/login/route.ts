@@ -15,10 +15,14 @@ export async function POST(request: NextRequest) {
     // Login with Directus
     const authData = await DirectusAPI.login(email, password);
     
+    if (!authData.access_token) {
+      throw new Error('No access token received from Directus');
+    }
+    
     // Get user details
     const user = await DirectusAPI.getCurrentUser();
     
-    return NextResponse.json({ 
+    const response = NextResponse.json({ 
       success: true, 
       user: {
         id: user.id,
@@ -29,6 +33,17 @@ export async function POST(request: NextRequest) {
       },
       token: authData.access_token
     });
+
+    // Set HTTP-only cookie for authentication
+    response.cookies.set('directus_token', authData.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: '/'
+    });
+
+    return response;
   } catch (error: unknown) {
     console.error('Login error:', error);
     return NextResponse.json(

@@ -1,6 +1,6 @@
 import { createDirectus, rest, authentication, readMe, createUser, readItems, createItem, updateItem, deleteItem } from '@directus/sdk';
 
-// Directus client configuration
+// Server-side Directus client configuration
 const directus = createDirectus(process.env.NEXT_PUBLIC_DIRECTUS_URL || 'https://directus-production-09ff.up.railway.app')
   .with(rest())
   .with(authentication());
@@ -49,58 +49,24 @@ export interface Social {
   date_updated: string;
 }
 
-// Helper functions for common operations
+// Server-side only helper functions
 export const DirectusAPI = {
-  // Authentication
+  // Authentication (server-side only)
   async login(email: string, password: string) {
     const result = await directus.login({ email, password });
-    // Store auth in localStorage for persistence
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('directus_auth_token', JSON.stringify(result));
-    }
     return result;
   },
 
   async logout() {
-    const result = await directus.logout();
-    // Clear auth from localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('directus_auth_token');
-    }
-    return result;
+    return await directus.logout();
   },
 
   async getCurrentUser() {
-    try {
-      // Check if we have stored auth token
-      if (typeof window !== 'undefined') {
-        const storedToken = localStorage.getItem('directus_auth_token');
-        if (storedToken) {
-          const tokenData = JSON.parse(storedToken);
-          if (tokenData.access_token) {
-            // Set the token for current request
-            directus.setToken(tokenData.access_token);
-          }
-        }
-      }
-      return await directus.request(readMe());
-    } catch (error) {
-      console.error('Error getting current user:', error);
-      // Clear invalid token
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('directus_auth_token');
-      }
-      throw error;
-    }
+    return await directus.request(readMe());
   },
 
-  async isAuthenticated(): Promise<boolean> {
-    try {
-      await this.getCurrentUser();
-      return true;
-    } catch {
-      return false;
-    }
+  async setToken(token: string) {
+    directus.setToken(token);
   },
 
   async register(email: string, password: string, first_name?: string, last_name?: string) {

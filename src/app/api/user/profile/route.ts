@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DirectusAPI } from '@/lib/directus';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
 	try {
+		// Get token from cookies
+		const token = request.cookies.get('directus_token')?.value;
+		if (!token) {
+			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+		}
+
+		// Set token for Directus request
+		await DirectusAPI.setToken(token);
+
 		// Get current authenticated user
 		const user = await DirectusAPI.getCurrentUser();
 		if (!user) {
@@ -46,6 +55,15 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
 	try {
+		// Get token from cookies
+		const token = request.cookies.get('directus_token')?.value;
+		if (!token) {
+			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+		}
+
+		// Set token for Directus request
+		await DirectusAPI.setToken(token);
+
 		// Get current authenticated user
 		const user = await DirectusAPI.getCurrentUser();
 		if (!user) {

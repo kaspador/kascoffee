@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { DirectusAPI } from '@/lib/directus';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -52,16 +51,13 @@ export default function DashboardPage() {
 		const checkAuth = async () => {
 			try {
 				setAuthLoading(true);
-				const isAuth = await DirectusAPI.isAuthenticated();
-				if (isAuth) {
-					const user = await DirectusAPI.getCurrentUser();
-					setAuthUser({
-						id: user.id,
-						email: user.email,
-						first_name: user.first_name,
-						last_name: user.last_name,
-						name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email
-					});
+				const response = await fetch('/api/auth/me', {
+					credentials: 'include', // Include cookies
+				});
+
+				if (response.ok) {
+					const data = await response.json();
+					setAuthUser(data.user);
 				} else {
 					router.push('/auth/signin');
 					return;
@@ -141,7 +137,10 @@ export default function DashboardPage() {
 
 	const handleLogout = async () => {
 		try {
-			await DirectusAPI.logout();
+			await fetch('/api/auth/logout', {
+				method: 'POST',
+				credentials: 'include', // Include cookies
+			});
 			setAuthUser(null);
 			setUserProfile(null);
 			setSocials(null);
