@@ -349,12 +349,16 @@ export default function UserProfilePage({ params }: PageProps) {
 					{/* Wallet Activity Section */}
 					{userPage.kaspaAddress && (
 						<div className="lg:col-span-3 mb-8">
-							<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+							<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start align-top">
 								{/* Wallet Balance */}
-								<WalletBalance address={userPage.kaspaAddress} />
+								<div className="flex">
+									<WalletBalance address={userPage.kaspaAddress} />
+								</div>
 								
 								{/* Recent Transactions */}
-								<TransactionList address={userPage.kaspaAddress} limit={5} />
+								<div className="flex">
+									<TransactionList address={userPage.kaspaAddress} limit={5} />
+								</div>
 							</div>
 						</div>
 					)}

@@ -64,7 +64,7 @@ export function TransactionList({ address, limit = 10 }: TransactionListProps) {
 
   if (loading) {
     return (
-      <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl h-fit">
+      <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl h-fit w-full">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg text-white">
             <History className="w-5 h-5 text-[#70C7BA]" />
@@ -82,7 +82,7 @@ export function TransactionList({ address, limit = 10 }: TransactionListProps) {
 
   if (error) {
     return (
-      <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl h-fit">
+      <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl h-fit w-full">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg text-white">
             <History className="w-5 h-5 text-[#70C7BA]" />
@@ -107,7 +107,7 @@ export function TransactionList({ address, limit = 10 }: TransactionListProps) {
   }
 
   return (
-    <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl h-fit">
+    <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl h-fit w-full">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-lg text-white">
           <History className="w-5 h-5 text-[#70C7BA]" />
@@ -136,7 +136,7 @@ export function TransactionList({ address, limit = 10 }: TransactionListProps) {
         )}
       </CardHeader>
       
-      <CardContent className="pt-0">
+      <CardContent className="pt-0 pb-4">
         {transactions.length === 0 ? (
           <div className="text-center py-8">
             <History className="w-12 h-12 text-[#70C7BA]/30 mx-auto mb-3" />

@@ -85,7 +85,7 @@ export function WalletBalance({ address }: WalletBalanceProps) {
 
   if (loading) {
     return (
-      <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl h-fit">
+      <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl h-fit w-full">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg text-white">
             <Wallet className="w-5 h-5 text-[#70C7BA]" />
@@ -103,7 +103,7 @@ export function WalletBalance({ address }: WalletBalanceProps) {
 
   if (error) {
     return (
-      <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl h-fit">
+      <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl h-fit w-full">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg text-white">
             <Wallet className="w-5 h-5 text-[#70C7BA]" />
@@ -126,7 +126,7 @@ export function WalletBalance({ address }: WalletBalanceProps) {
   }
 
   return (
-    <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl h-fit">
+    <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl h-fit w-full">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-lg text-white">
           <Wallet className="w-5 h-5 text-[#70C7BA]" />
@@ -140,7 +140,7 @@ export function WalletBalance({ address }: WalletBalanceProps) {
           </button>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0">
+      <CardContent className="pt-0 pb-4">
         {balance && (
           <div className="space-y-4">
             {/* Current Balance */}
