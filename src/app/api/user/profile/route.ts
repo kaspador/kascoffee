@@ -77,6 +77,10 @@ export async function PUT(request: NextRequest) {
 		
 		console.log('Profile update request:', { handle, displayName, userId: user.id });
 		
+		// Clean up URLs - remove trailing semicolons and whitespace
+		const cleanProfileImage = profileImage ? profileImage.trim().replace(/;+$/, '') : null;
+		const cleanBackgroundImage = backgroundImage ? backgroundImage.trim().replace(/;+$/, '') : null;
+		
 		// Check if user page already exists for this user
 		let userPage;
 		try {
@@ -95,8 +99,8 @@ export async function PUT(request: NextRequest) {
 			short_description: shortDescription || '',
 			long_description: longDescription || '',
 			kaspa_address: kaspaAddress,
-			profile_image: profileImage || null,
-			background_image: backgroundImage || null,
+			profile_image: cleanProfileImage,
+			background_image: cleanBackgroundImage,
 			background_color: '#0f172a',
 			foreground_color: '#ffffff',
 			is_active: true,
