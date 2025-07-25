@@ -113,7 +113,7 @@ export const DirectusAPI = {
 
   async getUserPageByUserId(userId: string): Promise<UserPage[]> {
     try {
-      const pages = await directusPublic.request(readItems('user_pages', {
+      const pages = await directusAuth.request(readItems('user_pages', {
         filter: { user_id: userId } // Changed from 'user' to 'user_id'
       })) as unknown[];
       return pages as UserPage[];
