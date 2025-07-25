@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { DirectusAPI } from '@/lib/directus';
+import { DirectusAPI, Social } from '@/lib/directus';
 
 export async function GET(
   request: NextRequest,
@@ -16,7 +16,7 @@ export async function GET(
     }
 
     // Get user's social links (defensive - socials collection may not exist yet)
-    let userSocials: any[] = [];
+    let userSocials: Social[] = [];
     try {
       userSocials = await DirectusAPI.getUserSocials(userPage.user_id);
     } catch (socialError) {
