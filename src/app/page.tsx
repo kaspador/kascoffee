@@ -46,7 +46,7 @@ export default function LandingPage() {
 						<div className="flex flex-col sm:flex-row gap-6 justify-center mt-12">
 							<Button size="lg" asChild className="bg-gradient-to-r from-[#70C7BA] to-[#49EACB] hover:from-[#49EACB] hover:to-[#70C7BA] text-black font-semibold px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-[#70C7BA]/25 transition-all duration-300 group">
 								<Link href="/auth/signup" className="flex items-center gap-2">
-									Get Started Free
+									Create your own page
 									<ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
 								</Link>
 							</Button>
