@@ -112,26 +112,37 @@ export async function PUT(request: NextRequest) {
 		
 		if (userPage) {
 			// Update existing user page
-			const updatedPage = await DirectusAPI.updateUserPage(userPage.id, userPageData);
-			return NextResponse.json({ 
-				userPage: {
-					id: updatedPage.id,
-					handle: updatedPage.handle,
-					displayName: updatedPage.display_name,
-					shortDescription: updatedPage.short_description,
-					longDescription: updatedPage.long_description,
-					kaspaAddress: updatedPage.kaspa_address,
-					profileImage: updatedPage.profile_image,
-					backgroundImage: updatedPage.background_image,
-					backgroundColor: updatedPage.background_color,
-					foregroundColor: updatedPage.foreground_color,
-					isActive: updatedPage.is_active,
-					updatedAt: new Date().toISOString()
-				}
-			});
-		} else {
-			// Create new user page
+			console.log('Attempting to UPDATE user page:', userPage.id);
+			try {
+				const updatedPage = await DirectusAPI.updateUserPage(userPage.id, userPageData);
+				console.log('UPDATE successful:', updatedPage.id);
+				return NextResponse.json({ 
+					userPage: {
+						id: updatedPage.id,
+						handle: updatedPage.handle,
+						displayName: updatedPage.display_name,
+						shortDescription: updatedPage.short_description,
+						longDescription: updatedPage.long_description,
+						kaspaAddress: updatedPage.kaspa_address,
+						profileImage: updatedPage.profile_image,
+						backgroundImage: updatedPage.background_image,
+						backgroundColor: updatedPage.background_color,
+						foregroundColor: updatedPage.foreground_color,
+						isActive: updatedPage.is_active,
+						updatedAt: new Date().toISOString()
+					}
+				});
+			} catch (updateError) {
+				console.error('UPDATE failed, falling back to CREATE:', updateError);
+				// Update failed, try to create instead
+			}
+		}
+		
+		// Create new user page (or fallback from failed update)
+		console.log('Attempting to CREATE user page');
+		try {
 			const newPage = await DirectusAPI.createUserPage(userPageData);
+			console.log('CREATE successful:', newPage.id);
 			return NextResponse.json({ 
 				userPage: {
 					id: newPage.id,
@@ -148,6 +159,9 @@ export async function PUT(request: NextRequest) {
 					updatedAt: new Date().toISOString()
 				}
 			});
+		} catch (createError) {
+			console.error('CREATE failed:', createError);
+			return NextResponse.json({ error: createError instanceof Error ? createError.message : 'Internal server error' }, { status: 500 });
 		}
 	} catch (error) {
 		console.error('Error updating profile:', error);
