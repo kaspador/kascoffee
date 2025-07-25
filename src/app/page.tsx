@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Coffee, Users, Zap, Globe, ArrowRight, Star } from 'lucide-react';
 import { Navbar } from "@/components/navbar";
+import FeatureCard from "@/components/feature-card";
 
 export default function LandingPage() {
 	return (
@@ -57,29 +58,23 @@ export default function LandingPage() {
 
 						{/* Features Grid */}
 						<div className="grid md:grid-cols-3 gap-8 mt-20 max-w-5xl mx-auto">
-							<div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-[#70C7BA]/50 transition-all duration-300 group">
-								<div className="w-12 h-12 bg-gradient-to-r from-[#70C7BA] to-[#49EACB] rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-									<Users className="w-6 h-6 text-white" />
-								</div>
-								<h3 className="text-xl font-semibold text-white mb-2">Personalized Pages</h3>
-								<p className="text-gray-400">Custom handles, themes, and descriptions for your unique donation page</p>
-							</div>
+							<FeatureCard
+								icon={Users}
+								title="Personalized Pages"
+								description="Custom handles, themes, and descriptions for your unique donation page"
+							/>
 
-							<div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-[#70C7BA]/50 transition-all duration-300 group">
-								<div className="w-12 h-12 bg-gradient-to-r from-[#70C7BA] to-[#49EACB] rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-									<Zap className="w-6 h-6 text-white" />
-								</div>
-								<h3 className="text-xl font-semibold text-white mb-2">Instant Kaspa</h3>
-								<p className="text-gray-400">Fast, secure cryptocurrency donations with QR codes</p>
-							</div>
+							<FeatureCard
+								icon={Zap}
+								title="Instant Kaspa"
+								description="Fast, secure cryptocurrency donations with QR codes"
+							/>
 
-							<div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-[#70C7BA]/50 transition-all duration-300 group">
-								<div className="w-12 h-12 bg-gradient-to-r from-[#70C7BA] to-[#49EACB] rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-									<Globe className="w-6 h-6 text-white" />
-								</div>
-								<h3 className="text-xl font-semibold text-white mb-2">Social Integration</h3>
-								<p className="text-gray-400">Link your social accounts and share your donation page</p>
-							</div>
+							<FeatureCard
+								icon={Globe}
+								title="Social Integration"
+								description="Link your social accounts and share your donation page"
+							/>
 						</div>
 
 						{/* Stats */}
