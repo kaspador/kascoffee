@@ -123,28 +123,19 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 		return () => clearTimeout(timeoutId);
 	}, [currentHandle, userPage?.handle, checkHandleAvailability]);
 
+	// Reset form when userPage data changes (including when switching tabs)
 	useEffect(() => {
-		console.log('ProfileForm: userPage prop changed:', userPage);
 		if (userPage) {
-			console.log('ProfileForm: Resetting form with data:', {
-				handle: userPage.handle,
-				displayName: userPage.displayName,
-				kaspaAddress: userPage.kaspaAddress,
-				shortDescription: userPage.shortDescription,
-				longDescription: userPage.longDescription
-			});
 			reset({
 				handle: userPage.handle,
 				displayName: userPage.displayName,
-				kaspaAddress: userPage.kaspaAddress || '',
+				kaspaAddress: userPage.kaspaAddress,
 				shortDescription: userPage.shortDescription || '',
 				profileImage: userPage.profileImage || '',
 				backgroundImage: userPage.backgroundImage || ''
 			});
+			// Also reset the long description state
 			setLongDescription(userPage.longDescription || '');
-			setHandleAvailable(null); // Reset handle availability check
-		} else {
-			console.log('ProfileForm: userPage is null/undefined, not resetting form');
 		}
 	}, [userPage, reset]);
 
