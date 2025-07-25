@@ -14,10 +14,10 @@ export default function QRCodeDisplay({ address, size = 200 }: QRCodeDisplayProp
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		console.log('QRCodeDisplay: Starting QR generation for address:', address);
+	
 		
 		if (!address) {
-			console.error('QRCodeDisplay: No address provided');
+	
 			setError('No address provided');
 			setLoading(false);
 			return;
@@ -25,7 +25,7 @@ export default function QRCodeDisplay({ address, size = 200 }: QRCodeDisplayProp
 
 		// Clean the address - remove kaspa: prefix if present
 		const cleanAddress = address.replace(/^kaspa:/, '').trim();
-		console.log('QRCodeDisplay: Clean address:', cleanAddress);
+	
 
 		if (!cleanAddress) {
 			setError('Invalid address');
@@ -48,11 +48,10 @@ export default function QRCodeDisplay({ address, size = 200 }: QRCodeDisplayProp
 				errorCorrectionLevel: 'M'
 			})
 			.then(() => {
-				console.log('QRCodeDisplay: QR code generated successfully');
+		
 				setLoading(false);
 			})
-			.catch((err) => {
-				console.error('QRCodeDisplay: Error generating QR code:', err);
+			.catch(() => {
 				setError('Failed to generate QR code');
 				setLoading(false);
 			});

@@ -87,39 +87,37 @@ export const DirectusAPI = {
   // User Pages
   async getUserPage(handle: string): Promise<UserPage | null> {
     try {
-      console.log(`DirectusAPI.getUserPage: Searching for handle "${handle}"`);
+      
       
       const pages = await directusPublic.request(readItems('user_pages', {
         filter: { handle: { _eq: handle } }, // Use exact match to be explicit
         limit: 1
       })) as unknown[];
       
-      console.log(`DirectusAPI.getUserPage: Found ${pages.length} pages for handle "${handle}"`);
+      
       
       if (pages.length > 0) {
         const page = pages[0] as UserPage;
-        console.log(`DirectusAPI.getUserPage: Page found - ID: ${page.id}, Active: ${page.is_active}, Handle: ${page.handle}`);
+        
         return page;
       }
       
-      console.log(`DirectusAPI.getUserPage: No page found for handle "${handle}"`);
+      
       return null;
-    } catch (error: unknown) {
-      console.error(`DirectusAPI.getUserPage: Error fetching user page for handle "${handle}":`, error);
-      return null;
-    }
+          } catch {
+        return null;
+      }
   },
 
   async getUserPageByUserId(userId: string): Promise<UserPage[]> {
     try {
       const pages = await directusAuth.request(readItems('user_pages', {
         filter: { user_id: userId } // Changed from 'user' to 'user_id'
-      })) as unknown[];
-      return pages as UserPage[];
-    } catch (error: unknown) {
-      console.error('Error fetching user pages by user ID:', error);
-      return [];
-    }
+              })) as unknown[];
+        return pages as UserPage[];
+      } catch {
+        return [];
+      }
   },
 
   async createUserPage(data: Omit<UserPage, 'id' | 'date_created' | 'date_updated'>) {
@@ -132,14 +130,13 @@ export const DirectusAPI = {
 
   async getAllUserPages(): Promise<UserPage[]> {
     try {
-      console.log('DirectusAPI.getAllUserPages: Fetching all user pages');
+      
       const pages = await directusPublic.request(readItems('user_pages')) as unknown[];
-      console.log(`DirectusAPI.getAllUserPages: Found ${pages.length} total pages`);
-      return pages as UserPage[];
-    } catch (error: unknown) {
-      console.error('DirectusAPI.getAllUserPages: Error fetching all user pages:', error);
-      return [];
-    }
+              
+        return pages as UserPage[];
+      } catch {
+        return [];
+      }
   },
 
   // Socials
@@ -149,10 +146,9 @@ export const DirectusAPI = {
         filter: { user: userId, is_visible: true } // Use 'user' to match the interface
       })) as unknown[];
       return socials as Social[];
-    } catch (error: unknown) {
-      console.error('Error fetching user socials (socials collection may not exist yet):', error);
-      return []; // Return empty array if socials collection doesn't exist
-    }
+          } catch {
+        return []; // Return empty array if socials collection doesn't exist
+      }
   },
 
   async createSocial(data: Omit<Social, 'id' | 'date_created' | 'date_updated'>) {

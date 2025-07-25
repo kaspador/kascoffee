@@ -106,8 +106,7 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 					message: 'This handle is already taken. Please choose a different one.' 
 				});
 			}
-		} catch (error) {
-			console.error('Error checking handle:', error);
+		} catch {
 		} finally {
 			setCheckingHandle(false);
 		}

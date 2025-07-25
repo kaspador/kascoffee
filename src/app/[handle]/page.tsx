@@ -40,28 +40,28 @@ interface UserPageData {
 
 async function fetchUserPage(handle: string): Promise<UserPageData | null> {
 	try {
-		console.log('Frontend: Fetching user page for handle:', handle);
+
 		const response = await fetch(`/api/user-page/${handle}`, {
 			cache: 'no-store'
 		});
 		
-		console.log('Frontend: API response status:', response.status);
+
 		
 		if (response.status === 404) {
-			console.log('Frontend: User page not found (404)');
+
 			return null;
 		}
 		
 		if (!response.ok) {
-			console.error('Frontend: API error:', response.status, response.statusText);
+
 			throw new Error(`API Error: ${response.status}`);
 		}
 		
 		const data = await response.json();
-		console.log('Frontend: Successfully fetched user page data', data);
+
 		return data;
 	} catch (error) {
-		console.error('Frontend: Error fetching user page:', error);
+
 		throw error;
 	}
 }
@@ -91,13 +91,12 @@ export default function UserProfilePage({ params }: PageProps) {
 
 		async function loadUserPage() {
 			setLoading(true);
-			console.log('Frontend: Loading user page for handle:', handle);
+	
 			try {
 				const data = await fetchUserPage(handle);
-				console.log('Frontend: Received user page data:', data);
+	
 				setUserPage(data);
-			} catch (error) {
-				console.error('Frontend: Error loading user page:', error);
+			} catch {
 				setUserPage(null);
 			} finally {
 				setLoading(false);
@@ -114,8 +113,7 @@ export default function UserProfilePage({ params }: PageProps) {
 			await navigator.clipboard.writeText(address);
 			setCopied(true);
 			setTimeout(() => setCopied(false), 2000);
-		} catch (err) {
-			console.error('Failed to copy address:', err);
+		} catch {
 		}
 	};
 
@@ -135,8 +133,7 @@ export default function UserProfilePage({ params }: PageProps) {
 				case 'discord':
 					try {
 						await navigator.clipboard.writeText(`${text}\n${url}`);
-					} catch (err) {
-						console.error('Failed to copy for Discord:', err);
+					} catch {
 					}
 					return;
 				case 'telegram':
@@ -156,8 +153,7 @@ export default function UserProfilePage({ params }: PageProps) {
 			} else {
 				try {
 					await navigator.clipboard.writeText(url);
-				} catch (err) {
-					console.error('Failed to copy URL:', err);
+				} catch {
 				}
 			}
 		}
@@ -175,7 +171,7 @@ export default function UserProfilePage({ params }: PageProps) {
 	}
 
 	if (!userPage) {
-		console.error('Frontend: User page data is null, calling notFound for handle:', handle);
+
 		notFound();
 	}
 

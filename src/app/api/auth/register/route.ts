@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       userData.role = roleId;
     }
 
-    console.log('Creating user with data:', { ...userData, password: '[HIDDEN]' });
+    
 
     const response = await fetch(`${directusUrl}/users`, {
       method: 'POST',
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
 
     // Check if response has content before parsing
     const responseText = await response.text();
-    console.log('Directus registration response:', response.status, responseText);
+    
 
     if (!response.ok) {
       let errorMessage = 'Registration failed';
@@ -75,9 +75,9 @@ export async function POST(request: NextRequest) {
             errorMessage = errorDetail || 'Registration failed';
           }
         }
-      } catch (parseError) {
-        console.error('Error parsing error response:', parseError);
-      }
+              } catch {
+          // Error parsing error response - use default message
+        }
       throw new Error(errorMessage);
     }
 
@@ -86,11 +86,10 @@ export async function POST(request: NextRequest) {
       try {
         const userData = JSON.parse(responseText);
         user = userData.data || userData;
-        console.log('User created successfully:', user.id);
-      } catch (parseError) {
-        console.error('Error parsing success response:', parseError);
-        user = { email }; // Fallback user object
-      }
+        
+              } catch {
+          user = { email }; // Fallback user object
+        }
     }
 
     // Now automatically log in the user after successful registration
@@ -108,7 +107,7 @@ export async function POST(request: NextRequest) {
 
       if (loginResponse.ok) {
         const loginData = await loginResponse.json();
-        console.log('Auto-login successful after registration');
+        
         
         // Set the token as HTTP-only cookie
         const response = NextResponse.json({ 
@@ -128,18 +127,18 @@ export async function POST(request: NextRequest) {
         
         return response;
       } else {
-        console.log('Auto-login failed, but registration was successful');
+        
       }
-    } catch (loginError) {
-      console.error('Auto-login error:', loginError);
-    }
+          } catch {
+        // Auto-login failed, but registration was successful
+      }
     
     return NextResponse.json({ 
       success: true, 
       user: user 
     });
   } catch (error: unknown) {
-    console.error('Registration error:', error);
+    
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Registration failed' },
       { status: 400 }

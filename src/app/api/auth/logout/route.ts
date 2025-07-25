@@ -17,11 +17,10 @@ export async function POST() {
     });
 
     return response;
-  } catch (error: unknown) {
-    console.error('Logout error:', error);
-    return NextResponse.json(
-      { error: 'Logout failed' },
-      { status: 500 }
-    );
-  }
+      } catch {
+      return NextResponse.json(
+        { error: 'Logout failed' },
+        { status: 500 }
+      );
+    }
 } 

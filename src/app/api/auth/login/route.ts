@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error: unknown) {
-    console.error('Login error:', error);
+    
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Login failed' },
       { status: 401 }

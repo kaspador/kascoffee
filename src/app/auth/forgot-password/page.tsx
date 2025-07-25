@@ -26,10 +26,9 @@ export default function ForgotPasswordPage() {
       // Temporarily show message that feature is coming soon
       setIsSuccess(true);
       setMessage('Password reset functionality is being updated. Please contact support for password resets.');
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
-      console.error('Forgot password error:', err);
-    } finally {
+          } catch {
+        setError('An unexpected error occurred. Please try again.');
+      } finally {
       setIsLoading(false);
     }
   };

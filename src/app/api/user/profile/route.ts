@@ -42,14 +42,13 @@ export async function GET(request: NextRequest) {
 				});
 			}
 		} catch {
-			console.log('No user page found, will show null');
+
 		}
 		
 		return NextResponse.json({ 
 			userPage: null // No profile set up yet
 		});
-	} catch (error) {
-		console.error('Error fetching profile:', error);
+		} catch {
 		return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 	}
 }
@@ -132,7 +131,7 @@ export async function PUT(request: NextRequest) {
 		
 		if (userPage) {
 			// Update existing user page
-			console.log(`Updating existing user page ${userPage.id} for user ${user.id}`);
+
 			const updatedPage = await DirectusAPI.updateUserPage(userPage.id, userPageData);
 			return NextResponse.json({ 
 				userPage: {
@@ -152,7 +151,7 @@ export async function PUT(request: NextRequest) {
 			});
 		} else {
 			// Create new user page
-			console.log(`Creating new user page for user ${user.id} with handle ${handle}`);
+
 			const newPage = await DirectusAPI.createUserPage(userPageData);
 			return NextResponse.json({ 
 				userPage: {
@@ -172,7 +171,7 @@ export async function PUT(request: NextRequest) {
 			});
 		}
 	} catch (error) {
-		console.error('Error updating profile:', error);
+
 		return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal server error' }, { status: 500 });
 	}
 } 

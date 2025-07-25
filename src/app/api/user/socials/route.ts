@@ -8,8 +8,7 @@ export async function GET() {
 		// For now, return empty array to prevent build errors
 		
 		return NextResponse.json({ socials: [] });
-	} catch (error) {
-		console.error('Error fetching social links:', error);
+	} catch {
 		return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 	}
 }
@@ -29,8 +28,7 @@ export async function POST(request: NextRequest) {
 				updatedAt: new Date().toISOString()
 			}
 		});
-	} catch (error) {
-		console.error('Error creating social link:', error);
+	} catch {
 		return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 	}
 }
@@ -48,8 +46,7 @@ export async function PUT(request: NextRequest) {
 				updatedAt: new Date().toISOString()
 			}
 		});
-	} catch (error) {
-		console.error('Error updating social link:', error);
+	} catch {
 		return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 	}
 }
@@ -60,8 +57,7 @@ export async function DELETE() {
 		// For now, return success to prevent build errors
 		
 		return NextResponse.json({ message: 'Social link deleted successfully' });
-	} catch (error) {
-		console.error('Error deleting social link:', error);
+	} catch {
 		return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 	}
 } 

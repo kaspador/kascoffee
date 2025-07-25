@@ -55,10 +55,9 @@ function ResetPasswordForm() {
     try {
       // Temporarily show message that feature is coming soon
       setError('Password reset functionality is being updated. Please use the sign-in page or contact support.');
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
-      console.error('Reset password error:', err);
-    } finally {
+          } catch {
+        setError('An unexpected error occurred. Please try again.');
+      } finally {
       setIsLoading(false);
     }
   };

@@ -48,10 +48,10 @@ export default function SignUpPage() {
 
 			// Always redirect to onboarding for new users (whether auto-login worked or not)
 			// The onboarding page will handle authentication check
-			console.log('Registration successful, redirecting to onboarding. Auto-login:', data.autoLogin);
+
 			router.push('/onboarding');
 		} catch (error: unknown) {
-			console.error('Registration error:', error);
+
 			setError(error instanceof Error ? error.message : 'Registration failed');
 		} finally {
 			setIsLoading(false);

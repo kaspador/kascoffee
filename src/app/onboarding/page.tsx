@@ -62,8 +62,7 @@ export default function OnboardingPage() {
 					router.push('/auth/signin');
 					return;
 				}
-			} catch (error) {
-				console.error('Auth check failed:', error);
+			} catch {
 				router.push('/auth/signin');
 				return;
 			} finally {

@@ -62,8 +62,7 @@ export default function DashboardPage() {
 					router.push('/auth/signin');
 					return;
 				}
-			} catch (error) {
-				console.error('Auth check failed:', error);
+			} catch {
 				router.push('/auth/signin');
 				return;
 			} finally {
@@ -77,19 +76,18 @@ export default function DashboardPage() {
 	// Function to fetch profile data from API
 	const fetchProfile = useCallback(async () => {
 		try {
-			console.log('Dashboard: Starting profile fetch');
+
 			setProfileLoading(true);
 			const response = await fetch('/api/user/profile');
 			
 			if (response.ok) {
 				const data = await response.json();
-				console.log('Dashboard: Profile data received:', data);
+
 				setUserProfile(data.userPage);
 			} else {
-				console.error('Dashboard: Profile fetch failed:', response.status);
+
 			}
-		} catch (error) {
-			console.error('Dashboard: Failed to fetch profile:', error);
+		} catch {
 		} finally {
 			setProfileLoading(false);
 		}
@@ -104,8 +102,7 @@ export default function DashboardPage() {
 				const data = await response.json();
 				setSocials(data);
 			}
-		} catch (error) {
-			console.error('Failed to fetch socials:', error);
+		} catch {
 		}
 	}, []);
 
@@ -113,7 +110,7 @@ export default function DashboardPage() {
 	useEffect(() => {
 		if (!authUser) return;
 		
-		console.log('Dashboard: Auth user loaded, fetching profile');
+
 		fetchProfile();
 		fetchSocials();
 	}, [authUser, fetchProfile, fetchSocials]); // Dependencies optimized to prevent infinite loops
@@ -144,8 +141,7 @@ export default function DashboardPage() {
 			setUserProfile(null);
 			setSocials(null);
 			router.push('/');
-		} catch (error) {
-			console.error('Logout error:', error);
+		} catch {
 			// Even if logout fails, clear local state and redirect
 			setAuthUser(null);
 			setUserProfile(null);

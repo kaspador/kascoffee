@@ -38,11 +38,10 @@ export async function GET(request: NextRequest) {
         name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email
       }
     });
-  } catch (error: unknown) {
-    console.error('Get user error:', error);
-    return NextResponse.json(
-      { error: 'Not authenticated' },
-      { status: 401 }
-    );
-  }
+      } catch {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
 } 
