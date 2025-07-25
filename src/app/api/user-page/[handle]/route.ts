@@ -19,7 +19,7 @@ export async function GET(
     let userSocials: Social[] = [];
     try {
       userSocials = await DirectusAPI.getUserSocials(userPage.user_id);
-    } catch (socialError) {
+    } catch {
       // Socials collection may not exist yet, proceed without socials
       userSocials = [];
     }

@@ -111,268 +111,240 @@ export default function UserProfilePage({ params }: PageProps) {
 
 	return (
 		<div 
-			className="min-h-screen relative overflow-hidden"
+			className="min-h-screen flex flex-col justify-center items-center p-6 relative overflow-hidden"
 			style={{ 
 				backgroundColor: userPage.backgroundColor,
-				color: userPage.foregroundColor,
-				backgroundImage: userPage.backgroundImage ? `url(${userPage.backgroundImage})` : undefined,
+				backgroundImage: userPage.backgroundImage ? `url(${userPage.backgroundImage})` : 'none',
 				backgroundSize: 'cover',
 				backgroundPosition: 'center',
-				backgroundAttachment: 'fixed'
+				backgroundRepeat: 'no-repeat'
 			}}
 		>
-			{/* Background overlay for better readability */}
-			{userPage.backgroundImage && (
-				<div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-			)}
-
-			{/* Animated background effects */}
-			<div className="absolute inset-0 opacity-10">
-				<div 
-					className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl animate-pulse"
-					style={{ backgroundColor: userPage.foregroundColor }}
-				/>
-				<div 
-					className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-3xl animate-pulse delay-1000"
-					style={{ backgroundColor: userPage.foregroundColor }}
-				/>
-			</div>
-
-			<div className="relative z-10 container mx-auto px-4 py-8 md:py-12">
-				{/* Navigation */}
-				<div className="flex justify-between items-center mb-8">
-					<Link 
-						href="/"
-						className="inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 hover:bg-white/10 transition-all duration-300 font-semibold"
-						style={{ 
-							borderColor: userPage.foregroundColor,
-							color: userPage.foregroundColor
-						}}
-					>
-						<Coffee className="w-4 h-4" />
-						kas.coffee
-					</Link>
-					
-					<div className="flex items-center gap-2">
-						<Button
-							variant="outline"
-							size="sm"
-							className="border-2 hover:bg-white/10 transition-all duration-300"
+				{/* Background overlay for better readability */}
+				<div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+				
+				{/* Header */}
+				<div className="relative w-full max-w-4xl mx-auto z-10">
+					{/* Navigation */}
+					<div className="flex justify-between items-center mb-12">
+						<Link
+							href="/"
+							className="flex items-center gap-2 text-white/80 hover:text-white transition-colors duration-300"
 							style={{ 
-								borderColor: userPage.foregroundColor,
-								color: userPage.foregroundColor,
-								backgroundColor: 'transparent'
-							}}
-							onClick={() => {
-								if (navigator.share) {
-									navigator.share({
-										title: `${userPage.displayName || userPage.handle || 'User'} - kas.coffee`,
-										text: userPage.shortDescription || `Support ${userPage.displayName || userPage.handle || 'this creator'} with Kaspa donations`,
-										url: window.location.href,
-									});
-								} else {
-									navigator.clipboard.writeText(window.location.href);
-								}
+								color: userPage.foregroundColor + '80',
 							}}
 						>
-							<Share2 className="w-4 h-4 mr-2" />
-							Share
-						</Button>
-					</div>
-				</div>
-
-				<div className="max-w-4xl mx-auto">
-					<div className="grid lg:grid-cols-3 gap-8">
-						{/* Profile Section */}
-						<div className="lg:col-span-2 space-y-6">
-							{/* Profile Card */}
-							<Card 
-								className="border-2 backdrop-blur-xl shadow-2xl"
+							<Coffee className="w-5 h-5" />
+							<span className="font-kaspa-body font-semibold">kas.coffee</span>
+						</Link>
+						
+						<div className="flex items-center gap-3">
+							<Button
+								variant="outline"
+								size="sm"
+								className="border-2 backdrop-blur-md bg-white/10 hover:bg-white/20 transition-all duration-300"
 								style={{ 
-									borderColor: `${userPage.foregroundColor}40`,
-									backgroundColor: `${userPage.backgroundColor}90`
+									borderColor: userPage.foregroundColor + '60',
+									color: userPage.foregroundColor,
+								}}
+								onClick={() => {
+									if (navigator.share) {
+										navigator.share({
+											title: `${userPage.displayName || userPage.handle || 'User'} - kas.coffee`,
+											text: userPage.shortDescription || `Support ${userPage.displayName || userPage.handle || 'this creator'} with Kaspa donations`,
+											url: window.location.href,
+										});
+									} else {
+										navigator.clipboard.writeText(window.location.href);
+									}
+								}}
+							>
+								<Share2 className="w-4 h-4 mr-2" />
+								Share
+							</Button>
+						</div>
+					</div>
+
+					{/* Main Content */}
+					<div className="text-center mb-16">
+						{/* Profile Section */}
+						<div className="flex flex-col items-center gap-6 mb-12">
+							<Avatar className="w-32 h-32 border-4 shadow-2xl" style={{ borderColor: userPage.foregroundColor }}>
+								<AvatarImage src={userPage.profileImage || undefined} alt={userPage.displayName || userPage.handle || 'User'} />
+								<AvatarFallback 
+									className="bg-gradient-to-br from-indigo-500/20 to-purple-600/20 text-3xl font-bold backdrop-blur-sm border border-white/20"
+									style={{
+										color: userPage.foregroundColor,
+										backgroundColor: `${userPage.backgroundColor}40`
+									}}
+								>
+									{userPage.displayName?.charAt(0) || 'U'}
+								</AvatarFallback>
+							</Avatar>
+							
+							<div className="space-y-4">
+								<h1 className="text-5xl font-bold font-kaspa-title tracking-wide text-center" style={{ color: userPage.foregroundColor }}>
+									{userPage.displayName || userPage.handle || 'User'}
+								</h1>
+								<Badge 
+									variant="secondary" 
+									className="px-4 py-2 text-lg font-kaspa-body backdrop-blur-md"
+									style={{ 
+										backgroundColor: `${userPage.foregroundColor}20`,
+										color: userPage.foregroundColor,
+										borderColor: `${userPage.foregroundColor}40`
+									}}
+								>
+									@{userPage.handle}
+								</Badge>
+								
+								{userPage.shortDescription && (
+									<p className="text-xl font-kaspa-body max-w-2xl mx-auto leading-relaxed" style={{ color: userPage.foregroundColor + 'E0' }}>
+										{userPage.shortDescription}
+									</p>
+								)}
+							</div>
+						</div>
+
+						{/* Long Description */}
+						{userPage.longDescription && (
+							<Card 
+								className="border-2 backdrop-blur-xl shadow-xl mb-8 max-w-3xl mx-auto"
+								style={{ 
+									borderColor: `${userPage.foregroundColor}30`,
+									backgroundColor: `${userPage.backgroundColor}95`
 								}}
 							>
 								<CardContent className="p-8">
-									<div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-										<Avatar className="w-24 h-24 border-4" style={{ borderColor: userPage.foregroundColor }}>
-											<AvatarImage src={userPage.profileImage || undefined} alt={userPage.displayName || userPage.handle || 'User'} />
-											<AvatarFallback 
-												className="bg-gradient-to-br from-indigo-500/20 to-purple-600/20 text-2xl font-bold backdrop-blur-sm border border-white/20"
-												style={{
-													color: userPage.foregroundColor,
-													backgroundColor: `${userPage.backgroundColor}40`
-												}}
-											>
-												{userPage.displayName?.charAt(0) || 'U'}
-											</AvatarFallback>
-										</Avatar>
-										<div className="text-center">
-											<h1 className="text-4xl font-bold mb-2 font-kaspa-title tracking-wide" style={{ color: userPage.foregroundColor }}>
-												{userPage.displayName || userPage.handle || 'User'}
-											</h1>
-											<Badge 
-												variant="outline" 
-												className="mb-4 border-2"
-												style={{ 
-													borderColor: userPage.foregroundColor,
-													color: userPage.foregroundColor,
-													backgroundColor: 'transparent'
-												}}
-											>
-												@{userPage.handle}
-											</Badge>
-											
-											{userPage.shortDescription && (
-												<p className="text-lg mb-4 opacity-90" style={{ color: userPage.foregroundColor }}>
-													{userPage.shortDescription}
-												</p>
-											)}
-											
-											<div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm opacity-75">
-												<div className="flex items-center gap-1">
-													<Heart className="w-4 h-4" />
-													<span>{userPage.viewCount} supporters</span>
-												</div>
-												<div className="flex items-center gap-1">
-													<Star className="w-4 h-4" />
-													<span>Active since {new Date(userPage.createdAt).getFullYear()}</span>
-												</div>
-											</div>
-										</div>
-									</div>
+									<h2 className="text-2xl font-bold mb-6 font-kaspa-title text-center" style={{ color: userPage.foregroundColor }}>
+										About {userPage.displayName || userPage.handle || 'User'}
+									</h2>
+									<div 
+										className="prose prose-lg max-w-none text-center"
+										style={{ 
+											color: userPage.foregroundColor + 'DD',
+											'--tw-prose-body': userPage.foregroundColor + 'DD',
+											'--tw-prose-headings': userPage.foregroundColor,
+											'--tw-prose-links': userPage.foregroundColor,
+											'--tw-prose-bold': userPage.foregroundColor,
+											'--tw-prose-counters': userPage.foregroundColor + '80',
+											'--tw-prose-bullets': userPage.foregroundColor + '80',
+											'--tw-prose-hr': userPage.foregroundColor + '40',
+											'--tw-prose-quotes': userPage.foregroundColor + 'CC',
+											'--tw-prose-quote-borders': userPage.foregroundColor + '40',
+											'--tw-prose-captions': userPage.foregroundColor + '80',
+											'--tw-prose-code': userPage.foregroundColor,
+											'--tw-prose-pre-code': userPage.foregroundColor + 'DD',
+											'--tw-prose-pre-bg': userPage.backgroundColor + '20',
+											'--tw-prose-th-borders': userPage.foregroundColor + '40',
+											'--tw-prose-td-borders': userPage.foregroundColor + '20'
+										} as React.CSSProperties}
+										dangerouslySetInnerHTML={{ __html: userPage.longDescription }}
+									/>
 								</CardContent>
 							</Card>
+						)}
 
-							{/* Long Description */}
-							{userPage.longDescription && (
-								<Card 
-									className="border-2 backdrop-blur-xl shadow-2xl"
-									style={{ 
-										borderColor: `${userPage.foregroundColor}40`,
-										backgroundColor: `${userPage.backgroundColor}90`
-									}}
-								>
-									<CardContent className="p-8">
-										<h2 className="text-2xl font-bold mb-4 font-kaspa-title" style={{ color: userPage.foregroundColor }}>
-											About {userPage.displayName || userPage.handle || 'User'}
-										</h2>
-										<div 
-											className="prose prose-lg max-w-none"
-											style={{ color: userPage.foregroundColor }}
+						{/* Support Section */}
+						<Card 
+							className="border-2 backdrop-blur-xl shadow-xl max-w-2xl mx-auto"
+							style={{ 
+								borderColor: `${userPage.foregroundColor}40`,
+								backgroundColor: `${userPage.backgroundColor}95`
+							}}
+						>
+							<CardContent className="p-8 text-center">
+								<Coffee className="w-16 h-16 mx-auto mb-6" style={{ color: userPage.foregroundColor }} />
+								<h2 className="text-3xl font-bold mb-4 font-kaspa-title" style={{ color: userPage.foregroundColor }}>
+									Support {userPage.displayName || userPage.handle || 'User'}
+								</h2>
+								<p className="text-lg mb-8 opacity-90 font-kaspa-body" style={{ color: userPage.foregroundColor }}>
+									Send Kaspa donations to show your support
+								</p>
+								
+								<div className="space-y-6">
+									<div 
+										className="p-4 rounded-xl border-2 bg-black/20 backdrop-blur-sm font-mono text-sm break-all"
+										style={{ 
+											borderColor: `${userPage.foregroundColor}30`,
+											color: userPage.foregroundColor 
+										}}
+									>
+										{userPage.kaspaAddress}
+									</div>
+									
+									<div className="flex flex-col sm:flex-row gap-4 justify-center">
+										<Button
+											size="lg"
+											className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold px-8 py-3 rounded-xl shadow-lg transition-all duration-300"
+											onClick={() => {
+												navigator.clipboard.writeText(userPage.kaspaAddress);
+											}}
 										>
-											{parse(userPage.longDescription)}
-										</div>
-									</CardContent>
-								</Card>
-							)}
-
-							{/* Social Links */}
-							{userPage.socials.length > 0 && (
-								<Card 
-									className="border-2 backdrop-blur-xl shadow-2xl"
-									style={{ 
-										borderColor: `${userPage.foregroundColor}40`,
-										backgroundColor: `${userPage.backgroundColor}90`
-									}}
-								>
-									<CardContent className="p-8">
-										<h2 className="text-xl font-bold mb-4" style={{ color: userPage.foregroundColor }}>
-											Connect
-										</h2>
-										<div className="flex flex-wrap gap-3">
-											{userPage.socials.map((social: UserPageData['socials'][0]) => {
+											<Copy className="w-5 h-5 mr-2" />
+											Copy Address
+										</Button>
+										
+										<Button
+											variant="outline"
+											size="lg"
+											className="border-2 backdrop-blur-md bg-white/10 hover:bg-white/20 font-semibold px-8 py-3 rounded-xl transition-all duration-300"
+											style={{ 
+												borderColor: userPage.foregroundColor + '60',
+												color: userPage.foregroundColor,
+											}}
+											onClick={() => {
+												const amount = prompt('Enter Kaspa amount (optional):');
+												const kaspaUrl = amount 
+													? `kaspa:${userPage.kaspaAddress}?amount=${amount}`
+													: `kaspa:${userPage.kaspaAddress}`;
+												window.open(kaspaUrl, '_blank');
+											}}
+										>
+											<ExternalLink className="w-5 h-5 mr-2" />
+											Open Wallet
+										</Button>
+									</div>
+								</div>
+								
+								{userPage.socials.length > 0 && (
+									<div className="mt-8 pt-6 border-t" style={{ borderColor: `${userPage.foregroundColor}30` }}>
+										<h3 className="text-lg font-semibold mb-4 font-kaspa-body" style={{ color: userPage.foregroundColor }}>
+											Connect with me
+										</h3>
+										<div className="flex flex-wrap justify-center gap-3">
+											{userPage.socials.map((social) => {
 												const IconComponent = socialIconMap[social.platform as keyof typeof socialIconMap] || FaGlobe;
 												return (
-													<Badge
+													<a
 														key={social.id}
-														variant="outline"
-														className="px-4 py-2 border-2 hover:bg-white/10 transition-all duration-300 cursor-pointer"
-														style={{ 
-															borderColor: userPage.foregroundColor,
-															color: userPage.foregroundColor,
-															backgroundColor: 'transparent'
-														}}
-														onClick={() => window.open(social.url, '_blank')}
+														href={social.url}
+														target="_blank"
+														rel="noopener noreferrer"
+														className="inline-flex items-center"
 													>
-														<IconComponent className="w-4 h-4 mr-2" />
-														{social.platform?.charAt(0)?.toUpperCase() + (social.platform?.slice(1) || '')}
-														<ExternalLink className="w-3 h-3 ml-2" />
-													</Badge>
+														<Badge 
+															variant="outline" 
+															className="px-4 py-2 border-2 backdrop-blur-md bg-white/10 hover:bg-white/20 transition-all duration-300 cursor-pointer"
+															style={{ 
+																borderColor: userPage.foregroundColor + '60',
+																color: userPage.foregroundColor,
+															}}
+														>
+															<IconComponent className="w-4 h-4 mr-2" />
+															{social.platform?.charAt(0)?.toUpperCase() + (social.platform?.slice(1) || '')}
+															<ExternalLink className="w-3 h-3 ml-2" />
+														</Badge>
+													</a>
 												);
 											})}
 										</div>
-									</CardContent>
-								</Card>
-							)}
-						</div>
-
-						{/* Donation Section */}
-						<div className="space-y-6">
-							{/* Donation Card */}
-							<Card 
-								className="border-2 backdrop-blur-xl shadow-2xl sticky top-8"
-								style={{ 
-									borderColor: `${userPage.foregroundColor}40`,
-									backgroundColor: `${userPage.backgroundColor}90`
-								}}
-							>
-								<CardContent className="p-8 text-center">
-									<div className="mb-6">
-										<Coffee className="w-16 h-16 mx-auto mb-4" style={{ color: userPage.foregroundColor }} />
-										<h2 className="text-2xl font-bold mb-2" style={{ color: userPage.foregroundColor }}>
-											Support {userPage.displayName || userPage.handle || 'User'}
-										</h2>
-										<p className="opacity-75" style={{ color: userPage.foregroundColor }}>
-											Send Kaspa donations to show your support
-										</p>
 									</div>
-
-									<div className="space-y-4">
-										<div className="p-4 rounded-lg border-2" style={{ borderColor: `${userPage.foregroundColor}40` }}>
-											<div className="text-sm font-medium mb-2 opacity-75" style={{ color: userPage.foregroundColor }}>
-												Kaspa Address
-											</div>
-											<div className="font-mono text-sm break-all p-3 rounded border" style={{ 
-												backgroundColor: `${userPage.foregroundColor}10`,
-												borderColor: `${userPage.foregroundColor}30`,
-												color: userPage.foregroundColor
-											}}>
-												{userPage.kaspaAddress}
-											</div>
-											<Button
-												size="sm"
-												className="mt-3 border-2 hover:bg-white/10 transition-all duration-300"
-												style={{ 
-													borderColor: userPage.foregroundColor,
-													color: userPage.foregroundColor,
-													backgroundColor: 'transparent'
-												}}
-												onClick={() => navigator.clipboard.writeText(userPage.kaspaAddress)}
-											>
-												<Copy className="w-4 h-4 mr-2" />
-												Copy Address
-											</Button>
-										</div>
-
-										<div className="p-4">
-											<div className="text-sm font-medium mb-3 opacity-75" style={{ color: userPage.foregroundColor }}>
-												QR Code
-											</div>
-											<div className="mx-auto">
-												<QRCodeDisplay 
-													address={userPage.kaspaAddress}
-													size={200}
-												/>
-											</div>
-										</div>
-									</div>
-								</CardContent>
-							</Card>
-						</div>
+								)}
+							</CardContent>
+						</Card>
 					</div>
 				</div>
 			</div>
-		</div>
 	);
 } 
