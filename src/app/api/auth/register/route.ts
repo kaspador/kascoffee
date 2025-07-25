@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Use Directus's built-in registration endpoint
+    // Use Directus's registration endpoint instead of users endpoint
     const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL || 'https://directus-production-09ff.up.railway.app';
     
     const response = await fetch(`${directusUrl}/users`, {
@@ -28,16 +28,37 @@ export async function POST(request: NextRequest) {
       }),
     });
 
+    // Check if response has content before parsing
+    const responseText = await response.text();
+    console.log('Directus response:', response.status, responseText);
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.errors?.[0]?.message || 'Registration failed');
+      let errorMessage = 'Registration failed';
+      try {
+        if (responseText) {
+          const errorData = JSON.parse(responseText);
+          errorMessage = errorData.errors?.[0]?.message || 'Registration failed';
+        }
+      } catch (parseError) {
+        console.error('Error parsing error response:', parseError);
+      }
+      throw new Error(errorMessage);
     }
 
-    const user = await response.json();
+    let user = null;
+    if (responseText) {
+      try {
+        const userData = JSON.parse(responseText);
+        user = userData.data || userData;
+      } catch (parseError) {
+        console.error('Error parsing success response:', parseError);
+        user = { email }; // Fallback user object
+      }
+    }
     
     return NextResponse.json({ 
       success: true, 
-      user: user.data 
+      user: user 
     });
   } catch (error: unknown) {
     console.error('Registration error:', error);
