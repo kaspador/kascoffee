@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { DirectusAPI } from '@/lib/directus';
 import { Button } from '@/components/ui/button';
