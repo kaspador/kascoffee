@@ -31,7 +31,7 @@ export async function GET() {
 					}
 				});
 			}
-		} catch (error) {
+		} catch {
 			console.log('No user page found, will show null');
 		}
 		
@@ -60,7 +60,7 @@ export async function PUT(request: NextRequest) {
 		try {
 			const userPages = await DirectusAPI.getUserPageByUserId(user.id);
 			userPage = userPages && userPages.length > 0 ? userPages[0] : null;
-		} catch (error) {
+		} catch {
 			// User page doesn't exist, that's ok
 		}
 		
