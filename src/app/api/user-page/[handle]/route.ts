@@ -42,9 +42,18 @@ export async function GET(
 
     const userData = {
       ...userPage,
+      // Map database field names to frontend expected names
+      displayName: userPage.display_name,
+      shortDescription: userPage.short_description,
+      longDescription: userPage.long_description,
+      kaspaAddress: userPage.kaspa_address,
+      profileImage: userPage.profile_image,
+      backgroundImage: userPage.background_image,
       backgroundColor: userPage.background_color || '#0f172a',
       foregroundColor: userPage.foreground_color || '#ffffff',
+      isActive: userPage.is_active,
       viewCount: userPage.view_count || 0,
+      userId: userPage.user_id,
       // Defensive socials handling
       socials: userSocials.filter(social => social && social.is_visible).map(social => ({
         id: social.id || '',

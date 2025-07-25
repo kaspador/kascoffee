@@ -79,7 +79,9 @@ export default function UserProfilePage({ params }: PageProps) {
 
 		async function loadUserPage() {
 			setLoading(true);
+			console.log('Frontend: Loading user page for handle:', handle);
 			const data = await fetchUserPage(handle);
+			console.log('Frontend: Received user page data:', data);
 			setUserPage(data);
 			setLoading(false);
 		}
