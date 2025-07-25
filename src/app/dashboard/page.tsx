@@ -298,35 +298,35 @@ export default function DashboardPage() {
 
 				{/* Dashboard Tabs */}
 				<Tabs defaultValue="profile" className="space-y-8">
-					<div className="flex justify-center">
-						<TabsList className="grid grid-cols-4 bg-slate-800/90 backdrop-blur-xl border border-[#70C7BA]/30 rounded-2xl p-2 shadow-xl">
+					<div className="flex justify-center mb-8">
+						<TabsList className="inline-flex bg-slate-800/90 backdrop-blur-xl border border-[#70C7BA]/30 rounded-2xl p-1 shadow-xl">
 							<TabsTrigger 
 								value="profile" 
-								className="flex items-center justify-center gap-2 rounded-xl font-kaspa-body font-semibold px-4 py-3 text-gray-400 hover:text-white transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#70C7BA] data-[state=active]:to-[#49EACB] data-[state=active]:text-white data-[state=active]:shadow-lg"
+								className="flex items-center gap-2 rounded-xl font-kaspa-body font-semibold px-6 py-3 text-gray-400 hover:text-white transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#70C7BA] data-[state=active]:to-[#49EACB] data-[state=active]:text-white data-[state=active]:shadow-lg min-w-[120px] justify-center"
 							>
 								<User className="h-5 w-5" />
-								<span className="hidden sm:inline">Profile</span>
+								<span>Profile</span>
 							</TabsTrigger>
 							<TabsTrigger 
 								value="theme" 
-								className="flex items-center justify-center gap-2 rounded-xl font-kaspa-body font-semibold px-4 py-3 text-gray-400 hover:text-white transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#70C7BA] data-[state=active]:to-[#49EACB] data-[state=active]:text-white data-[state=active]:shadow-lg"
+								className="flex items-center gap-2 rounded-xl font-kaspa-body font-semibold px-6 py-3 text-gray-400 hover:text-white transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#70C7BA] data-[state=active]:to-[#49EACB] data-[state=active]:text-white data-[state=active]:shadow-lg min-w-[120px] justify-center"
 							>
 								<Palette className="h-5 w-5" />
-								<span className="hidden sm:inline">Theme</span>
+								<span>Theme</span>
 							</TabsTrigger>
 							<TabsTrigger 
 								value="socials" 
-								className="flex items-center justify-center gap-2 rounded-xl font-kaspa-body font-semibold px-4 py-3 text-gray-400 hover:text-white transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#70C7BA] data-[state=active]:to-[#49EACB] data-[state=active]:text-white data-[state=active]:shadow-lg"
+								className="flex items-center gap-2 rounded-xl font-kaspa-body font-semibold px-6 py-3 text-gray-400 hover:text-white transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#70C7BA] data-[state=active]:to-[#49EACB] data-[state=active]:text-white data-[state=active]:shadow-lg min-w-[120px] justify-center"
 							>
 								<LinkIcon className="h-5 w-5" />
-								<span className="hidden sm:inline">Social</span>
+								<span>Social</span>
 							</TabsTrigger>
 							<TabsTrigger 
 								value="settings" 
-								className="flex items-center justify-center gap-2 rounded-xl font-kaspa-body font-semibold px-4 py-3 text-gray-400 hover:text-white transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#70C7BA] data-[state=active]:to-[#49EACB] data-[state=active]:text-white data-[state=active]:shadow-lg"
+								className="flex items-center gap-2 rounded-xl font-kaspa-body font-semibold px-6 py-3 text-gray-400 hover:text-white transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#70C7BA] data-[state=active]:to-[#49EACB] data-[state=active]:text-white data-[state=active]:shadow-lg min-w-[120px] justify-center"
 							>
 								<Settings className="h-5 w-5" />
-								<span className="hidden sm:inline">Settings</span>
+								<span>Settings</span>
 							</TabsTrigger>
 						</TabsList>
 					</div>
