@@ -349,7 +349,7 @@ export default function UserProfilePage({ params }: PageProps) {
 					{/* Wallet Activity Section */}
 					{userPage.kaspaAddress && (
 						<div className="lg:col-span-3 mb-8">
-							<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+							<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 								{/* Wallet Balance */}
 								<WalletBalance address={userPage.kaspaAddress} />
 								

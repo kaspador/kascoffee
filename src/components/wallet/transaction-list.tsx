@@ -107,7 +107,7 @@ export function TransactionList({ address, limit = 10 }: TransactionListProps) {
   }
 
   return (
-    <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl">
+    <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl h-fit">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-lg text-white">
           <History className="w-5 h-5 text-[#70C7BA]" />
@@ -123,7 +123,7 @@ export function TransactionList({ address, limit = 10 }: TransactionListProps) {
         
         {/* Transaction Summary */}
         {transactions.length > 0 && (
-          <div className="flex items-center gap-4 text-sm text-gray-300">
+          <div className="flex items-center justify-center gap-4 text-sm text-gray-300 mt-2">
             <span className="flex items-center gap-1">
               <span className="w-2 h-2 bg-[#49EACB] rounded-full"></span>
               {donations.length} donations
@@ -138,22 +138,22 @@ export function TransactionList({ address, limit = 10 }: TransactionListProps) {
       
       <CardContent className="pt-0">
         {transactions.length === 0 ? (
-          <div className="text-center py-6">
-            <History className="w-8 h-8 text-[#70C7BA]/30 mx-auto mb-2" />
-            <p className="text-gray-300 mb-1 text-sm">No transactions found</p>
+          <div className="text-center py-8">
+            <History className="w-12 h-12 text-[#70C7BA]/30 mx-auto mb-3" />
+            <p className="text-gray-300 mb-2 text-sm">No transactions found</p>
             <p className="text-xs text-gray-400">
               Transactions will appear here once the wallet has activity
             </p>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {displayedTransactions.map((transaction) => (
               <TransactionCard key={transaction.id} transaction={transaction} />
             ))}
             
             {/* Show More/Less Button */}
             {transactions.length > limit && (
-              <div className="pt-2 border-t border-[#70C7BA]/20">
+              <div className="pt-3 border-t border-[#70C7BA]/20">
                 <Button
                   onClick={() => setShowAll(!showAll)}
                   variant="outline"
