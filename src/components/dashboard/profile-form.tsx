@@ -124,7 +124,15 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 	}, [currentHandle, userPage?.handle, checkHandleAvailability]);
 
 	useEffect(() => {
+		console.log('ProfileForm: userPage prop changed:', userPage);
 		if (userPage) {
+			console.log('ProfileForm: Resetting form with data:', {
+				handle: userPage.handle,
+				displayName: userPage.displayName,
+				kaspaAddress: userPage.kaspaAddress,
+				shortDescription: userPage.shortDescription,
+				longDescription: userPage.longDescription
+			});
 			reset({
 				handle: userPage.handle,
 				displayName: userPage.displayName,
@@ -135,6 +143,8 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 			});
 			setLongDescription(userPage.longDescription || '');
 			setHandleAvailable(null); // Reset handle availability check
+		} else {
+			console.log('ProfileForm: userPage is null/undefined, not resetting form');
 		}
 	}, [userPage, reset]);
 
@@ -187,20 +197,35 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 
 	const handleStatus = getHandleStatus();
 
-	if (isLoading) {
+	// Show loading state if explicitly loading OR if we haven't received userPage data yet
+	const showLoading = isLoading || (!userPage && !updateProfileMutation.error);
+	
+	if (showLoading) {
 		return (
 			<div className="space-y-6">
-				<div className="animate-pulse">
-					<div className="h-4 bg-slate-700 rounded w-1/4 mb-2"></div>
-					<div className="h-12 bg-slate-700 rounded"></div>
+				<div className="text-center py-8">
+					<div className="w-8 h-8 border-2 border-[#70C7BA] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+					<p className="text-[#70C7BA] text-sm">Loading your profile data...</p>
 				</div>
-				<div className="animate-pulse">
-					<div className="h-4 bg-slate-700 rounded w-1/4 mb-2"></div>
-					<div className="h-12 bg-slate-700 rounded"></div>
-				</div>
-				<div className="animate-pulse">
-					<div className="h-4 bg-slate-700 rounded w-1/4 mb-2"></div>
-					<div className="h-24 bg-slate-700 rounded"></div>
+				<div className="animate-pulse space-y-6">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<div>
+							<div className="h-4 bg-slate-700 rounded w-1/4 mb-2"></div>
+							<div className="h-12 bg-slate-700 rounded"></div>
+						</div>
+						<div>
+							<div className="h-4 bg-slate-700 rounded w-1/4 mb-2"></div>
+							<div className="h-12 bg-slate-700 rounded"></div>
+						</div>
+					</div>
+					<div>
+						<div className="h-4 bg-slate-700 rounded w-1/4 mb-2"></div>
+						<div className="h-12 bg-slate-700 rounded"></div>
+					</div>
+					<div>
+						<div className="h-4 bg-slate-700 rounded w-1/4 mb-2"></div>
+						<div className="h-24 bg-slate-700 rounded"></div>
+					</div>
 				</div>
 			</div>
 		);
