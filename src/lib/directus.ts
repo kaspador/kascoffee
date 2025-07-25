@@ -175,7 +175,7 @@ export const DirectusAPI = {
 
   // Wallet Snapshots
   async createWalletSnapshot(data: Omit<WalletSnapshot, 'id' | 'date_created'>) {
-    return await directusAuth.request(createItem('wallet_snapshots', data));
+    return await directusPublic.request(createItem('wallet_snapshots', data));
   },
 
   async getWalletSnapshots(kaspaAddress: string, hours: number = 24): Promise<WalletSnapshot[]> {
@@ -212,7 +212,7 @@ export const DirectusAPI = {
   },
 
   async updateWalletSnapshot(id: string, data: Partial<WalletSnapshot>) {
-    return await directusAuth.request(updateItem('wallet_snapshots', id, data));
+    return await directusPublic.request(updateItem('wallet_snapshots', id, data));
   },
 
   async cleanupOldSnapshots(daysToKeep: number = 30) {
@@ -220,14 +220,14 @@ export const DirectusAPI = {
       const cutoffTime = new Date(Date.now() - (daysToKeep * 24 * 60 * 60 * 1000)).toISOString();
       
       // Get old snapshots
-      const oldSnapshots = await directusAuth.request(readItems('wallet_snapshots', {
+      const oldSnapshots = await directusPublic.request(readItems('wallet_snapshots', {
         filter: { timestamp: { _lt: cutoffTime } },
         fields: ['id']
       })) as unknown[];
       
       // Delete them
       for (const snapshot of oldSnapshots) {
-        await directusAuth.request(deleteItem('wallet_snapshots', (snapshot as any).id));
+        await directusPublic.request(deleteItem('wallet_snapshots', (snapshot as any).id));
       }
       
       return oldSnapshots.length;
