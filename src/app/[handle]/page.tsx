@@ -94,8 +94,21 @@ export default function UserProfilePage({ params }: PageProps) {
 	
 			try {
 				const data = await fetchUserPage(handle);
-	
 				setUserPage(data);
+
+				// Track page view with unique IP filtering
+				if (data) {
+					try {
+						await fetch(`/api/track-view/${handle}`, {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+							},
+						});
+					} catch {
+						// Silently fail if view tracking fails
+					}
+				}
 			} catch {
 				setUserPage(null);
 			} finally {

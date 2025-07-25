@@ -226,10 +226,10 @@ export default function DashboardPage() {
 								<div className="flex-1">
 									<p className="text-[#70C7BA] text-sm font-kaspa-subheader font-bold uppercase tracking-wider mb-2">PAGE VIEWS</p>
 									<p className="text-3xl font-kaspa-header font-black text-white mb-2">{userProfile?.viewCount || 0}</p>
-									<p className="text-green-400 text-sm flex items-center gap-1.5 font-kaspa-body">
-										<TrendingUp className="w-4 h-4" />
-										Growing steadily
-									</p>
+														<p className="text-green-400 text-sm flex items-center gap-1.5 font-kaspa-body">
+						<TrendingUp className="w-4 h-4" />
+						Unique visitors
+					</p>
 								</div>
 								<div className="w-14 h-14 bg-[#70C7BA]/20 rounded-2xl flex items-center justify-center group-hover:bg-[#70C7BA]/30 transition-all duration-300">
 									<Eye className="w-7 h-7 text-[#70C7BA]" />
