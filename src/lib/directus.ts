@@ -22,20 +22,20 @@ export interface User {
 
 export interface UserPage {
   id: string;
-  user: string; // User ID
+  user_id: string; // Changed from 'user' to 'user_id' to avoid database conflicts
   handle: string;
   display_name: string;
-  short_description?: string;
-  long_description?: string;
-  kaspa_address?: string;
-  profile_image?: string;
-  background_image?: string;
+  short_description: string;
+  long_description: string;
+  kaspa_address: string;
+  profile_image: string | null;
+  background_image: string | null;
   background_color: string;
   foreground_color: string;
   is_active: boolean;
   view_count: number;
-  date_created: string;
-  date_updated: string;
+  date_created?: string;
+  date_updated?: string;
 }
 
 export interface Social {
@@ -97,7 +97,7 @@ export const DirectusAPI = {
   async getUserPageByUserId(userId: string): Promise<UserPage[]> {
     try {
       const pages = await directus.request(readItems('user_pages', {
-        filter: { user: userId }
+        filter: { user_id: userId } // Changed from 'user' to 'user_id'
       })) as unknown[];
       return pages as UserPage[];
     } catch (error: unknown) {

@@ -36,7 +36,8 @@ export async function GET(request: NextRequest) {
 						backgroundColor: userPage.background_color,
 						foregroundColor: userPage.foreground_color,
 						isActive: userPage.is_active,
-						viewCount: userPage.view_count
+						viewCount: userPage.view_count,
+						userId: userPage.user_id // Add user_id to response
 					}
 				});
 			}
@@ -93,7 +94,7 @@ export async function PUT(request: NextRequest) {
 		}
 		
 		const userPageData = {
-			user: user.id, // Use real user ID
+			user_id: user.id, // Use different field name to avoid conflicts
 			handle,
 			display_name: displayName,
 			short_description: shortDescription || '',
@@ -107,7 +108,7 @@ export async function PUT(request: NextRequest) {
 			view_count: 0
 		};
 		
-		console.log('User page data to save:', { ...userPageData, user: `${userPageData.user} (type: ${typeof userPageData.user})` });
+		console.log('User page data to save:', { ...userPageData, user: `${userPageData.user_id} (type: ${typeof userPageData.user_id})` });
 		
 		if (userPage) {
 			// Update existing user page
