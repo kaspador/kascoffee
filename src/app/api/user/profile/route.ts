@@ -82,6 +82,13 @@ export async function PUT(request: NextRequest) {
 		const cleanProfileImage = profileImage ? profileImage.trim().replace(/;+$/, '') : null;
 		const cleanBackgroundImage = backgroundImage ? backgroundImage.trim().replace(/;+$/, '') : null;
 		
+		console.log('URL cleaning:', { 
+			originalProfile: profileImage, 
+			cleanedProfile: cleanProfileImage,
+			originalBackground: backgroundImage,
+			cleanedBackground: cleanBackgroundImage
+		});
+		
 		// Check if user page already exists for this user
 		let userPage;
 		try {
@@ -108,7 +115,7 @@ export async function PUT(request: NextRequest) {
 			view_count: 0
 		};
 		
-		console.log('User page data to save:', { ...userPageData, user_id: `${userPageData.user_id} (type: ${typeof userPageData.user_id})` });
+		console.log('User page data to save:', userPageData);
 		
 		if (userPage) {
 			// Update existing user page
