@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,7 +16,11 @@ import { validateKaspaAddress } from '@/lib/utils/kaspa-validation';
 
 // Zod schema for form validation
 const profileFormSchema = z.object({
-	handle: z.string().min(1, 'Handle is required').max(50, 'Handle must be less than 50 characters'),
+	handle: z.string()
+		.min(1, 'Handle is required')
+		.max(50, 'Handle must be less than 50 characters')
+		.regex(/^[a-zA-Z0-9-_]+$/, 'Handle can only contain letters, numbers, hyphens, and underscores')
+		.refine((handle) => handle.length >= 3, 'Handle must be at least 3 characters long'),
 	displayName: z.string().min(1, 'Display name is required').max(100, 'Display name must be less than 100 characters'),
 	kaspaAddress: z.string().refine(
 		(address) => validateKaspaAddress(address),
@@ -53,6 +57,8 @@ interface ProfileFormProps {
 
 export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps) {
 	const [longDescription, setLongDescription] = useState(userPage?.longDescription || '');
+	const [handleAvailable, setHandleAvailable] = useState<boolean | null>(null);
+	const [checkingHandle, setCheckingHandle] = useState(false);
 	const queryClient = useQueryClient();
 
 	const {
@@ -60,7 +66,9 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 		handleSubmit,
 		watch,
 		formState: { errors },
-		reset
+		reset,
+		setError,
+		clearErrors
 	} = useForm<ProfileFormData>({
 		resolver: zodResolver(profileFormSchema),
 		defaultValues: {
@@ -73,6 +81,48 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 		}
 	});
 
+	const currentHandle = watch('handle');
+
+	// Debounced handle validation
+	const checkHandleAvailability = useCallback(async (handle: string) => {
+		if (!handle || handle.length < 3 || handle === userPage?.handle) {
+			setHandleAvailable(null);
+			setCheckingHandle(false);
+			return;
+		}
+
+		setCheckingHandle(true);
+		try {
+			const response = await fetch(`/api/user-page/${handle.toLowerCase()}`);
+			if (response.status === 404) {
+				// Handle is available
+				setHandleAvailable(true);
+				clearErrors('handle');
+			} else if (response.ok) {
+				// Handle is taken
+				setHandleAvailable(false);
+				setError('handle', { 
+					type: 'manual', 
+					message: 'This handle is already taken. Please choose a different one.' 
+				});
+			}
+		} catch (error) {
+			console.error('Error checking handle:', error);
+		} finally {
+			setCheckingHandle(false);
+		}
+	}, [userPage?.handle, clearErrors, setError]);
+
+	useEffect(() => {
+		if (!currentHandle || currentHandle === userPage?.handle) return;
+		
+		const timeoutId = setTimeout(() => {
+			checkHandleAvailability(currentHandle);
+		}, 500);
+
+		return () => clearTimeout(timeoutId);
+	}, [currentHandle, userPage?.handle, checkHandleAvailability]);
+
 	useEffect(() => {
 		if (userPage) {
 			reset({
@@ -84,6 +134,7 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 				backgroundImage: userPage.backgroundImage || ''
 			});
 			setLongDescription(userPage.longDescription || '');
+			setHandleAvailable(null); // Reset handle availability check
 		}
 	}, [userPage, reset]);
 
@@ -110,10 +161,31 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 	});
 
 	const onSubmit = (data: ProfileFormData) => {
+		// Additional validation before submit
+		if (handleAvailable === false && data.handle !== userPage?.handle) {
+			setError('handle', { 
+				type: 'manual', 
+				message: 'This handle is already taken. Please choose a different one.' 
+			});
+			return;
+		}
+
 		updateProfileMutation.mutate({ ...data, longDescription });
 	};
 
 	const shortDescriptionLength = watch('shortDescription')?.length || 0;
+
+	// Get handle status styling
+	const getHandleStatus = () => {
+		if (!currentHandle || currentHandle.length < 3) return null;
+		if (currentHandle === userPage?.handle) return { color: 'text-blue-400', message: 'Current handle' };
+		if (checkingHandle) return { color: 'text-yellow-400', message: 'Checking availability...' };
+		if (handleAvailable === true) return { color: 'text-green-400', message: 'Handle available!' };
+		if (handleAvailable === false) return { color: 'text-red-400', message: 'Handle taken' };
+		return null;
+	};
+
+	const handleStatus = getHandleStatus();
 
 	if (isLoading) {
 		return (
@@ -159,17 +231,29 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 							<Label htmlFor="handle" className="text-gray-300 font-kaspa-body font-semibold">
 								Handle *
 							</Label>
-							<Input
-								id="handle"
-								{...register('handle')}
-								placeholder="your-unique-handle"
-								className="bg-slate-800/50 border-[#70C7BA]/30 text-white placeholder:text-gray-500 focus:border-[#70C7BA] focus:ring-[#70C7BA]/20 rounded-xl font-kaspa-body transition-all duration-300"
-							/>
+							<div className="relative">
+								<Input
+									id="handle"
+									{...register('handle')}
+									placeholder="your-unique-handle"
+									className="bg-slate-800/50 border-[#70C7BA]/30 text-white placeholder:text-gray-500 focus:border-[#70C7BA] focus:ring-[#70C7BA]/20 rounded-xl font-kaspa-body transition-all duration-300"
+								/>
+								{checkingHandle && (
+									<div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+										<div className="w-4 h-4 border-2 border-[#70C7BA] border-t-transparent rounded-full animate-spin"></div>
+									</div>
+								)}
+							</div>
 							{errors.handle && (
 								<p className="text-red-400 text-sm font-kaspa-body">{errors.handle.message}</p>
 							)}
+							{handleStatus && (
+								<p className={`text-sm font-kaspa-body ${handleStatus.color}`}>
+									{handleStatus.message}
+								</p>
+							)}
 							<p className="text-xs text-gray-500 font-kaspa-body">
-								This will be your unique URL: kas.coffee/your-handle
+								This will be your unique URL: kas.coffee/{currentHandle || 'your-handle'}
 							</p>
 						</div>
 
@@ -304,7 +388,7 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 			<div className="flex flex-col sm:flex-row gap-4 sm:justify-end pt-8 border-t border-[#70C7BA]/20">
 				<Button
 					type="submit"
-					disabled={updateProfileMutation.isPending}
+					disabled={updateProfileMutation.isPending || (handleAvailable === false && currentHandle !== userPage?.handle)}
 					className="w-full sm:w-auto bg-gradient-to-r from-[#70C7BA] to-[#49EACB] hover:from-[#5ba8a0] hover:to-[#3dd4b4] text-white px-8 py-4 font-kaspa-subheader font-bold rounded-xl shadow-lg hover:shadow-[#70C7BA]/25 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
 				>
 					{updateProfileMutation.isPending ? (

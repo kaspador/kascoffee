@@ -74,12 +74,11 @@ export async function PUT(request: NextRequest) {
 		const body = await request.json();
 		const { handle, displayName, kaspaAddress, shortDescription, longDescription, profileImage, backgroundImage } = body;
 		
-		// Clean up URLs - remove trailing semicolons and unwanted characters
-		const cleanProfileImage = profileImage ? 
-			profileImage.toString().trim().replace(/[;,\s]+$/g, '').replace(/;/g, '') : null;
-		const cleanBackgroundImage = backgroundImage ? 
-			backgroundImage.toString().trim().replace(/[;,\s]+$/g, '').replace(/;/g, '') : null;
-		
+		// Validate handle format
+		if (!handle || !/^[a-zA-Z0-9-_]+$/.test(handle)) {
+			return NextResponse.json({ error: 'Handle can only contain letters, numbers, hyphens, and underscores' }, { status: 400 });
+		}
+
 		// Check if user page already exists for this user
 		let userPage;
 		try {
@@ -89,23 +88,39 @@ export async function PUT(request: NextRequest) {
 			// User page doesn't exist, that's ok
 		}
 		
+		// Check handle uniqueness - only if it's a new handle or user doesn't have a page yet
+		const shouldCheckHandle = !userPage || userPage.handle !== handle;
+		if (shouldCheckHandle) {
+			const existingPage = await DirectusAPI.getUserPage(handle);
+			if (existingPage && existingPage.user_id !== user.id) {
+				return NextResponse.json({ error: 'This handle is already taken. Please choose a different one.' }, { status: 400 });
+			}
+		}
+		
+		// Clean up URLs - remove trailing semicolons and unwanted characters
+		const cleanProfileImage = profileImage ? 
+			profileImage.toString().trim().replace(/[;,\s]+$/g, '').replace(/;/g, '') : null;
+		const cleanBackgroundImage = backgroundImage ? 
+			backgroundImage.toString().trim().replace(/[;,\s]+$/g, '').replace(/;/g, '') : null;
+		
 		const userPageData = {
 			user_id: user.id,
-			handle,
-			display_name: displayName,
-			short_description: shortDescription || '',
-			long_description: longDescription || '',
-			kaspa_address: kaspaAddress,
+			handle: handle.toLowerCase().trim(), // Normalize handle
+			display_name: displayName.trim(),
+			short_description: shortDescription ? shortDescription.trim() : '',
+			long_description: longDescription ? longDescription.trim() : '',
+			kaspa_address: kaspaAddress.trim(),
 			profile_image: cleanProfileImage,
 			background_image: cleanBackgroundImage,
 			background_color: '#0f172a',
 			foreground_color: '#ffffff',
 			is_active: true,
-			view_count: 0
+			view_count: userPage ? userPage.view_count : 0 // Preserve existing view count
 		};
 		
 		if (userPage) {
 			// Update existing user page
+			console.log(`Updating existing user page ${userPage.id} for user ${user.id}`);
 			const updatedPage = await DirectusAPI.updateUserPage(userPage.id, userPageData);
 			return NextResponse.json({ 
 				userPage: {
@@ -125,6 +140,7 @@ export async function PUT(request: NextRequest) {
 			});
 		} else {
 			// Create new user page
+			console.log(`Creating new user page for user ${user.id} with handle ${handle}`);
 			const newPage = await DirectusAPI.createUserPage(userPageData);
 			return NextResponse.json({ 
 				userPage: {
