@@ -15,8 +15,14 @@ export async function GET(
       return NextResponse.json({ error: 'User page not found' }, { status: 404 });
     }
 
-    // Get user's social links
-    const userSocials = await DirectusAPI.getUserSocials(userPage.user_id);
+    // Get user's social links (defensive - socials collection may not exist yet)
+    let userSocials: any[] = [];
+    try {
+      userSocials = await DirectusAPI.getUserSocials(userPage.user_id);
+    } catch (socialError) {
+      console.log('Socials collection not available yet, proceeding without socials:', socialError);
+      userSocials = [];
+    }
 
     // TODO: Implement view count increment in Directus
     // For now, we'll skip this feature until collections are set up
@@ -26,12 +32,13 @@ export async function GET(
       backgroundColor: userPage.background_color || '#0f172a',
       foregroundColor: userPage.foreground_color || '#ffffff',
       viewCount: userPage.view_count || 0,
-      socials: userSocials.filter(social => social.is_visible).map(social => ({
-        id: social.id,
-        platform: social.platform,
-        url: social.url,
+      // Defensive socials handling
+      socials: userSocials.filter(social => social && social.is_visible).map(social => ({
+        id: social.id || '',
+        platform: social.platform || '',
+        url: social.url || '',
         username: social.username || '',
-        isVisible: social.is_visible
+        isVisible: social.is_visible || false
       }))
     };
 

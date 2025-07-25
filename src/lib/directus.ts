@@ -118,12 +118,12 @@ export const DirectusAPI = {
   async getUserSocials(userId: string): Promise<Social[]> {
     try {
       const socials = await directus.request(readItems('socials', {
-        filter: { user: userId, is_visible: true }
+        filter: { user_id: userId, is_visible: true } // Changed from 'user' to 'user_id'
       })) as unknown[];
       return socials as Social[];
     } catch (error: unknown) {
-      console.error('Error fetching user socials:', error);
-      return [];
+      console.error('Error fetching user socials (socials collection may not exist yet):', error);
+      return []; // Return empty array if socials collection doesn't exist
     }
   },
 
