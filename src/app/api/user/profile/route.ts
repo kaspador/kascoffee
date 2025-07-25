@@ -55,11 +55,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
-	console.log('🔥 PUT /api/user/profile called - NEW VERSION');
 	try {
 		// Get token from cookies
 		const token = request.cookies.get('directus_token')?.value;
-		console.log('🔑 Token from cookies:', token ? 'EXISTS' : 'MISSING');
 		if (!token) {
 			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
@@ -73,45 +71,26 @@ export async function PUT(request: NextRequest) {
 			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
 
-		console.log('Authenticated user:', { id: user.id, email: user.email });
-
 		const body = await request.json();
 		const { handle, displayName, kaspaAddress, shortDescription, longDescription, profileImage, backgroundImage } = body;
 		
-		console.log('🔍 RAW BODY FROM FRONTEND:', body);
-		console.log('🔍 Destructured profileImage:', profileImage);
-		console.log('🔍 Destructured backgroundImage:', backgroundImage);
-		
-		console.log('Profile update request:', { handle, displayName, userId: user.id });
-		
-		// Clean up URLs - remove trailing semicolons, commas, and other unwanted characters
+		// Clean up URLs - remove trailing semicolons and unwanted characters
 		const cleanProfileImage = profileImage ? 
 			profileImage.toString().trim().replace(/[;,\s]+$/g, '').replace(/;/g, '') : null;
 		const cleanBackgroundImage = backgroundImage ? 
 			backgroundImage.toString().trim().replace(/[;,\s]+$/g, '').replace(/;/g, '') : null;
-		
-		console.log('URL cleaning:', { 
-			originalProfile: profileImage, 
-			cleanedProfile: cleanProfileImage,
-			originalBackground: backgroundImage,
-			cleanedBackground: cleanBackgroundImage,
-			profileType: typeof profileImage,
-			backgroundType: typeof backgroundImage
-		});
 		
 		// Check if user page already exists for this user
 		let userPage;
 		try {
 			const userPages = await DirectusAPI.getUserPageByUserId(user.id);
 			userPage = userPages && userPages.length > 0 ? userPages[0] : null;
-			console.log('Existing user page:', userPage ? userPage.id : 'none');
 		} catch {
 			// User page doesn't exist, that's ok
-			console.log('No existing user page found');
 		}
 		
 		const userPageData = {
-			user_id: user.id, // Use different field name to avoid conflicts
+			user_id: user.id,
 			handle,
 			display_name: displayName,
 			short_description: shortDescription || '',
@@ -125,17 +104,28 @@ export async function PUT(request: NextRequest) {
 			view_count: 0
 		};
 		
-		console.log('User page data to save:', userPageData);
-		console.log('🔍 URL DEBUG - Profile image in userPageData:', userPageData.profile_image);
-		console.log('🔍 URL DEBUG - Background image in userPageData:', userPageData.background_image);
-		
-		// TEMPORARY: Skip UPDATE entirely to avoid foreign key issues
-		// Force CREATE to bypass the problematic UPDATE operation
-		console.log('⚠️ FORCING CREATE to bypass UPDATE issues');
-		
-		try {
+		if (userPage) {
+			// Update existing user page
+			const updatedPage = await DirectusAPI.updateUserPage(userPage.id, userPageData);
+			return NextResponse.json({ 
+				userPage: {
+					id: updatedPage.id,
+					handle: updatedPage.handle,
+					displayName: updatedPage.display_name,
+					shortDescription: updatedPage.short_description,
+					longDescription: updatedPage.long_description,
+					kaspaAddress: updatedPage.kaspa_address,
+					profileImage: updatedPage.profile_image,
+					backgroundImage: updatedPage.background_image,
+					backgroundColor: updatedPage.background_color,
+					foregroundColor: updatedPage.foreground_color,
+					isActive: updatedPage.is_active,
+					updatedAt: new Date().toISOString()
+				}
+			});
+		} else {
+			// Create new user page
 			const newPage = await DirectusAPI.createUserPage(userPageData);
-			console.log('CREATE successful:', newPage.id);
 			return NextResponse.json({ 
 				userPage: {
 					id: newPage.id,
@@ -152,42 +142,6 @@ export async function PUT(request: NextRequest) {
 					updatedAt: new Date().toISOString()
 				}
 			});
-		} catch (createError) {
-			console.error('CREATE failed:', createError);
-			
-			// If images are causing foreign key issues, try without images
-			if (createError instanceof Error && createError.message.includes('Invalid foreign key')) {
-				console.log('🔄 Retrying CREATE without images due to foreign key error');
-				const userPageDataNoImages = { ...userPageData };
-				delete userPageDataNoImages.profile_image;
-				delete userPageDataNoImages.background_image;
-				
-				try {
-					const newPageNoImages = await DirectusAPI.createUserPage(userPageDataNoImages);
-					console.log('CREATE without images successful:', newPageNoImages.id);
-					return NextResponse.json({ 
-						userPage: {
-							id: newPageNoImages.id,
-							handle: newPageNoImages.handle,
-							displayName: newPageNoImages.display_name,
-							shortDescription: newPageNoImages.short_description,
-							longDescription: newPageNoImages.long_description,
-							kaspaAddress: newPageNoImages.kaspa_address,
-							profileImage: null, // Images couldn't be saved due to Directus config
-							backgroundImage: null,
-							backgroundColor: newPageNoImages.background_color,
-							foregroundColor: newPageNoImages.foreground_color,
-							isActive: newPageNoImages.is_active,
-							updatedAt: new Date().toISOString()
-						}
-					});
-				} catch (retryError) {
-					console.error('Retry CREATE without images also failed:', retryError);
-					return NextResponse.json({ error: retryError instanceof Error ? retryError.message : 'Internal server error' }, { status: 500 });
-				}
-			}
-			
-			return NextResponse.json({ error: createError instanceof Error ? createError.message : 'Internal server error' }, { status: 500 });
 		}
 	} catch (error) {
 		console.error('Error updating profile:', error);

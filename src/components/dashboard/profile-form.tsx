@@ -5,6 +5,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -57,7 +59,8 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 		register,
 		handleSubmit,
 		watch,
-		formState: { errors }
+		formState: { errors },
+		reset
 	} = useForm<ProfileFormData>({
 		resolver: zodResolver(profileFormSchema),
 		defaultValues: {
@@ -70,9 +73,22 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 		}
 	});
 
+	useEffect(() => {
+		if (userPage) {
+			reset({
+				handle: userPage.handle,
+				displayName: userPage.displayName,
+				kaspaAddress: userPage.kaspaAddress || '',
+				shortDescription: userPage.shortDescription || '',
+				profileImage: userPage.profileImage || '',
+				backgroundImage: userPage.backgroundImage || ''
+			});
+			setLongDescription(userPage.longDescription || '');
+		}
+	}, [userPage, reset]);
+
 	const updateProfileMutation = useMutation({
 		mutationFn: async (data: ProfileFormData & { longDescription: string }) => {
-			console.log('🚀 Form data being sent to API:', data);
 			const response = await fetch('/api/user/profile', {
 				method: 'PUT',
 				headers: { 
@@ -94,9 +110,6 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 	});
 
 	const onSubmit = (data: ProfileFormData) => {
-		console.log('📝 Form values after validation:', data);
-		console.log('📝 Profile image value:', data.profileImage);
-		console.log('📝 Background image value:', data.backgroundImage);
 		updateProfileMutation.mutate({ ...data, longDescription });
 	};
 
