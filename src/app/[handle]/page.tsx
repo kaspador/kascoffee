@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ExternalLink, Copy, Coffee, Share2, User, Heart, QrCode } from 'lucide-react';
+import { ExternalLink, Copy, Coffee, Share2, User, Eye, QrCode, Zap, Globe } from 'lucide-react';
 import { FaTwitter, FaDiscord, FaTelegram, FaGlobe, FaGithub } from 'react-icons/fa';
 import QRCodeDisplay from '@/components/qr-code-display';
 import { useEffect, useState } from 'react';
@@ -124,10 +124,10 @@ export default function UserProfilePage({ params }: PageProps) {
 
 	if (loading) {
 		return (
-			<div className="min-h-screen bg-slate-950 flex items-center justify-center">
+			<div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
 				<div className="text-center">
-					<Coffee className="w-8 h-8 mx-auto mb-4 text-green-500 animate-pulse" />
-					<div className="text-white text-lg">Loading...</div>
+					<Coffee className="w-12 h-12 mx-auto mb-4 text-[#70C7BA] animate-pulse" />
+					<div className="text-white text-xl">Loading...</div>
 				</div>
 			</div>
 		);
@@ -146,30 +146,20 @@ export default function UserProfilePage({ params }: PageProps) {
 	};
 
 	return (
-		<div 
-			className="min-h-screen relative"
-			style={{ 
-				backgroundColor: userPage.backgroundColor,
-				backgroundImage: userPage.backgroundImage ? `url(${userPage.backgroundImage})` : 'none',
-				backgroundSize: 'cover',
-				backgroundPosition: 'center',
-				backgroundRepeat: 'no-repeat'
-			}}
-		>
-			{/* Background overlay */}
-			{userPage.backgroundImage && (
-				<div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
-			)}
+		<div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative">
+			{/* Animated background with Kaspa colors */}
+			<div className="absolute inset-0 bg-gradient-to-r from-[#70C7BA]/10 via-[#49EACB]/10 to-[#70C7BA]/10 animate-pulse"></div>
+			<div className="absolute top-20 left-20 w-72 h-72 bg-[#70C7BA]/20 rounded-full blur-3xl animate-pulse"></div>
+			<div className="absolute bottom-20 right-20 w-96 h-96 bg-[#49EACB]/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
 			
-			<div className="relative z-10 container mx-auto px-4 py-6 max-w-4xl">
+			<div className="relative z-10 container mx-auto px-4 py-6 max-w-6xl">
 				{/* Header */}
 				<div className="flex justify-between items-center mb-8">
 					<Link
 						href="/"
-						className="flex items-center gap-2 text-sm font-medium transition-opacity hover:opacity-80"
-						style={{ color: userPage.foregroundColor }}
+						className="flex items-center gap-2 text-[#70C7BA] hover:text-[#49EACB] transition-colors font-semibold"
 					>
-						<Coffee className="w-4 h-4" />
+						<Coffee className="w-5 h-5" />
 						<span>kas.coffee</span>
 					</Link>
 					
@@ -177,12 +167,7 @@ export default function UserProfilePage({ params }: PageProps) {
 						variant="outline"
 						size="sm"
 						onClick={handleShare}
-						className="border"
-						style={{ 
-							borderColor: userPage.foregroundColor + '40',
-							color: userPage.foregroundColor,
-							backgroundColor: 'transparent'
-						}}
+						className="border-[#70C7BA]/40 text-[#70C7BA] hover:bg-[#70C7BA]/10 bg-transparent"
 					>
 						<Share2 className="w-4 h-4 mr-2" />
 						Share
@@ -190,47 +175,50 @@ export default function UserProfilePage({ params }: PageProps) {
 				</div>
 
 				{/* Profile Header */}
-				<div className="text-center mb-8">
-					<Avatar className="w-24 h-24 mx-auto mb-4 border-4 shadow-lg" style={{ borderColor: userPage.foregroundColor }}>
+				<div className="text-center mb-12">
+					<Avatar className="w-32 h-32 mx-auto mb-6 border-4 border-[#70C7BA] shadow-xl shadow-[#70C7BA]/25">
 						<AvatarImage src={userPage.profileImage || undefined} alt={userPage.displayName || userPage.handle} />
-						<AvatarFallback 
-							className="text-2xl font-bold"
-							style={{
-								color: userPage.foregroundColor,
-								backgroundColor: userPage.backgroundColor + '80'
-							}}
-						>
+						<AvatarFallback className="text-3xl font-bold bg-gradient-to-br from-[#70C7BA] to-[#49EACB] text-white">
 							{(userPage.displayName || userPage.handle)?.charAt(0)?.toUpperCase() || 'U'}
 						</AvatarFallback>
 					</Avatar>
 					
-					<h1 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: userPage.foregroundColor }}>
-						{userPage.displayName || userPage.handle}
+					<h1 className="text-4xl md:text-6xl font-black mb-4">
+						<span className="bg-gradient-to-r from-white via-[#70C7BA] to-[#49EACB] bg-clip-text text-transparent">
+							{userPage.displayName || userPage.handle}
+						</span>
 					</h1>
 					
 					<Badge 
-						variant="secondary" 
-						className="mb-4 px-3 py-1"
-						style={{ 
-							backgroundColor: userPage.foregroundColor + '20',
-							color: userPage.foregroundColor,
-							border: `1px solid ${userPage.foregroundColor}40`
-						}}
+						className="mb-6 px-4 py-2 text-lg bg-gradient-to-r from-[#70C7BA]/20 to-[#49EACB]/20 border border-[#70C7BA]/30 text-[#70C7BA]"
 					>
 						@{userPage.handle}
 					</Badge>
 					
 					{userPage.shortDescription && (
-						<p className="text-lg md:text-xl mb-6 max-w-2xl mx-auto leading-relaxed" style={{ color: userPage.foregroundColor + 'E0' }}>
+						<p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-6">
 							{userPage.shortDescription}
 						</p>
 					)}
+
+					{/* Stats Row */}
+					<div className="flex justify-center items-center gap-6 mb-8">
+						<div className="flex items-center gap-2 text-gray-400">
+							<Eye className="w-4 h-4" />
+							<span>{userPage.viewCount || 0} views</span>
+						</div>
+						<div className="w-1 h-1 bg-gray-600 rounded-full"></div>
+						<div className="flex items-center gap-2 text-[#70C7BA]">
+							<Zap className="w-4 h-4" />
+							<span>Powered by Kaspa</span>
+						</div>
+					</div>
 				</div>
 
-				{/* Social Links Row */}
+				{/* Social Links */}
 				{userPage.socials.length > 0 && (
-					<div className="flex justify-center mb-8">
-						<div className="flex flex-wrap justify-center gap-3">
+					<div className="flex justify-center mb-12">
+						<div className="flex flex-wrap justify-center gap-4">
 							{userPage.socials.map((social) => {
 								const IconComponent = socialIconMap[social.platform as keyof typeof socialIconMap] || FaGlobe;
 								return (
@@ -243,13 +231,7 @@ export default function UserProfilePage({ params }: PageProps) {
 									>
 										<Button
 											variant="outline"
-											size="sm"
-											className="border transition-all duration-300 group-hover:scale-105"
-											style={{ 
-												borderColor: userPage.foregroundColor + '40',
-												color: userPage.foregroundColor,
-												backgroundColor: 'rgba(255,255,255,0.1)'
-											}}
+											className="border-[#70C7BA]/40 text-white hover:bg-[#70C7BA]/20 bg-gradient-to-r from-[#70C7BA]/10 to-[#49EACB]/10 backdrop-blur-xl transition-all duration-300 group-hover:scale-105"
 										>
 											<IconComponent className="w-4 h-4 mr-2" />
 											{social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}
@@ -262,33 +244,26 @@ export default function UserProfilePage({ params }: PageProps) {
 					</div>
 				)}
 
-				{/* Main Content */}
-				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-					{/* Left Column - About & Description */}
-					<div className="lg:col-span-2 space-y-6">
+				{/* Main Content Grid */}
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+					{/* Left Column - About */}
+					<div className="space-y-6">
 						{userPage.longDescription && (
-							<Card 
-								className="border backdrop-blur-sm"
-								style={{ 
-									borderColor: userPage.foregroundColor + '30',
-									backgroundColor: userPage.backgroundColor + 'F5'
-								}}
-							>
-								<CardContent className="p-6">
-									<div className="flex items-center gap-2 mb-4">
-										<User className="w-5 h-5" style={{ color: userPage.foregroundColor }} />
-										<h2 className="text-xl font-bold" style={{ color: userPage.foregroundColor }}>
+							<Card className="border-[#70C7BA]/30 bg-gradient-to-br from-slate-900/95 to-slate-800/95 backdrop-blur-xl">
+								<CardContent className="p-8">
+									<div className="flex items-center gap-3 mb-6">
+										<User className="w-6 h-6 text-[#70C7BA]" />
+										<h2 className="text-2xl font-bold text-white">
 											About {userPage.displayName || userPage.handle}
 										</h2>
 									</div>
 									<div 
-										className="prose prose-sm max-w-none leading-relaxed"
+										className="prose prose-lg max-w-none text-gray-300 leading-relaxed"
 										style={{ 
-											color: userPage.foregroundColor + 'DD',
-											'--tw-prose-body': userPage.foregroundColor + 'DD',
-											'--tw-prose-headings': userPage.foregroundColor,
-											'--tw-prose-links': userPage.foregroundColor,
-											'--tw-prose-strong': userPage.foregroundColor,
+											'--tw-prose-body': '#d1d5db',
+											'--tw-prose-headings': '#ffffff',
+											'--tw-prose-links': '#70C7BA',
+											'--tw-prose-strong': '#ffffff',
 										} as React.CSSProperties}
 										dangerouslySetInnerHTML={{ __html: userPage.longDescription }}
 									/>
@@ -297,74 +272,62 @@ export default function UserProfilePage({ params }: PageProps) {
 						)}
 					</div>
 
-					{/* Right Column - Support Section */}
+					{/* Right Column - Support */}
 					<div className="space-y-6">
-						<Card 
-							className="border backdrop-blur-sm"
-							style={{ 
-								borderColor: userPage.foregroundColor + '30',
-								backgroundColor: userPage.backgroundColor + 'F5'
-							}}
-						>
-							<CardContent className="p-6">
-								<div className="text-center mb-6">
-									<div className="flex items-center justify-center gap-2 mb-3">
-										<Heart className="w-6 h-6 text-red-500" />
-										<Coffee className="w-6 h-6" style={{ color: userPage.foregroundColor }} />
+						<Card className="border-[#70C7BA]/30 bg-gradient-to-br from-slate-900/95 to-slate-800/95 backdrop-blur-xl">
+							<CardContent className="p-8">
+								<div className="text-center mb-8">
+									<div className="inline-flex items-center gap-3 bg-gradient-to-r from-[#70C7BA]/20 to-[#49EACB]/20 backdrop-blur-xl border border-[#70C7BA]/30 rounded-full px-6 py-3 mb-6">
+										<Coffee className="w-6 h-6 text-[#70C7BA]" />
+										<span className="text-[#70C7BA] font-semibold">Support with Kaspa</span>
 									</div>
-									<h2 className="text-xl font-bold mb-2" style={{ color: userPage.foregroundColor }}>
-										Support Me
+									<h2 className="text-3xl font-bold text-white mb-2">
+										Buy me a coffee
 									</h2>
-									<p className="text-sm opacity-80" style={{ color: userPage.foregroundColor }}>
+									<p className="text-gray-400">
 										Send Kaspa donations to show your support
 									</p>
 								</div>
 								
-								{/* Tabs for Address and QR */}
+								{/* Donation Tabs */}
 								<Tabs defaultValue="qr" className="w-full">
-									<TabsList className="grid w-full grid-cols-2 mb-4">
-										<TabsTrigger value="qr" className="text-xs">
-											<QrCode className="w-3 h-3 mr-1" />
+									<TabsList className="grid w-full grid-cols-2 mb-6 bg-slate-800 border-[#70C7BA]/30">
+										<TabsTrigger value="qr" className="data-[state=active]:bg-[#70C7BA] data-[state=active]:text-white">
+											<QrCode className="w-4 h-4 mr-2" />
 											QR Code
 										</TabsTrigger>
-										<TabsTrigger value="address" className="text-xs">
-											<Copy className="w-3 h-3 mr-1" />
+										<TabsTrigger value="address" className="data-[state=active]:bg-[#70C7BA] data-[state=active]:text-white">
+											<Copy className="w-4 h-4 mr-2" />
 											Address
 										</TabsTrigger>
 									</TabsList>
 									
-									<TabsContent value="qr" className="space-y-4">
+									<TabsContent value="qr" className="space-y-6">
 										<div className="flex justify-center">
-											<div className="bg-white p-4 rounded-lg">
-												<QRCodeDisplay address={userPage.kaspaAddress} size={160} />
+											<div className="bg-white p-6 rounded-xl shadow-lg">
+												<QRCodeDisplay address={userPage.kaspaAddress} size={200} />
 											</div>
 										</div>
-										<p className="text-xs text-center opacity-70" style={{ color: userPage.foregroundColor }}>
-											Scan with your Kaspa wallet
+										<p className="text-center text-gray-400 text-sm">
+											Scan with your Kaspa wallet app
 										</p>
 									</TabsContent>
 									
-									<TabsContent value="address" className="space-y-4">
-										<div 
-											className="p-3 rounded-lg border text-xs font-mono break-all text-center"
-											style={{ 
-												borderColor: userPage.foregroundColor + '30',
-												backgroundColor: userPage.backgroundColor + '40',
-												color: userPage.foregroundColor 
-											}}
-										>
+									<TabsContent value="address" className="space-y-6">
+										<div className="p-4 rounded-lg border border-[#70C7BA]/30 bg-slate-800/50 font-mono text-sm text-gray-300 break-all text-center">
 											{userPage.kaspaAddress}
 										</div>
 									</TabsContent>
 								</Tabs>
 								
-								<div className="flex flex-col gap-3 mt-6">
+								{/* Action Buttons */}
+								<div className="flex flex-col gap-4 mt-8">
 									<Button
 										onClick={handleCopyAddress}
-										className="w-full bg-green-600 hover:bg-green-700 text-white"
+										className="w-full bg-gradient-to-r from-[#70C7BA] to-[#49EACB] hover:from-[#49EACB] hover:to-[#70C7BA] text-white font-semibold py-3 rounded-full shadow-lg hover:shadow-[#70C7BA]/25 transition-all duration-300"
 									>
 										<Copy className="w-4 h-4 mr-2" />
-										{copied ? 'Copied!' : 'Copy Address'}
+										{copied ? 'Address Copied!' : 'Copy Kaspa Address'}
 									</Button>
 									
 									<Button
@@ -376,36 +339,11 @@ export default function UserProfilePage({ params }: PageProps) {
 												: `kaspa:${userPage.kaspaAddress}`;
 											window.open(kaspaUrl, '_blank');
 										}}
-										className="w-full border"
-										style={{ 
-											borderColor: userPage.foregroundColor + '40',
-											color: userPage.foregroundColor,
-											backgroundColor: 'transparent'
-										}}
+										className="w-full border-[#70C7BA]/40 text-[#70C7BA] hover:bg-[#70C7BA]/10 py-3 rounded-full transition-all duration-300"
 									>
 										<ExternalLink className="w-4 h-4 mr-2" />
-										Open Wallet
+										Open in Wallet
 									</Button>
-								</div>
-							</CardContent>
-						</Card>
-
-						{/* Stats Card */}
-						<Card 
-							className="border backdrop-blur-sm"
-							style={{ 
-								borderColor: userPage.foregroundColor + '30',
-								backgroundColor: userPage.backgroundColor + 'F5'
-							}}
-						>
-							<CardContent className="p-4">
-								<div className="text-center">
-									<div className="text-2xl font-bold mb-1" style={{ color: userPage.foregroundColor }}>
-										{userPage.viewCount || 0}
-									</div>
-									<div className="text-sm opacity-70" style={{ color: userPage.foregroundColor }}>
-										Profile Views
-									</div>
 								</div>
 							</CardContent>
 						</Card>
