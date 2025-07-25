@@ -39,18 +39,33 @@ interface UserPageData {
 
 async function fetchUserPage(handle: string): Promise<UserPageData | null> {
 	try {
+		console.log('Frontend: Fetching user page for handle:', handle);
 		const response = await fetch(`/api/user-page/${handle}`, {
 			cache: 'no-store'
 		});
 		
-		if (!response.ok) {
-			return null;
+		console.log('Frontend: API response status:', response.status);
+		
+		if (response.status === 404) {
+			console.log('Frontend: User page not found (404)');
+			return null; // Page legitimately doesn't exist
 		}
 		
-		return await response.json();
+		if (!response.ok) {
+			console.error('Frontend: API error:', response.status, response.statusText);
+			// For other errors (500, etc.), we should retry or show a different error
+			// For now, let's not call notFound() for server errors
+			throw new Error(`API Error: ${response.status}`);
+		}
+		
+		const data = await response.json();
+		console.log('Frontend: Successfully fetched user page data');
+		return data;
 	} catch (error) {
-		console.error('Error fetching user page:', error);
-		return null;
+		console.error('Frontend: Error fetching user page:', error);
+		// Don't return null for network errors - this would trigger notFound incorrectly
+		// Instead, we'll handle this in the component
+		throw error;
 	}
 }
 
@@ -77,13 +92,21 @@ export default function UserProfilePage({ params }: PageProps) {
 	useEffect(() => {
 		if (!handle) return;
 
-		async function loadUserPage() {
+				async function loadUserPage() {
 			setLoading(true);
 			console.log('Frontend: Loading user page for handle:', handle);
-			const data = await fetchUserPage(handle);
-			console.log('Frontend: Received user page data:', data);
-			setUserPage(data);
-			setLoading(false);
+			try {
+				const data = await fetchUserPage(handle);
+				console.log('Frontend: Received user page data:', data);
+				setUserPage(data);
+			} catch (error) {
+				console.error('Frontend: Error loading user page:', error);
+				// For network errors or API errors, set userPage to null
+				// The component will handle showing appropriate error
+				setUserPage(null);
+			} finally {
+				setLoading(false);
+			}
 		}
 
 		loadUserPage();
@@ -135,7 +158,10 @@ export default function UserProfilePage({ params }: PageProps) {
 		);
 	}
 
+	// Only call notFound if we're sure the page doesn't exist
+	// Don't call it on API errors or temporary issues
 	if (!userPage) {
+		console.error('Frontend: User page data is null, calling notFound for handle:', handle);
 		notFound();
 	}
 
