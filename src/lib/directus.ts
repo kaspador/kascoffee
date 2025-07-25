@@ -8,7 +8,12 @@ const directusAuth = createDirectus(process.env.NEXT_PUBLIC_DIRECTUS_URL || 'htt
 // Public Directus client for reading public data (user pages)
 const directusPublic = createDirectus(process.env.NEXT_PUBLIC_DIRECTUS_URL || 'https://directus-production-09ff.up.railway.app')
   .with(rest())
-  .with(staticToken(process.env.DIRECTUS_PUBLIC_TOKEN || process.env.DIRECTUS_TOKEN || ''));
+  .with(authentication());
+
+// Set the admin token for public read operations
+if (process.env.DIRECTUS_TOKEN) {
+  directusPublic.setToken(process.env.DIRECTUS_TOKEN);
+}
 
 // Debug token in production
 console.log('DIRECTUS_TOKEN exists:', !!process.env.DIRECTUS_TOKEN);
