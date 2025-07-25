@@ -5,25 +5,9 @@ const directusAuth = createDirectus(process.env.NEXT_PUBLIC_DIRECTUS_URL || 'htt
   .with(rest())
   .with(authentication());
 
-// Public Directus client for reading public data (user pages)
+// Public Directus client for reading public data (user pages) - no auth needed for public collections
 const directusPublic = createDirectus(process.env.NEXT_PUBLIC_DIRECTUS_URL || 'https://directus-production-09ff.up.railway.app')
-  .with(rest())
-  .with(authentication());
-
-// Set the read-only token for public operations (fallback to admin token if not set)
-if (process.env.DIRECTUS_PUBLIC_TOKEN) {
-  console.log('Setting DIRECTUS_PUBLIC_TOKEN for public client');
-  directusPublic.setToken(process.env.DIRECTUS_PUBLIC_TOKEN);
-} else if (process.env.DIRECTUS_TOKEN) {
-  console.warn('Using admin token for public operations - consider creating a read-only token');
-  console.log('Setting admin token for public client, token starts with:', process.env.DIRECTUS_TOKEN.substring(0, 8));
-  directusPublic.setToken(process.env.DIRECTUS_TOKEN);
-  console.log('Token set successfully on public client');
-}
-
-// Debug token in production
-console.log('DIRECTUS_TOKEN exists:', !!process.env.DIRECTUS_TOKEN);
-console.log('Token length:', process.env.DIRECTUS_TOKEN?.length || 0);
+  .with(rest());
 
 export { directusAuth as directus, directusPublic };
 
