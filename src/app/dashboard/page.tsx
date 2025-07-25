@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { DirectusAPI } from '@/lib/directus';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,7 +11,6 @@ import { ThemeCustomization } from '@/components/dashboard/theme-customization';
 import { SocialLinksForm } from '@/components/dashboard/social-links-form';
 import { User, Palette, Link as LinkIcon, Settings, Eye, Copy, LogOut, Coffee, Sparkles, TrendingUp, Users } from 'lucide-react';
 import Link from 'next/link';
-// Temporarily disabled - will implement with Directus auth
 
 // Type for API responses
 interface UserProfile {
@@ -31,14 +31,60 @@ interface UserProfile {
 	updatedAt: string;
 }
 
+interface AuthUser {
+	id: string;
+	email: string;
+	first_name?: string;
+	last_name?: string;
+	name: string;
+}
+
 export default function DashboardPage() {
-	// Temporarily skip auth check - will implement with Directus
-	const session = useMemo(() => ({ user: { name: 'User' } }), []);
-	const isPending = false;
+	const [authUser, setAuthUser] = useState<AuthUser | null>(null);
+	const [authLoading, setAuthLoading] = useState(true);
 	const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 	const [profileLoading, setProfileLoading] = useState(false);
 	const [socials, setSocials] = useState<{socials: Array<{id: string; platform: string; url: string; username: string; isVisible: boolean}>} | null>(null);
 	const router = useRouter();
+
+	// Check authentication on component mount
+	useEffect(() => {
+		const checkAuth = async () => {
+			try {
+				setAuthLoading(true);
+				const isAuth = await DirectusAPI.isAuthenticated();
+				if (isAuth) {
+					const user = await DirectusAPI.getCurrentUser();
+					setAuthUser({
+						id: user.id,
+						email: user.email,
+						first_name: user.first_name,
+						last_name: user.last_name,
+						name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email
+					});
+				} else {
+					router.push('/auth/signin');
+					return;
+				}
+			} catch (error) {
+				console.error('Auth check failed:', error);
+				router.push('/auth/signin');
+				return;
+			} finally {
+				setAuthLoading(false);
+			}
+		};
+
+		checkAuth();
+	}, [router]);
+
+	// Fetch profile when user is authenticated
+	useEffect(() => {
+		if (!authUser) return;
+		
+		fetchProfile();
+		fetchSocials();
+	}, [authUser]);
 
 	// Function to fetch profile data from API
 	const fetchProfile = async () => {
@@ -71,19 +117,6 @@ export default function DashboardPage() {
 		}
 	};
 
-	useEffect(() => {
-		if (isPending) return; // Wait for session check to complete
-		
-		if (!session) {
-			router.push('/auth/signin');
-			return;
-		}
-		
-		// User is authenticated, fetch their data
-		fetchProfile();
-		fetchSocials();
-	}, [session, isPending, router]);
-
 	// Convert UserProfile to the format expected by components
 	const convertProfileForComponents = (profile: UserProfile | null) => {
 		if (!profile) return undefined;
@@ -107,11 +140,23 @@ export default function DashboardPage() {
 	};
 
 	const handleLogout = async () => {
-		// Temporarily disabled - will implement with Directus
-		router.push('/');
+		try {
+			await DirectusAPI.logout();
+			setAuthUser(null);
+			setUserProfile(null);
+			setSocials(null);
+			router.push('/');
+		} catch (error) {
+			console.error('Logout error:', error);
+			// Even if logout fails, clear local state and redirect
+			setAuthUser(null);
+			setUserProfile(null);
+			setSocials(null);
+			router.push('/');
+		}
 	};
 
-	if (isPending) {
+	if (authLoading) {
 		return (
 			<div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
 				<div className="text-center">
@@ -122,7 +167,7 @@ export default function DashboardPage() {
 		);
 	}
 
-	if (!session) {
+	if (!authUser) {
 		return null;
 	}
 
@@ -182,7 +227,7 @@ export default function DashboardPage() {
 					</div>
 					<h1 className="text-3xl md:text-4xl font-kaspa-header font-black text-white mb-3">
 						Welcome back, <span className="bg-gradient-to-r from-[#70C7BA] to-[#49EACB] bg-clip-text text-transparent">
-							{userProfile?.displayName || session.user.name}
+							{userProfile?.displayName || authUser.name}
 						</span>
 					</h1>
 					<p className="text-gray-400 text-lg font-kaspa-body max-w-2xl mx-auto">

@@ -3,38 +3,69 @@ import { DirectusAPI } from '@/lib/directus';
 
 export async function GET() {
 	try {
-		// TODO: Get current user from session/auth
-		// For now, we'll try to get a user page, but since auth isn't fully set up,
-		// we'll return null to indicate no profile exists yet
+		// Get current authenticated user
+		const user = await DirectusAPI.getCurrentUser();
+		if (!user) {
+			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+		}
+
+		// Try to get the user's page
+		try {
+			const userPages = await DirectusAPI.getUserPageByUserId(user.id);
+			if (userPages && userPages.length > 0) {
+				const userPage = userPages[0];
+				return NextResponse.json({ 
+					userPage: {
+						id: userPage.id,
+						handle: userPage.handle,
+						displayName: userPage.display_name,
+						shortDescription: userPage.short_description,
+						longDescription: userPage.long_description,
+						kaspaAddress: userPage.kaspa_address,
+						profileImage: userPage.profile_image,
+						backgroundImage: userPage.background_image,
+						backgroundColor: userPage.background_color,
+						foregroundColor: userPage.foreground_color,
+						isActive: userPage.is_active,
+						viewCount: userPage.view_count
+					}
+				});
+			}
+		} catch (error) {
+			console.log('No user page found, will show null');
+		}
 		
 		return NextResponse.json({ 
-			userPage: null // Will be replaced when proper auth is implemented
+			userPage: null // No profile set up yet
 		});
 	} catch (error) {
 		console.error('Error fetching profile:', error);
-		return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+		return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 	}
 }
 
 export async function PUT(request: NextRequest) {
 	try {
+		// Get current authenticated user
+		const user = await DirectusAPI.getCurrentUser();
+		if (!user) {
+			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+		}
+
 		const body = await request.json();
 		const { handle, displayName, kaspaAddress, shortDescription, longDescription, profileImage, backgroundImage } = body;
 		
-		// TODO: Get current user ID from session/auth
-		// For now, we'll create a user page with a temporary user ID
-		const tempUserId = 'temp-user-id'; // This will be replaced with actual auth
-		
-		// First check if user page already exists
+		// Check if user page already exists for this user
 		let userPage;
 		try {
-			userPage = await DirectusAPI.getUserPage(handle);
+			const userPages = await DirectusAPI.getUserPageByUserId(user.id);
+			userPage = userPages && userPages.length > 0 ? userPages[0] : null;
 		} catch (error) {
 			// User page doesn't exist, that's ok
 		}
 		
 		const userPageData = {
-			user: tempUserId,
+			user: user.id, // Use real user ID
 			handle,
 			display_name: displayName,
 			short_description: shortDescription || '',

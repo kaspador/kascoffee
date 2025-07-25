@@ -53,15 +53,54 @@ export interface Social {
 export const DirectusAPI = {
   // Authentication
   async login(email: string, password: string) {
-    return await directus.login({ email, password });
+    const result = await directus.login({ email, password });
+    // Store auth in localStorage for persistence
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('directus_auth_token', JSON.stringify(result));
+    }
+    return result;
   },
 
   async logout() {
-    return await directus.logout();
+    const result = await directus.logout();
+    // Clear auth from localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('directus_auth_token');
+    }
+    return result;
   },
 
   async getCurrentUser() {
-    return await directus.request(readMe());
+    try {
+      // Check if we have stored auth token
+      if (typeof window !== 'undefined') {
+        const storedToken = localStorage.getItem('directus_auth_token');
+        if (storedToken) {
+          const tokenData = JSON.parse(storedToken);
+          if (tokenData.access_token) {
+            // Set the token for current request
+            directus.setToken(tokenData.access_token);
+          }
+        }
+      }
+      return await directus.request(readMe());
+    } catch (error) {
+      console.error('Error getting current user:', error);
+      // Clear invalid token
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('directus_auth_token');
+      }
+      throw error;
+    }
+  },
+
+  async isAuthenticated(): Promise<boolean> {
+    try {
+      await this.getCurrentUser();
+      return true;
+    } catch {
+      return false;
+    }
   },
 
   async register(email: string, password: string, first_name?: string, last_name?: string) {
@@ -86,6 +125,18 @@ export const DirectusAPI = {
     } catch (error: unknown) {
       console.error('Error fetching user page:', error);
       return null;
+    }
+  },
+
+  async getUserPageByUserId(userId: string): Promise<UserPage[]> {
+    try {
+      const pages = await directus.request(readItems('user_pages', {
+        filter: { user: userId }
+      })) as unknown[];
+      return pages as UserPage[];
+    } catch (error: unknown) {
+      console.error('Error fetching user pages by user ID:', error);
+      return [];
     }
   },
 

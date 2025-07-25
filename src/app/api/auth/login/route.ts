@@ -4,7 +4,7 @@ import { DirectusAPI } from '@/lib/directus';
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
-
+    
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email and password are required' },
@@ -12,11 +12,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Login with Directus
     const authData = await DirectusAPI.login(email, password);
+    
+    // Get user details
+    const user = await DirectusAPI.getCurrentUser();
     
     return NextResponse.json({ 
       success: true, 
-      user: authData 
+      user: {
+        id: user.id,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        name: `${user.first_name || ''} ${user.last_name || ''}`.trim()
+      },
+      token: authData.access_token
     });
   } catch (error: unknown) {
     console.error('Login error:', error);
