@@ -21,8 +21,8 @@ const profileFormSchema = z.object({
 		'Please enter a valid Kaspa address'
 	),
 	shortDescription: z.string().max(300, 'Short description must be less than 300 characters').optional(),
-	profileImage: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
-	backgroundImage: z.string().url('Please enter a valid URL').optional().or(z.literal(''))
+	profileImage: z.string().optional(),
+	backgroundImage: z.string().optional()
 });
 
 type ProfileFormData = z.infer<typeof profileFormSchema>;
@@ -72,6 +72,7 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 
 	const updateProfileMutation = useMutation({
 		mutationFn: async (data: ProfileFormData & { longDescription: string }) => {
+			console.log('🚀 Form data being sent to API:', data);
 			const response = await fetch('/api/user/profile', {
 				method: 'PUT',
 				headers: { 
@@ -93,6 +94,9 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 	});
 
 	const onSubmit = (data: ProfileFormData) => {
+		console.log('📝 Form values after validation:', data);
+		console.log('📝 Profile image value:', data.profileImage);
+		console.log('📝 Background image value:', data.backgroundImage);
 		updateProfileMutation.mutate({ ...data, longDescription });
 	};
 
