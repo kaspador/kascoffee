@@ -14,7 +14,7 @@ export default function QRCodeDisplay({ address, size = 200 }: QRCodeDisplayProp
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		console.log('QRCodeDisplay: Rendering QR code for address:', address);
+		console.log('QRCodeDisplay: Starting QR generation for address:', address);
 		
 		if (!address) {
 			console.error('QRCodeDisplay: No address provided');
@@ -23,61 +23,56 @@ export default function QRCodeDisplay({ address, size = 200 }: QRCodeDisplayProp
 			return;
 		}
 
+		// Clean the address - remove kaspa: prefix if present
+		const cleanAddress = address.replace(/^kaspa:/, '').trim();
+		console.log('QRCodeDisplay: Clean address:', cleanAddress);
+
+		if (!cleanAddress) {
+			setError('Invalid address');
+			setLoading(false);
+			return;
+		}
+
 		if (canvasRef.current) {
 			setLoading(true);
 			setError(null);
 			
-			// Clean the address - handle both raw kaspa addresses and kaspa: URIs
-			const cleanAddress = address.startsWith('kaspa:') ? address : `kaspa:${address}`;
-			
+			// Generate QR code with the clean address
 			QRCode.toCanvas(canvasRef.current, cleanAddress, {
 				width: size,
 				margin: 2,
 				color: {
 					dark: '#000000',
 					light: '#ffffff'
-				}
+				},
+				errorCorrectionLevel: 'M'
 			})
 			.then(() => {
-				console.log('QRCodeDisplay: QR code rendered successfully for:', cleanAddress);
+				console.log('QRCodeDisplay: QR code generated successfully');
 				setLoading(false);
 			})
 			.catch((err) => {
-				console.error('QRCodeDisplay: Error rendering QR code:', err);
-				// Try with just the address without kaspa: prefix
-				const fallbackAddress = address.replace('kaspa:', '');
-				QRCode.toCanvas(canvasRef.current!, fallbackAddress, {
-					width: size,
-					margin: 2,
-					color: {
-						dark: '#000000',
-						light: '#ffffff'
-					}
-				})
-				.then(() => {
-					console.log('QRCodeDisplay: QR code rendered successfully with fallback address');
-					setLoading(false);
-				})
-				.catch((fallbackErr) => {
-					console.error('QRCodeDisplay: Fallback also failed:', fallbackErr);
-					setError('Failed to generate QR code');
-					setLoading(false);
-				});
+				console.error('QRCodeDisplay: Error generating QR code:', err);
+				setError('Failed to generate QR code');
+				setLoading(false);
 			});
 		}
 	}, [address, size]);
 
 	if (error) {
 		return (
-			<div className="flex justify-center items-center h-48 text-red-400 text-sm">
-				{error}
+			<div className="flex justify-center items-center bg-red-50 border border-red-200 rounded-lg p-8" style={{ width: size, height: size }}>
+				<div className="text-center">
+					<div className="text-red-600 text-sm font-medium">QR Code Error</div>
+					<div className="text-red-500 text-xs mt-1">{error}</div>
+				</div>
 			</div>
 		);
 	}
 
 	if (loading) {
 		return (
-			<div className="flex justify-center items-center h-48">
+			<div className="flex justify-center items-center bg-gray-50 border border-gray-200 rounded-lg" style={{ width: size, height: size }}>
 				<div className="w-8 h-8 border-2 border-[#70C7BA] border-t-transparent rounded-full animate-spin"></div>
 			</div>
 		);
@@ -85,7 +80,7 @@ export default function QRCodeDisplay({ address, size = 200 }: QRCodeDisplayProp
 
 	return (
 		<div className="flex justify-center">
-			<canvas ref={canvasRef} className="border rounded-lg" />
+			<canvas ref={canvasRef} className="rounded-lg shadow-sm" />
 		</div>
 	);
 } 

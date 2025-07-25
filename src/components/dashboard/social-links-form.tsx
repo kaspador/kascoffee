@@ -172,7 +172,10 @@ export function SocialLinksForm({ socials: initialSocials, isLoading, onSuccess 
                 Show on donation page
               </Label>
             </div>
-            <Button className="bg-[#70C7BA] hover:bg-[#5ba8a0] text-white">
+            <Button 
+              className="bg-[#70C7BA] hover:bg-[#5ba8a0] text-white"
+              onClick={() => alert('Social links functionality coming soon! This feature is still being implemented.')}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Social Link
             </Button>

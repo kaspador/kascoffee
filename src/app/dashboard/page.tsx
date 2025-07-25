@@ -134,12 +134,6 @@ export default function DashboardPage() {
 		};
 	};
 
-	const copyProfileUrl = () => {
-		if (userProfile?.handle) {
-			navigator.clipboard.writeText(`https://kas.coffee/${userProfile.handle}`);
-		}
-	};
-
 	const handleLogout = async () => {
 		try {
 			await fetch('/api/auth/logout', {
@@ -196,17 +190,6 @@ export default function DashboardPage() {
 							</span>
 						</Link>
 						<div className="flex items-center gap-4">
-							{userProfile?.handle && (
-								<Button 
-									variant="ghost" 
-									size="sm"
-									onClick={copyProfileUrl}
-									className="hidden md:flex items-center gap-2 border border-[#70C7BA]/30 text-[#70C7BA] hover:bg-[#70C7BA]/10 hover:border-[#70C7BA] rounded-full backdrop-blur-sm font-kaspa-body transition-all duration-300"
-								>
-									<Copy className="h-4 w-4" />
-									Copy Profile URL
-								</Button>
-							)}
 							<Button 
 								variant="ghost" 
 								size="sm"
@@ -310,14 +293,6 @@ export default function DashboardPage() {
 									</div>
 								</div>
 								<div className="flex flex-col sm:flex-row items-center gap-3">
-									<Button 
-										variant="outline"
-										onClick={copyProfileUrl}
-										className="w-full sm:w-auto flex items-center justify-center gap-2 border-[#70C7BA]/50 text-[#70C7BA] hover:bg-[#70C7BA]/10 hover:border-[#70C7BA] rounded-xl backdrop-blur-sm font-kaspa-body font-semibold px-6 py-3 transition-all duration-300"
-									>
-										<Copy className="h-5 w-5" />
-										Copy URL
-									</Button>
 									<Button 
 										asChild
 										className="w-full sm:w-auto bg-gradient-to-r from-[#70C7BA] to-[#49EACB] hover:from-[#5ba8a0] hover:to-[#3dd4b4] text-white font-kaspa-subheader font-bold rounded-xl shadow-lg hover:shadow-[#70C7BA]/25 px-6 py-3 transition-all duration-300 transform hover:scale-105"
