@@ -48,8 +48,8 @@ export default function SignUpPage() {
 
 			// Check if auto-login was successful
 			if (data.autoLogin) {
-				// User is automatically logged in, redirect to dashboard
-				router.push('/dashboard');
+				// User is automatically logged in, redirect to onboarding for new users
+				router.push('/onboarding');
 			} else {
 				// Registration successful but need to login manually
 				router.push('/auth/signin?message=Registration successful. Please sign in.');

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ProfileForm } from '@/components/dashboard/profile-form';
 import { ThemeCustomization } from '@/components/dashboard/theme-customization';
 import { SocialLinksForm } from '@/components/dashboard/social-links-form';
-import { User, Palette, Link as LinkIcon, Settings, Eye, Copy, LogOut, Coffee, Sparkles, TrendingUp, Users } from 'lucide-react';
+import { User, Palette, Link as LinkIcon, Settings, Eye, LogOut, Coffee, Sparkles, TrendingUp, Users } from 'lucide-react';
 import Link from 'next/link';
 
 // Type for API responses
@@ -74,17 +74,8 @@ export default function DashboardPage() {
 		checkAuth();
 	}, [router]);
 
-	// Fetch profile when user is authenticated
-	useEffect(() => {
-		if (!authUser) return;
-		
-		console.log('Dashboard: Auth user loaded, fetching profile');
-		fetchProfile();
-		fetchSocials();
-	}, [authUser]); // Remove fetchProfile from dependency to avoid infinite loops
-
 	// Function to fetch profile data from API
-	const fetchProfile = async () => {
+	const fetchProfile = useCallback(async () => {
 		try {
 			console.log('Dashboard: Starting profile fetch');
 			setProfileLoading(true);
@@ -102,10 +93,10 @@ export default function DashboardPage() {
 		} finally {
 			setProfileLoading(false);
 		}
-	};
+	}, []);
 
 	// Function to fetch social links
-	const fetchSocials = async () => {
+	const fetchSocials = useCallback(async () => {
 		try {
 			const response = await fetch('/api/user/socials');
 			
@@ -116,7 +107,16 @@ export default function DashboardPage() {
 		} catch (error) {
 			console.error('Failed to fetch socials:', error);
 		}
-	};
+	}, []);
+
+	// Fetch profile when user is authenticated
+	useEffect(() => {
+		if (!authUser) return;
+		
+		console.log('Dashboard: Auth user loaded, fetching profile');
+		fetchProfile();
+		fetchSocials();
+	}, [authUser, fetchProfile, fetchSocials]); // Dependencies optimized to prevent infinite loops
 
 	// Convert UserProfile to the format expected by components
 	const convertProfileForComponents = (profile: UserProfile | null) => {
