@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ExternalLink, Copy, Coffee, Share2, User, Eye, QrCode, Zap } from 'lucide-react';
 import { FaTwitter, FaDiscord, FaTelegram, FaGlobe, FaGithub } from 'react-icons/fa';
 import QRCodeDisplay from '@/components/qr-code-display';
@@ -117,24 +118,49 @@ export default function UserProfilePage({ params }: PageProps) {
 		}
 	};
 
-	const handleShare = async () => {
+	const handleShare = async (platform?: string) => {
 		if (!userPage) return;
 		
-		if (navigator.share) {
-			try {
-				await navigator.share({
-					title: `${userPage.displayName || userPage.handle} - kas.coffee`,
-					text: userPage.shortDescription || `Support ${userPage.displayName || userPage.handle} with Kaspa donations`,
-					url: window.location.href,
-				});
-			} catch {
-				handleCopyAddress();
+		const url = window.location.href;
+		const title = `${userPage.displayName || userPage.handle} - kas.coffee`;
+		const text = userPage.shortDescription || `Support ${userPage.displayName || userPage.handle} with Kaspa donations`;
+		
+		if (platform) {
+			let shareUrl = '';
+			switch (platform) {
+				case 'twitter':
+					shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+					break;
+				case 'discord':
+					// Discord doesn't have a direct share URL, copy to clipboard instead
+					try {
+						await navigator.clipboard.writeText(`${text}\n${url}`);
+						// You could add a toast notification here
+					} catch (err) {
+						console.error('Failed to copy for Discord:', err);
+					}
+					return;
+				case 'telegram':
+					shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+					break;
+			}
+			if (shareUrl) {
+				window.open(shareUrl, '_blank', 'width=600,height=400');
 			}
 		} else {
-			try {
-				await navigator.clipboard.writeText(window.location.href);
-			} catch (err) {
-				console.error('Failed to copy URL:', err);
+			// Default share behavior
+			if (navigator.share) {
+				try {
+					await navigator.share({ title, text, url });
+				} catch {
+					await navigator.clipboard.writeText(url);
+				}
+			} else {
+				try {
+					await navigator.clipboard.writeText(url);
+				} catch (err) {
+					console.error('Failed to copy URL:', err);
+				}
 			}
 		}
 	};
@@ -164,9 +190,9 @@ export default function UserProfilePage({ params }: PageProps) {
 	};
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+		<div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
 			{/* Header */}
-			<div className="bg-white shadow-sm border-b border-gray-200">
+			<div className="bg-white/80 backdrop-blur-lg shadow-sm border-b border-gray-200/50 sticky top-0 z-50">
 				<div className="container mx-auto px-4 py-4 flex justify-between items-center max-w-4xl">
 					<Link
 						href="/"
@@ -176,44 +202,76 @@ export default function UserProfilePage({ params }: PageProps) {
 						<span className="text-lg font-bold">kas.coffee</span>
 					</Link>
 					
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={handleShare}
-						className="border-[#70C7BA] text-[#70C7BA] hover:bg-[#70C7BA] hover:text-white"
-					>
-						<Share2 className="w-4 h-4 mr-2" />
-						Share
-					</Button>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button
+								variant="outline"
+								size="sm"
+								className="border-[#70C7BA] text-[#70C7BA] hover:bg-[#70C7BA] hover:text-white shadow-sm"
+							>
+								<Share2 className="w-4 h-4 mr-2" />
+								Share
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent className="w-48">
+							<DropdownMenuItem onClick={() => handleShare('twitter')}>
+								<FaTwitter className="w-4 h-4 mr-2 text-blue-500" />
+								Twitter
+							</DropdownMenuItem>
+							<DropdownMenuItem onClick={() => handleShare('discord')}>
+								<FaDiscord className="w-4 h-4 mr-2 text-indigo-500" />
+								Discord
+							</DropdownMenuItem>
+							<DropdownMenuItem onClick={() => handleShare('telegram')}>
+								<FaTelegram className="w-4 h-4 mr-2 text-blue-400" />
+								Telegram
+							</DropdownMenuItem>
+							<DropdownMenuItem onClick={() => handleShare()}>
+								<ExternalLink className="w-4 h-4 mr-2" />
+								Share Link
+							</DropdownMenuItem>
+							<DropdownMenuItem onClick={handleCopyAddress}>
+								<Copy className="w-4 h-4 mr-2" />
+								Copy URL
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 			</div>
 
 			<div className="container mx-auto px-4 py-8 max-w-4xl">
 				{/* Profile Header */}
-				<div className="text-center mb-8">
+				<div className="text-center mb-12">
 					<div className="relative inline-block mb-6">
-						<Avatar className="w-32 h-32 border-4 border-[#70C7BA] shadow-lg">
+						<Avatar className="w-40 h-40 border-4 border-[#70C7BA] shadow-xl">
 							<AvatarImage 
-								src={userPage.profileImage || undefined} 
+								src={userPage.profileImage ? userPage.profileImage : undefined}
 								alt={userPage.displayName || userPage.handle}
 								className="object-cover"
+								onError={(e) => {
+									console.log('Profile image failed to load:', userPage.profileImage);
+									(e.target as HTMLImageElement).style.display = 'none';
+								}}
 							/>
-							<AvatarFallback className="text-3xl font-bold bg-gradient-to-br from-[#70C7BA] to-[#49EACB] text-white">
+							<AvatarFallback className="text-4xl font-bold bg-gradient-to-br from-[#70C7BA] to-[#49EACB] text-white">
 								{(userPage.displayName || userPage.handle)?.charAt(0)?.toUpperCase() || 'U'}
 							</AvatarFallback>
 						</Avatar>
+						<div className="absolute -bottom-2 -right-2 w-8 h-8 bg-[#49EACB] rounded-full flex items-center justify-center shadow-lg">
+							<Coffee className="w-4 h-4 text-white" />
+						</div>
 					</div>
 					
-					<h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
+					<h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4">
 						{userPage.displayName || userPage.handle}
 					</h1>
 					
-					<Badge className="mb-4 px-4 py-2 text-base bg-[#70C7BA] text-white hover:bg-[#5ba8a0]">
+					<Badge className="mb-6 px-6 py-2 text-lg bg-[#70C7BA] text-white hover:bg-[#5ba8a0] rounded-full shadow-lg">
 						@{userPage.handle}
 					</Badge>
 					
 					{userPage.shortDescription && (
-						<p className="text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed mb-6">
+						<p className="text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed mb-8 bg-white/50 rounded-2xl p-6 shadow-sm">
 							{userPage.shortDescription}
 						</p>
 					)}

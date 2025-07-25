@@ -20,7 +20,7 @@ import {
 	Undo,
 	Redo
 } from 'lucide-react';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 interface RichTextEditorProps {
 	content: string;
@@ -64,6 +64,13 @@ export function RichTextEditor({
 			}
 		}
 	});
+
+	// Sync content when it changes externally (like when switching tabs)
+	useEffect(() => {
+		if (editor && content !== editor.getHTML()) {
+			editor.commands.setContent(content);
+		}
+	}, [content, editor]);
 
 	const addLink = useCallback(() => {
 		const previousUrl = editor?.getAttributes('link').href;

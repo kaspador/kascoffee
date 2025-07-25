@@ -27,7 +27,10 @@ export default function QRCodeDisplay({ address, size = 200 }: QRCodeDisplayProp
 			setLoading(true);
 			setError(null);
 			
-			QRCode.toCanvas(canvasRef.current, address, {
+			// Clean the address - handle both raw kaspa addresses and kaspa: URIs
+			const cleanAddress = address.startsWith('kaspa:') ? address : `kaspa:${address}`;
+			
+			QRCode.toCanvas(canvasRef.current, cleanAddress, {
 				width: size,
 				margin: 2,
 				color: {
@@ -36,13 +39,30 @@ export default function QRCodeDisplay({ address, size = 200 }: QRCodeDisplayProp
 				}
 			})
 			.then(() => {
-				console.log('QRCodeDisplay: QR code rendered successfully');
+				console.log('QRCodeDisplay: QR code rendered successfully for:', cleanAddress);
 				setLoading(false);
 			})
 			.catch((err) => {
 				console.error('QRCodeDisplay: Error rendering QR code:', err);
-				setError('Failed to generate QR code');
-				setLoading(false);
+				// Try with just the address without kaspa: prefix
+				const fallbackAddress = address.replace('kaspa:', '');
+				QRCode.toCanvas(canvasRef.current!, fallbackAddress, {
+					width: size,
+					margin: 2,
+					color: {
+						dark: '#000000',
+						light: '#ffffff'
+					}
+				})
+				.then(() => {
+					console.log('QRCodeDisplay: QR code rendered successfully with fallback address');
+					setLoading(false);
+				})
+				.catch((fallbackErr) => {
+					console.error('QRCodeDisplay: Fallback also failed:', fallbackErr);
+					setError('Failed to generate QR code');
+					setLoading(false);
+				});
 			});
 		}
 	}, [address, size]);
