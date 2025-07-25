@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { DirectusAPI } from '@/lib/directus';
+import { NextResponse } from 'next/server';
+import { DirectusAPI, UserPage } from '@/lib/directus';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // This is a debug endpoint - only enable in development
     if (process.env.NODE_ENV === 'production') {
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     
     console.log(`Debug: Found ${pages.length} total user pages`);
     
-    const debugData = pages.map((page: any) => ({
+    const debugData = pages.map((page: UserPage) => ({
       id: page.id,
       handle: page.handle,
       display_name: page.display_name,
