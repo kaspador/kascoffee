@@ -53,6 +53,16 @@ export interface Social {
   date_updated: string;
 }
 
+export interface WalletSnapshot {
+  id: string;
+  kaspa_address: string;
+  balance: string; // Store as string to preserve precision
+  balance_kas: number;
+  timestamp: string; // ISO datetime
+  hour_key: string; // For deduplication: "2025-07-25T20"
+  date_created: string;
+}
+
 // Server-side only helper functions
 export const DirectusAPI = {
   // Authentication (server-side only)
@@ -161,5 +171,68 @@ export const DirectusAPI = {
 
   async deleteSocial(id: string) {
     return await directusAuth.request(deleteItem('socials', id));
+  },
+
+  // Wallet Snapshots
+  async createWalletSnapshot(data: Omit<WalletSnapshot, 'id' | 'date_created'>) {
+    return await directusAuth.request(createItem('wallet_snapshots', data));
+  },
+
+  async getWalletSnapshots(kaspaAddress: string, hours: number = 24): Promise<WalletSnapshot[]> {
+    try {
+      const cutoffTime = new Date(Date.now() - (hours * 60 * 60 * 1000)).toISOString();
+      
+      const snapshots = await directusPublic.request(readItems('wallet_snapshots', {
+        filter: { 
+          kaspa_address: { _eq: kaspaAddress },
+          timestamp: { _gte: cutoffTime }
+        },
+        sort: ['-timestamp'],
+        limit: hours * 2 // Allow for multiple snapshots per hour
+      })) as unknown[];
+      
+      return snapshots as WalletSnapshot[];
+    } catch {
+      return [];
+    }
+  },
+
+  async getLatestWalletSnapshot(kaspaAddress: string): Promise<WalletSnapshot | null> {
+    try {
+      const snapshots = await directusPublic.request(readItems('wallet_snapshots', {
+        filter: { kaspa_address: { _eq: kaspaAddress } },
+        sort: ['-timestamp'],
+        limit: 1
+      })) as unknown[];
+      
+      return snapshots.length > 0 ? snapshots[0] as WalletSnapshot : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async updateWalletSnapshot(id: string, data: Partial<WalletSnapshot>) {
+    return await directusAuth.request(updateItem('wallet_snapshots', id, data));
+  },
+
+  async cleanupOldSnapshots(daysToKeep: number = 30) {
+    try {
+      const cutoffTime = new Date(Date.now() - (daysToKeep * 24 * 60 * 60 * 1000)).toISOString();
+      
+      // Get old snapshots
+      const oldSnapshots = await directusAuth.request(readItems('wallet_snapshots', {
+        filter: { timestamp: { _lt: cutoffTime } },
+        fields: ['id']
+      })) as unknown[];
+      
+      // Delete them
+      for (const snapshot of oldSnapshots) {
+        await directusAuth.request(deleteItem('wallet_snapshots', (snapshot as any).id));
+      }
+      
+      return oldSnapshots.length;
+    } catch {
+      return 0;
+    }
   }
 }; 

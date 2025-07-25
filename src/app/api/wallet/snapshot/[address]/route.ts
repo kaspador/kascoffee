@@ -1,29 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-interface BalanceSnapshot {
-  address: string;
-  balance: number;
-  balanceKas: number;
-  timestamp: number;
-  hour: string; // Format: YYYY-MM-DD-HH for easy grouping
-}
-
-// In-memory storage for balance snapshots (in production, use database)
-const balanceHistory = new Map<string, BalanceSnapshot[]>();
-
-// Clean up old snapshots (keep last 30 days)
-setInterval(() => {
-  const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-  
-  for (const [address, snapshots] of balanceHistory.entries()) {
-    const filtered = snapshots.filter(snapshot => snapshot.timestamp > thirtyDaysAgo);
-    if (filtered.length === 0) {
-      balanceHistory.delete(address);
-    } else {
-      balanceHistory.set(address, filtered);
-    }
-  }
-}, 24 * 60 * 60 * 1000); // Run daily
+import { DirectusAPI } from '@/lib/directus';
 
 export async function POST(
   request: NextRequest, 
@@ -65,56 +41,66 @@ export async function POST(
 
     const data = await response.json();
     const balanceInKas = data.balance / 100000000;
-    const now = Date.now();
-    const hour = new Date(now).toISOString().slice(0, 13); // YYYY-MM-DDTHH
-    
-    // Create snapshot
-    const snapshot: BalanceSnapshot = {
-      address: kaspaAddress,
-      balance: data.balance,
-      balanceKas: balanceInKas,
-      timestamp: now,
-      hour
-    };
-    
-    // Get existing snapshots for this address
-    const addressSnapshots = balanceHistory.get(kaspaAddress) || [];
+    const now = new Date();
+    const hour = now.toISOString().slice(0, 13); // YYYY-MM-DDTHH
     
     // Check if we already have a snapshot for this hour
-    const existingHourSnapshot = addressSnapshots.find(s => s.hour === hour);
+    const existingSnapshots = await DirectusAPI.getWalletSnapshots(kaspaAddress, 1);
+    const existingHourSnapshot = existingSnapshots.find(s => s.hour_key === hour);
+    
+    let snapshot;
+    let balanceChange = 0;
+    let changePercentage = 0;
     
     if (existingHourSnapshot) {
       // Update existing snapshot
-      existingHourSnapshot.balance = data.balance;
-      existingHourSnapshot.balanceKas = balanceInKas;
-      existingHourSnapshot.timestamp = now;
+      snapshot = await DirectusAPI.updateWalletSnapshot(existingHourSnapshot.id, {
+        balance: data.balance.toString(),
+        balance_kas: balanceInKas,
+        timestamp: now.toISOString()
+      });
     } else {
-      // Add new snapshot
-      addressSnapshots.push(snapshot);
-      // Keep only last 24*30 = 720 hours (30 days)
-      if (addressSnapshots.length > 720) {
-        addressSnapshots.shift();
+      // Create new snapshot
+      snapshot = await DirectusAPI.createWalletSnapshot({
+        kaspa_address: kaspaAddress,
+        balance: data.balance.toString(),
+        balance_kas: balanceInKas,
+        timestamp: now.toISOString(),
+        hour_key: hour
+      });
+    }
+    
+    // Get previous snapshot for change calculation
+    const recentSnapshots = await DirectusAPI.getWalletSnapshots(kaspaAddress, 2);
+    if (recentSnapshots.length > 1) {
+      // Sort by timestamp to ensure proper order
+      const sortedSnapshots = recentSnapshots.sort((a, b) => 
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
+      
+      const currentSnapshot = sortedSnapshots[0];
+      const previousSnapshot = sortedSnapshots[1];
+      
+      balanceChange = currentSnapshot.balance_kas - previousSnapshot.balance_kas;
+      if (previousSnapshot.balance_kas > 0) {
+        changePercentage = (balanceChange / previousSnapshot.balance_kas) * 100;
       }
     }
     
-    balanceHistory.set(kaspaAddress, addressSnapshots);
-    
-    // Calculate balance change from previous snapshot
-    let balanceChange = 0;
-    let changePercentage = 0;
-    if (addressSnapshots.length > 1) {
-      const previousSnapshot = addressSnapshots[addressSnapshots.length - 2];
-      balanceChange = balanceInKas - previousSnapshot.balanceKas;
-      if (previousSnapshot.balanceKas > 0) {
-        changePercentage = (balanceChange / previousSnapshot.balanceKas) * 100;
-      }
-    }
+    // Get total snapshots count
+    const allSnapshots = await DirectusAPI.getWalletSnapshots(kaspaAddress, 24 * 30); // 30 days
     
     return NextResponse.json({
-      snapshot,
+      snapshot: {
+        address: kaspaAddress,
+        balance: data.balance,
+        balanceKas: balanceInKas,
+        timestamp: now.getTime(),
+        hour
+      },
       balanceChange,
       changePercentage,
-      totalSnapshots: addressSnapshots.length
+      totalSnapshots: allSnapshots.length
     });
   } catch (error) {
     console.error('Snapshot creation error:', error);
@@ -142,33 +128,36 @@ export async function GET(
     }
 
     const kaspaAddress = address.startsWith('kaspa:') ? address : `kaspa:${address}`;
-    const addressSnapshots = balanceHistory.get(kaspaAddress) || [];
-    
-    // Filter snapshots by requested time range
-    const cutoffTime = Date.now() - (hours * 60 * 60 * 1000);
-    const recentSnapshots = addressSnapshots.filter(snapshot => 
-      snapshot.timestamp >= cutoffTime
-    );
+    const snapshots = await DirectusAPI.getWalletSnapshots(kaspaAddress, hours);
     
     // Calculate statistics
     let minBalance = Infinity;
     let maxBalance = -Infinity;
     let totalChange = 0;
     
-    if (recentSnapshots.length > 0) {
-      minBalance = Math.min(...recentSnapshots.map(s => s.balanceKas));
-      maxBalance = Math.max(...recentSnapshots.map(s => s.balanceKas));
+    if (snapshots.length > 0) {
+      minBalance = Math.min(...snapshots.map(s => s.balance_kas));
+      maxBalance = Math.max(...snapshots.map(s => s.balance_kas));
       
-      if (recentSnapshots.length > 1) {
-        const firstSnapshot = recentSnapshots[0];
-        const lastSnapshot = recentSnapshots[recentSnapshots.length - 1];
-        totalChange = lastSnapshot.balanceKas - firstSnapshot.balanceKas;
+      if (snapshots.length > 1) {
+        const sortedSnapshots = snapshots.sort((a, b) => 
+          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        );
+        const firstSnapshot = sortedSnapshots[0];
+        const lastSnapshot = sortedSnapshots[sortedSnapshots.length - 1];
+        totalChange = lastSnapshot.balance_kas - firstSnapshot.balance_kas;
       }
     }
     
     return NextResponse.json({
-      snapshots: recentSnapshots,
-      count: recentSnapshots.length,
+      snapshots: snapshots.map(s => ({
+        address: s.kaspa_address,
+        balance: parseInt(s.balance),
+        balanceKas: s.balance_kas,
+        timestamp: new Date(s.timestamp).getTime(),
+        hour: s.hour_key
+      })),
+      count: snapshots.length,
       statistics: {
         minBalance: minBalance === Infinity ? 0 : minBalance,
         maxBalance: maxBalance === -Infinity ? 0 : maxBalance,
@@ -183,7 +172,4 @@ export async function GET(
       { status: 500 }
     );
   }
-}
-
-// Export the balance history for potential use in other routes
-export { balanceHistory }; 
+} 
