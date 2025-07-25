@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // Temporarily simplified user profile API - will implement with Directus collections
 
-export async function GET(request: NextRequest) {
+export async function GET() {
 	try {
 		// TODO: Implement with Directus authentication and user_pages collection
 		// For now, return mock data to prevent build errors

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DirectusAPI } from '@/lib/directus';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const user = await DirectusAPI.getCurrentUser();
     
@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
       success: true, 
       user 
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Get user error:', error);
     return NextResponse.json(
       { error: 'Not authenticated' },

@@ -7,9 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Coffee, Mail, Lock, ArrowLeft, Github, AlertCircle } from "lucide-react";
-import { FaGoogle } from "react-icons/fa";
+import { Coffee, Mail, Lock, ArrowLeft, AlertCircle } from "lucide-react";
 // Removed Better Auth import - now using Directus API
 
 export default function SignInPage() {

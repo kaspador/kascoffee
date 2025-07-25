@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // Temporarily simplified user socials API - will implement with Directus collections
 
-export async function GET(request: NextRequest) {
+export async function GET() {
 	try {
 		// TODO: Implement with Directus authentication and socials collection
 		// For now, return empty array to prevent build errors
@@ -54,7 +54,7 @@ export async function PUT(request: NextRequest) {
 	}
 }
 
-export async function DELETE(request: NextRequest) {
+export async function DELETE() {
 	try {
 		// TODO: Implement with Directus authentication and socials collection
 		// For now, return success to prevent build errors

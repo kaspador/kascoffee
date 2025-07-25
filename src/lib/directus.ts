@@ -1,4 +1,4 @@
-import { createDirectus, rest, authentication, readMe, readUsers, createUser, updateUser, readItems, createItem, updateItem, deleteItem } from '@directus/sdk';
+import { createDirectus, rest, authentication, readMe, createUser, readItems, createItem, updateItem, deleteItem } from '@directus/sdk';
 
 // Directus client configuration
 const directus = createDirectus(process.env.NEXT_PUBLIC_DIRECTUS_URL || 'https://directus-production-09ff.up.railway.app')
@@ -81,9 +81,9 @@ export const DirectusAPI = {
       const pages = await directus.request(readItems('user_pages', {
         filter: { handle },
         limit: 1
-      })) as any[];
+      })) as unknown[];
       return (pages[0] as UserPage) || null;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching user page:', error);
       return null;
     }
@@ -102,9 +102,9 @@ export const DirectusAPI = {
     try {
       const socials = await directus.request(readItems('socials', {
         filter: { user: userId, is_visible: true }
-      })) as any[];
+      })) as unknown[];
       return socials as Social[];
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching user socials:', error);
       return [];
     }

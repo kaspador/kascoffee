@@ -16,12 +16,9 @@ function ResetPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
-  
-  const router = useRouter();
+  	const [showPassword, setShowPassword] = useState(false);
+	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+	const [token, setToken] = useState<string | null>(null);
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -112,13 +109,13 @@ function ResetPasswordForm() {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            {/* Success Message */}
-            {isSuccess && (
-              <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-3 flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-400" />
-                <span className="text-green-400 text-sm">{message}</span>
-              </div>
-            )}
+            						{/* Success Message */}
+						{message && !error && (
+							<div className="bg-green-500/10 border border-green-500/30 rounded-xl p-3 flex items-center gap-2">
+								<CheckCircle className="w-4 h-4 text-green-400" />
+								<span className="text-green-400 text-sm">{message}</span>
+							</div>
+						)}
 
             {/* Error Message */}
             {error && (
@@ -128,7 +125,7 @@ function ResetPasswordForm() {
               </div>
             )}
 
-            {!isSuccess && token && (
+            						{!message && token && (
               <form className="space-y-4" onSubmit={handleSubmit}>
                 <div className="space-y-2">
                   <Label htmlFor="newPassword" className="text-white font-medium">New Password</Label>

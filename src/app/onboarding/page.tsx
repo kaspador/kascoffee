@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 // Temporarily disabled - will implement with Directus auth
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
@@ -34,7 +34,6 @@ const onboardingSteps = [
 ];
 
 export default function OnboardingPage() {
-	const router = useRouter();
 	const [completedSteps, setCompletedSteps] = useState<string[]>([]);
 
 	// Temporarily skip auth check - will implement with Directus
