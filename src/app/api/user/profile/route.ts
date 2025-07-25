@@ -108,7 +108,7 @@ export async function PUT(request: NextRequest) {
 			view_count: 0
 		};
 		
-		console.log('User page data to save:', { ...userPageData, user: `${userPageData.user_id} (type: ${typeof userPageData.user_id})` });
+		console.log('User page data to save:', { ...userPageData, user_id: `${userPageData.user_id} (type: ${typeof userPageData.user_id})` });
 		
 		if (userPage) {
 			// Update existing user page

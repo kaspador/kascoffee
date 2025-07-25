@@ -16,7 +16,7 @@ export async function GET(
     }
 
     // Get user's social links
-    const userSocials = await DirectusAPI.getUserSocials(userPage.user);
+    const userSocials = await DirectusAPI.getUserSocials(userPage.user_id);
 
     // TODO: Implement view count increment in Directus
     // For now, we'll skip this feature until collections are set up
