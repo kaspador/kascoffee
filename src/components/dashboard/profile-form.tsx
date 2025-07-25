@@ -136,6 +136,17 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 			});
 			// Also reset the long description state
 			setLongDescription(userPage.longDescription || '');
+		} else {
+			// For new users, reset to empty form
+			reset({
+				handle: '',
+				displayName: '',
+				kaspaAddress: '',
+				shortDescription: '',
+				profileImage: '',
+				backgroundImage: ''
+			});
+			setLongDescription('');
 		}
 	}, [userPage, reset]);
 
@@ -188,8 +199,8 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 
 	const handleStatus = getHandleStatus();
 
-	// Show loading state if explicitly loading OR if we haven't received userPage data yet
-	const showLoading = isLoading || (!userPage && !updateProfileMutation.error);
+	// Show loading state ONLY if explicitly loading (not when userPage is null for new users)
+	const showLoading = isLoading;
 	
 	if (showLoading) {
 		return (

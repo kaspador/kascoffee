@@ -120,7 +120,7 @@ export default function DashboardPage() {
 
 	// Convert UserProfile to the format expected by components
 	const convertProfileForComponents = (profile: UserProfile | null) => {
-		if (!profile) return undefined;
+		if (!profile) return undefined; // Return undefined for new users to match component interfaces
 		
 		return {
 			...profile,
