@@ -21,26 +21,21 @@ interface TransactionCardProps {
   transaction: Transaction;
 }
 
-export function TransactionCard({ transaction }: TransactionCardProps) {
+const formatDate = (timestamp: number) => {
+  return new Date(timestamp).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
+const getKaspaExplorerUrl = (hash: string) => {
+  return `https://explorer.kaspa.org/transactions/${hash}`;
+};
+
+export const TransactionCard: React.FC<TransactionCardProps> = ({ transaction }) => {
   const isDonation = transaction.type === 'donation';
-  const formatDate = (timestamp: number) => {
-    const date = new Date(timestamp);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const truncateAddress = (address: string) => {
-    if (!address) return '';
-    return `${address.slice(0, 12)}...${address.slice(-8)}`;
-  };
-
-  const getKaspaExplorerUrl = (hash: string) => {
-    return `https://explorer.kaspa.org/txs/${hash}`;
-  };
 
   return (
     <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/20 hover:border-[#70C7BA]/40 transition-all duration-300 shadow-lg">
