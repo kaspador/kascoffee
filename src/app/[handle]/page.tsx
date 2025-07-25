@@ -166,8 +166,8 @@ export default function UserProfilePage({ params }: PageProps) {
 							onClick={() => {
 								if (navigator.share) {
 									navigator.share({
-										title: `${userPage.displayName} - kas.coffee`,
-										text: userPage.shortDescription || `Support ${userPage.displayName} with Kaspa donations`,
+										title: `${userPage.displayName || userPage.handle || 'User'} - kas.coffee`,
+										text: userPage.shortDescription || `Support ${userPage.displayName || userPage.handle || 'this creator'} with Kaspa donations`,
 										url: window.location.href,
 									});
 								} else {
@@ -196,21 +196,20 @@ export default function UserProfilePage({ params }: PageProps) {
 								<CardContent className="p-8">
 									<div className="flex flex-col md:flex-row items-center md:items-start gap-6">
 										<Avatar className="w-24 h-24 border-4" style={{ borderColor: userPage.foregroundColor }}>
-											<AvatarImage src={userPage.profileImage || undefined} alt={userPage.displayName} />
+											<AvatarImage src={userPage.profileImage || undefined} alt={userPage.displayName || userPage.handle || 'User'} />
 											<AvatarFallback 
-												className="text-2xl font-bold"
-												style={{ 
-													backgroundColor: userPage.foregroundColor,
-													color: userPage.backgroundColor
+												className="bg-gradient-to-br from-indigo-500/20 to-purple-600/20 text-2xl font-bold backdrop-blur-sm border border-white/20"
+												style={{
+													color: userPage.foregroundColor,
+													backgroundColor: `${userPage.backgroundColor}40`
 												}}
 											>
-												{userPage.displayName.charAt(0)}
+												{userPage.displayName?.charAt(0) || 'U'}
 											</AvatarFallback>
 										</Avatar>
-										
-										<div className="flex-1 text-center md:text-left">
-											<h1 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: userPage.foregroundColor }}>
-												{userPage.displayName}
+										<div className="text-center">
+											<h1 className="text-4xl font-bold mb-2 font-kaspa-title tracking-wide" style={{ color: userPage.foregroundColor }}>
+												{userPage.displayName || userPage.handle || 'User'}
 											</h1>
 											<Badge 
 												variant="outline" 
@@ -255,8 +254,8 @@ export default function UserProfilePage({ params }: PageProps) {
 									}}
 								>
 									<CardContent className="p-8">
-										<h2 className="text-xl font-bold mb-4" style={{ color: userPage.foregroundColor }}>
-											About {userPage.displayName}
+										<h2 className="text-2xl font-bold mb-4 font-kaspa-title" style={{ color: userPage.foregroundColor }}>
+											About {userPage.displayName || userPage.handle || 'User'}
 										</h2>
 										<div 
 											className="prose prose-lg max-w-none"
@@ -297,7 +296,7 @@ export default function UserProfilePage({ params }: PageProps) {
 														onClick={() => window.open(social.url, '_blank')}
 													>
 														<IconComponent className="w-4 h-4 mr-2" />
-														{social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}
+														{social.platform?.charAt(0)?.toUpperCase() + (social.platform?.slice(1) || '')}
 														<ExternalLink className="w-3 h-3 ml-2" />
 													</Badge>
 												);
@@ -322,7 +321,7 @@ export default function UserProfilePage({ params }: PageProps) {
 									<div className="mb-6">
 										<Coffee className="w-16 h-16 mx-auto mb-4" style={{ color: userPage.foregroundColor }} />
 										<h2 className="text-2xl font-bold mb-2" style={{ color: userPage.foregroundColor }}>
-											Support {userPage.displayName}
+											Support {userPage.displayName || userPage.handle || 'User'}
 										</h2>
 										<p className="opacity-75" style={{ color: userPage.foregroundColor }}>
 											Send Kaspa donations to show your support

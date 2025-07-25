@@ -78,6 +78,10 @@ export async function PUT(request: NextRequest) {
 		const body = await request.json();
 		const { handle, displayName, kaspaAddress, shortDescription, longDescription, profileImage, backgroundImage } = body;
 		
+		console.log('🔍 RAW BODY FROM FRONTEND:', body);
+		console.log('🔍 Destructured profileImage:', profileImage);
+		console.log('🔍 Destructured backgroundImage:', backgroundImage);
+		
 		console.log('Profile update request:', { handle, displayName, userId: user.id });
 		
 		// Clean up URLs - remove trailing semicolons and whitespace
