@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Coffee, Mail, Lock, ArrowLeft, Github, AlertCircle } from "lucide-react";
 import { FaGoogle } from "react-icons/fa";
-import { signIn } from "@/lib/auth-client";
+// Removed Better Auth import - now using Directus API
 
 export default function SignInPage() {
 	const [isLoading, setIsLoading] = useState(false);
@@ -25,14 +25,18 @@ export default function SignInPage() {
 		setIsLoading(true);
 
 		try {
-			const result = await signIn.email({
-				email,
-				password,
+			const response = await fetch('/api/auth/login', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ email, password }),
 			});
 
-			if (result.error) {
-				// Show specific error message from Better Auth
-				setError(result.error.message || "Invalid email or password");
+			const result = await response.json();
+
+			if (!response.ok) {
+				setError(result.error || "Invalid email or password");
 			} else {
 				// Redirect to dashboard on successful login
 				router.push("/dashboard");
@@ -45,35 +49,7 @@ export default function SignInPage() {
 		}
 	};
 
-	const handleGoogleSignIn = async () => {
-		setIsLoading(true);
-		try {
-			await signIn.social({
-				provider: "google",
-				callbackURL: "/dashboard",
-			});
-		} catch (err) {
-			setError("Failed to sign in with Google");
-			console.error("Google sign in error:", err);
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
-	const handleGithubSignIn = async () => {
-		setIsLoading(true);
-		try {
-			await signIn.social({
-				provider: "github",
-				callbackURL: "/dashboard",
-			});
-		} catch (err) {
-			setError("Failed to sign in with GitHub");
-			console.error("GitHub sign in error:", err);
-		} finally {
-			setIsLoading(false);
-		}
-	};
+	// Social auth functions removed - focusing on Directus email authentication
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden flex items-center justify-center p-6">
@@ -121,38 +97,7 @@ export default function SignInPage() {
 							</div>
 						)}
 
-						{/* Social Login Buttons */}
-						<div className="space-y-3">
-							<Button
-								variant="outline"
-								className="w-full border-white/20 bg-white/5 hover:bg-white/10 text-white rounded-xl h-12"
-								disabled={isLoading}
-								onClick={handleGoogleSignIn}
-							>
-								<FaGoogle className="w-5 h-5 mr-3" />
-								Continue with Google
-							</Button>
-							<Button
-								variant="outline"
-								className="w-full border-white/20 bg-white/5 hover:bg-white/10 text-white rounded-xl h-12"
-								disabled={isLoading}
-								onClick={handleGithubSignIn}
-							>
-								<Github className="w-5 h-5 mr-3" />
-								Continue with GitHub
-							</Button>
-						</div>
-
-						<div className="relative">
-							<div className="absolute inset-0 flex items-center">
-								<Separator className="w-full bg-white/20" />
-							</div>
-							<div className="relative flex justify-center text-xs uppercase">
-								<span className="bg-gradient-to-r from-slate-950 to-slate-900 px-2 text-gray-400">
-									Or continue with email
-								</span>
-							</div>
-						</div>
+						{/* Note: Social login disabled for now - focusing on Directus email auth */}
 
 						{/* Email/Password Form */}
 						<form className="space-y-4" onSubmit={handleSubmit}>

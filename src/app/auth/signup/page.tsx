@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Coffee, Mail, Lock, User, ArrowLeft, Github, AlertCircle } from "lucide-react";
 import { FaGoogle } from "react-icons/fa";
-import { signUp, signIn } from "@/lib/auth-client";
+// Removed Better Auth import - now using Directus API
 
 export default function SignUpPage() {
 	const [isLoading, setIsLoading] = useState(false);
@@ -26,14 +26,26 @@ export default function SignUpPage() {
 		setIsLoading(true);
 
 		try {
-			const result = await signUp.email({
-				email,
-				password,
-				name,
+			const [firstName, ...lastNameParts] = name.split(' ');
+			const lastName = lastNameParts.join(' ');
+
+			const response = await fetch('/api/auth/register', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ 
+					email, 
+					password, 
+					first_name: firstName,
+					last_name: lastName || undefined 
+				}),
 			});
 
-			if (result.error) {
-				setError(result.error.message || "Failed to create account");
+			const result = await response.json();
+
+			if (!response.ok) {
+				setError(result.error || "Failed to create account");
 			} else {
 				// Redirect to onboarding on successful signup
 				router.push("/onboarding");
@@ -46,35 +58,7 @@ export default function SignUpPage() {
 		}
 	};
 
-	const handleGoogleSignUp = async () => {
-		setIsLoading(true);
-		try {
-			await signIn.social({
-				provider: "google",
-				callbackURL: "/onboarding",
-			});
-		} catch (err) {
-			setError("Failed to sign up with Google");
-			console.error("Google sign up error:", err);
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
-	const handleGithubSignUp = async () => {
-		setIsLoading(true);
-		try {
-			await signIn.social({
-				provider: "github",
-				callbackURL: "/onboarding",
-			});
-		} catch (err) {
-			setError("Failed to sign up with GitHub");
-			console.error("GitHub sign up error:", err);
-		} finally {
-			setIsLoading(false);
-		}
-	};
+	// Social auth functions removed - focusing on Directus email authentication
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden flex items-center justify-center p-6">
@@ -122,38 +106,7 @@ export default function SignUpPage() {
 							</div>
 						)}
 
-						{/* Social Login Buttons */}
-						<div className="space-y-3">
-							<Button
-								variant="outline"
-								className="w-full border-white/20 bg-white/5 hover:bg-white/10 text-white rounded-xl h-12"
-								disabled={isLoading}
-								onClick={handleGoogleSignUp}
-							>
-								<FaGoogle className="w-5 h-5 mr-3" />
-								Continue with Google
-							</Button>
-							<Button
-								variant="outline"
-								className="w-full border-white/20 bg-white/5 hover:bg-white/10 text-white rounded-xl h-12"
-								disabled={isLoading}
-								onClick={handleGithubSignUp}
-							>
-								<Github className="w-5 h-5 mr-3" />
-								Continue with GitHub
-							</Button>
-						</div>
-
-						<div className="relative">
-							<div className="absolute inset-0 flex items-center">
-								<Separator className="w-full bg-white/20" />
-							</div>
-							<div className="relative flex justify-center text-xs uppercase">
-								<span className="bg-gradient-to-r from-slate-950 to-slate-900 px-2 text-gray-400">
-									Or continue with email
-								</span>
-							</div>
-						</div>
+						{/* Note: Social login disabled for now - focusing on Directus email auth */}
 
 						{/* Email/Password Form */}
 						<form className="space-y-4" onSubmit={handleSubmit}>
