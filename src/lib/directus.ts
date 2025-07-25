@@ -142,7 +142,7 @@ export const DirectusAPI = {
   async getUserSocials(userId: string): Promise<Social[]> {
     try {
       const socials = await directus.request(readItems('socials', {
-        filter: { user_id: userId, is_visible: true } // Changed from 'user' to 'user_id'
+        filter: { user: userId, is_visible: true } // Use 'user' to match the interface
       })) as unknown[];
       return socials as Social[];
     } catch (error: unknown) {

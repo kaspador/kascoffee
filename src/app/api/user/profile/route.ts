@@ -72,11 +72,24 @@ export async function PUT(request: NextRequest) {
 		}
 
 		const body = await request.json();
-		const { handle, displayName, kaspaAddress, shortDescription, longDescription, profileImage, backgroundImage } = body;
+		const { 
+			handle, 
+			displayName, 
+			kaspaAddress, 
+			shortDescription, 
+			longDescription, 
+			profileImage, 
+			backgroundImage,
+			backgroundColor,
+			foregroundColor
+		} = body;
 		
-		// Validate handle format
-		if (!handle || !/^[a-zA-Z0-9-_]+$/.test(handle)) {
-			return NextResponse.json({ error: 'Handle can only contain letters, numbers, hyphens, and underscores' }, { status: 400 });
+		// Only validate handle if it's provided (not just updating colors/other fields)
+		if (handle) {
+			// Validate handle format
+			if (!/^[a-zA-Z0-9-_]+$/.test(handle)) {
+				return NextResponse.json({ error: 'Handle can only contain letters, numbers, hyphens, and underscores' }, { status: 400 });
+			}
 		}
 
 		// Check if user page already exists for this user
@@ -88,9 +101,8 @@ export async function PUT(request: NextRequest) {
 			// User page doesn't exist, that's ok
 		}
 		
-		// Check handle uniqueness - only if it's a new handle or user doesn't have a page yet
-		const shouldCheckHandle = !userPage || userPage.handle !== handle;
-		if (shouldCheckHandle) {
+		// Check handle uniqueness - only if a handle is provided and it's different from current
+		if (handle && (!userPage || userPage.handle !== handle)) {
 			const existingPage = await DirectusAPI.getUserPage(handle);
 			if (existingPage && existingPage.user_id !== user.id) {
 				return NextResponse.json({ error: 'This handle is already taken. Please choose a different one.' }, { status: 400 });
@@ -105,15 +117,15 @@ export async function PUT(request: NextRequest) {
 		
 		const userPageData = {
 			user_id: user.id,
-			handle: handle.toLowerCase().trim(), // Normalize handle
-			display_name: displayName.trim(),
-			short_description: shortDescription ? shortDescription.trim() : '',
-			long_description: longDescription ? longDescription.trim() : '',
-			kaspa_address: kaspaAddress.trim(),
-			profile_image: cleanProfileImage,
-			background_image: cleanBackgroundImage,
-			background_color: '#0f172a',
-			foreground_color: '#ffffff',
+			handle: handle ? handle.toLowerCase().trim() : userPage?.handle, // Normalize handle if provided, otherwise keep existing
+			display_name: displayName ? displayName.trim() : userPage?.display_name,
+			short_description: shortDescription !== undefined ? shortDescription.trim() : userPage?.short_description,
+			long_description: longDescription !== undefined ? longDescription.trim() : userPage?.long_description,
+			kaspa_address: kaspaAddress ? kaspaAddress.trim() : userPage?.kaspa_address,
+			profile_image: cleanProfileImage !== undefined ? cleanProfileImage : userPage?.profile_image,
+			background_image: cleanBackgroundImage !== undefined ? cleanBackgroundImage : userPage?.background_image,
+			background_color: backgroundColor || userPage?.background_color || '#0f172a',
+			foreground_color: foregroundColor || userPage?.foreground_color || '#ffffff',
 			is_active: true,
 			view_count: userPage ? userPage.view_count : 0 // Preserve existing view count
 		};
