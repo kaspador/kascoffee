@@ -22,7 +22,7 @@ export interface User {
 
 export interface UserPage {
   id: string;
-  user_id: string; // Changed from 'user' to 'user_id' to avoid database conflicts
+  user_id: string; // String type due to Directus UUID field conversion issues
   handle: string;
   display_name: string;
   short_description: string;
