@@ -106,7 +106,7 @@ export default function UserProfilePage({ params }: PageProps) {
 					text: userPage.shortDescription || `Support ${userPage.displayName || userPage.handle} with Kaspa donations`,
 					url: window.location.href,
 				});
-			} catch (err) {
+			} catch {
 				// User cancelled share or error occurred
 				handleCopyAddress();
 			}
