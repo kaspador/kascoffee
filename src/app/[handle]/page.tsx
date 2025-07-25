@@ -124,8 +124,7 @@ export default function UserProfilePage({ params }: PageProps) {
 	const handleCopyAddress = async () => {
 		if (!userPage) return;
 		try {
-			const address = userPage.kaspaAddress.replace('kaspa:', '');
-			await navigator.clipboard.writeText(address);
+			await navigator.clipboard.writeText(userPage.kaspaAddress);
 			setCopied(true);
 			setTimeout(() => setCopied(false), 2000);
 		} catch {
@@ -391,7 +390,7 @@ export default function UserProfilePage({ params }: PageProps) {
 										<div className="p-6 rounded-2xl border border-[#70C7BA]/30 bg-slate-800/50 backdrop-blur-sm">
 											<p className="text-xs text-gray-400 mb-2">Kaspa Address:</p>
 											<p className="font-mono text-sm text-white break-all">
-												{userPage.kaspaAddress.replace('kaspa:', '')}
+												{userPage.kaspaAddress}
 											</p>
 										</div>
 									</TabsContent>

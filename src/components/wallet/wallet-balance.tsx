@@ -182,7 +182,7 @@ export function WalletBalance({ address }: WalletBalanceProps) {
             <div className="pt-3 border-t border-[#70C7BA]/20">
               <div className="text-xs text-gray-400 mb-2 text-center">Wallet Address</div>
               <div className="font-mono text-xs text-gray-300 break-all bg-black/20 p-3 rounded text-center">
-                {balance.address.replace('kaspa:', '')}
+                {balance.address}
               </div>
             </div>
           </div>
