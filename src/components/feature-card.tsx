@@ -1,4 +1,5 @@
 import { Component, createElement, FunctionComponent, ReactElement, ReactNode } from "react";
+import { Balancer } from 'react-wrap-balancer'
 
 export default function FeatureCard(props: {
     icon: FunctionComponent<{ className?: string }>,
@@ -13,7 +14,7 @@ export default function FeatureCard(props: {
                 })}
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">{props.title}</h3>
-            <p className="text-gray-400">{props.description}</p>
+            <p className="text-gray-400"><Balancer>{props.description}</Balancer></p>
         </div>
     )
 }
