@@ -85,7 +85,7 @@ export function WalletBalance({ address }: WalletBalanceProps) {
 
   if (loading) {
     return (
-      <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl">
+      <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl h-fit">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg text-white">
             <Wallet className="w-5 h-5 text-[#70C7BA]" />
@@ -103,7 +103,7 @@ export function WalletBalance({ address }: WalletBalanceProps) {
 
   if (error) {
     return (
-      <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl">
+      <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl h-fit">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg text-white">
             <Wallet className="w-5 h-5 text-[#70C7BA]" />
