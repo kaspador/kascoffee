@@ -1,4 +1,4 @@
-import { createDirectus, rest, authentication, readMe, createUser, readItems, createItem, updateItem, deleteItem, staticToken } from '@directus/sdk';
+import { createDirectus, rest, authentication, readMe, createUser, readItems, createItem, updateItem, deleteItem } from '@directus/sdk';
 
 // Authenticated Directus client for dashboard/admin operations
 const directusAuth = createDirectus(process.env.NEXT_PUBLIC_DIRECTUS_URL || 'https://directus-production-09ff.up.railway.app')
@@ -10,8 +10,11 @@ const directusPublic = createDirectus(process.env.NEXT_PUBLIC_DIRECTUS_URL || 'h
   .with(rest())
   .with(authentication());
 
-// Set the admin token for public read operations
-if (process.env.DIRECTUS_TOKEN) {
+// Set the read-only token for public operations (fallback to admin token if not set)
+if (process.env.DIRECTUS_PUBLIC_TOKEN) {
+  directusPublic.setToken(process.env.DIRECTUS_PUBLIC_TOKEN);
+} else if (process.env.DIRECTUS_TOKEN) {
+  console.warn('Using admin token for public operations - consider creating a read-only token');
   directusPublic.setToken(process.env.DIRECTUS_TOKEN);
 }
 
