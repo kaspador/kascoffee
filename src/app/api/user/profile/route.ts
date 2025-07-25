@@ -5,20 +5,10 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET() {
 	try {
 		// TODO: Implement with Directus authentication and user_pages collection
-		// For now, return mock data to prevent build errors
+		// For now, return null to indicate no profile set up yet
 		
 		return NextResponse.json({ 
-			userPage: {
-				id: 'temp-id',
-				handle: 'user-temp',
-				displayName: 'User',
-				shortDescription: 'Welcome to my donation page!',
-				longDescription: '',
-				kaspaAddress: null,
-				backgroundColor: '#70C7BA',
-				foregroundColor: '#ffffff',
-				isActive: true
-			}
+			userPage: null // This will hide the donation URL until profile is created
 		});
 	} catch (error) {
 		console.error('Error fetching profile:', error);

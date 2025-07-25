@@ -37,7 +37,18 @@ export async function POST(request: NextRequest) {
       try {
         if (responseText) {
           const errorData = JSON.parse(responseText);
-          errorMessage = errorData.errors?.[0]?.message || 'Registration failed';
+          const errorDetail = errorData.errors?.[0]?.message || '';
+          
+          // Handle specific Directus errors with user-friendly messages
+          if (errorDetail.includes('has to be unique') && errorDetail.includes('email')) {
+            errorMessage = 'An account with this email already exists. Please sign in instead.';
+          } else if (errorDetail.includes('password')) {
+            errorMessage = 'Password must be at least 8 characters long.';
+          } else if (errorDetail.includes('email')) {
+            errorMessage = 'Please enter a valid email address.';
+          } else {
+            errorMessage = errorDetail || 'Registration failed';
+          }
         }
       } catch (parseError) {
         console.error('Error parsing error response:', parseError);
