@@ -11,6 +11,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { ExternalLink, Copy, Coffee, Share2, User, Eye, QrCode, Zap, Heart, ArrowLeft } from 'lucide-react';
 import { FaTwitter, FaDiscord, FaTelegram, FaGlobe, FaGithub } from 'react-icons/fa';
 import QRCodeDisplay from '@/components/qr-code-display';
+import { WalletBalance } from '@/components/wallet/wallet-balance';
+import { TransactionList } from '@/components/wallet/transaction-list';
 import { useEffect, useState } from 'react';
 
 interface UserPageData {
@@ -341,6 +343,19 @@ export default function UserProfilePage({ params }: PageProps) {
 									/>
 								</CardContent>
 							</Card>
+						</div>
+					)}
+
+					{/* Wallet Activity Section */}
+					{userPage.kaspaAddress && (
+						<div className="lg:col-span-3">
+							<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+								{/* Wallet Balance */}
+								<WalletBalance address={userPage.kaspaAddress} />
+								
+								{/* Recent Transactions */}
+								<TransactionList address={userPage.kaspaAddress} limit={5} />
+							</div>
 						</div>
 					)}
 
