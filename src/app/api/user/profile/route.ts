@@ -55,9 +55,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+	console.log('🔥 PUT /api/user/profile called - NEW VERSION');
 	try {
 		// Get token from cookies
 		const token = request.cookies.get('directus_token')?.value;
+		console.log('🔑 Token from cookies:', token ? 'EXISTS' : 'MISSING');
 		if (!token) {
 			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
