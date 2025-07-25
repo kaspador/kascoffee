@@ -81,8 +81,8 @@ export async function PUT(request: NextRequest) {
 		console.log('Profile update request:', { handle, displayName, userId: user.id });
 		
 		// Clean up URLs - remove trailing semicolons and whitespace
-		const cleanProfileImage = profileImage ? profileImage.trim().replace(/;+$/, '') : null;
-		const cleanBackgroundImage = backgroundImage ? backgroundImage.trim().replace(/;+$/, '') : null;
+		const cleanProfileImage = profileImage ? profileImage.trim().replace(/[;,]+$/, '') : null;
+		const cleanBackgroundImage = backgroundImage ? backgroundImage.trim().replace(/[;,]+$/, '') : null;
 		
 		console.log('URL cleaning:', { 
 			originalProfile: profileImage, 
@@ -118,37 +118,13 @@ export async function PUT(request: NextRequest) {
 		};
 		
 		console.log('User page data to save:', userPageData);
+		console.log('🔍 URL DEBUG - Profile image in userPageData:', userPageData.profile_image);
+		console.log('🔍 URL DEBUG - Background image in userPageData:', userPageData.background_image);
 		
-		if (userPage) {
-			// Update existing user page
-			console.log('Attempting to UPDATE user page:', userPage.id);
-			try {
-				const updatedPage = await DirectusAPI.updateUserPage(userPage.id, userPageData);
-				console.log('UPDATE successful:', updatedPage.id);
-				return NextResponse.json({ 
-					userPage: {
-						id: updatedPage.id,
-						handle: updatedPage.handle,
-						displayName: updatedPage.display_name,
-						shortDescription: updatedPage.short_description,
-						longDescription: updatedPage.long_description,
-						kaspaAddress: updatedPage.kaspa_address,
-						profileImage: updatedPage.profile_image,
-						backgroundImage: updatedPage.background_image,
-						backgroundColor: updatedPage.background_color,
-						foregroundColor: updatedPage.foreground_color,
-						isActive: updatedPage.is_active,
-						updatedAt: new Date().toISOString()
-					}
-				});
-			} catch (updateError) {
-				console.error('UPDATE failed, falling back to CREATE:', updateError);
-				// Update failed, try to create instead
-			}
-		}
+		// TEMPORARY: Skip UPDATE entirely to avoid foreign key issues
+		// Force CREATE to bypass the problematic UPDATE operation
+		console.log('⚠️ FORCING CREATE to bypass UPDATE issues');
 		
-		// Create new user page (or fallback from failed update)
-		console.log('Attempting to CREATE user page');
 		try {
 			const newPage = await DirectusAPI.createUserPage(userPageData);
 			console.log('CREATE successful:', newPage.id);

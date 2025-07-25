@@ -15,14 +15,17 @@ export async function GET(
       return NextResponse.json({ error: 'User page not found' }, { status: 404 });
     }
 
-    // Get user's social links (defensive - socials collection may not exist yet)
-    let userSocials: Social[] = [];
-    try {
-      userSocials = await DirectusAPI.getUserSocials(userPage.user_id);
-    } catch (socialError) {
-      console.log('Socials collection not available yet, proceeding without socials:', socialError);
-      userSocials = [];
-    }
+    // Get user's social links (TEMPORARILY DISABLED - causing crashes)
+    const userSocials: Social[] = [];
+    console.log('⚠️ Socials lookup temporarily disabled to prevent crashes');
+    
+    // TODO: Re-enable when socials collection is properly set up
+    // try {
+    //   userSocials = await DirectusAPI.getUserSocials(userPage.user_id);
+    // } catch (socialError) {
+    //   console.log('Socials collection not available yet, proceeding without socials:', socialError);
+    //   userSocials = [];
+    // }
 
     // TODO: Implement view count increment in Directus
     // For now, we'll skip this feature until collections are set up
