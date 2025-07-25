@@ -60,11 +60,7 @@ export function RichTextEditor({
 		},
 		editorProps: {
 			attributes: {
-				class: `prose prose-sm sm:prose-lg prose-invert max-w-none focus:outline-none min-h-[200px] p-4 text-white ${className}
-					prose-headings:text-white prose-p:text-gray-200 prose-strong:text-white prose-em:text-gray-200
-					prose-blockquote:text-gray-300 prose-blockquote:border-l-[#70C7BA] prose-code:text-[#49EACB]
-					prose-pre:bg-slate-800 prose-pre:text-gray-200 prose-li:text-gray-200 prose-ul:text-gray-200
-					prose-ol:text-gray-200 prose-a:text-[#70C7BA] prose-a:no-underline hover:prose-a:underline`
+				class: `prose prose-sm sm:prose-lg prose-invert max-w-none focus:outline-none min-h-[200px] p-4 text-white ${className} prose-headings:text-white prose-p:text-gray-200 prose-strong:text-white prose-em:text-gray-200 prose-blockquote:text-gray-300 prose-blockquote:border-l-[#70C7BA] prose-code:text-[#49EACB] prose-pre:bg-slate-800 prose-pre:text-gray-200 prose-li:text-gray-200 prose-ul:text-gray-200 prose-ol:text-gray-200 prose-a:text-[#70C7BA] prose-a:no-underline hover:prose-a:underline`
 			}
 		}
 	});
