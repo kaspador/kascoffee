@@ -1,5 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import crypto from 'crypto';
+
+// In-memory store for reset tokens (in production, use Redis or database)
+const resetTokens = new Map<string, { email: string, expires: number }>();
+
+// Clean up expired tokens every hour
+setInterval(() => {
+  const now = Date.now();
+  for (const [token, data] of resetTokens.entries()) {
+    if (now > data.expires) {
+      resetTokens.delete(token);
+    }
+  }
+}, 60 * 60 * 1000);
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,28 +26,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL || 'https://directus-production-09ff.up.railway.app';
+    // Generate a secure reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const expires = Date.now() + (60 * 60 * 1000); // 1 hour expiry
 
-    // Generate password reset request with Directus
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/reset-password`;
-    
-    const resetResponse = await fetch(`${directusUrl}/auth/password/request`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email,
-        reset_url: resetUrl
-      }),
-    });
+    // Store the token
+    resetTokens.set(resetToken, { email, expires });
 
-    if (!resetResponse.ok) {
-      // Don't reveal specific errors to prevent information disclosure
-      throw new Error('Failed to process password reset request');
-    }
+    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/reset-password?token=${resetToken}`;
 
-    // Send custom welcome email with Resend if API key is available
+    // Send email with Resend if API key is available
     const resendApiKey = process.env.RESEND_API_KEY;
     if (resendApiKey) {
       try {
@@ -51,13 +53,25 @@ export async function POST(request: NextRequest) {
               </div>
               
               <div style="background: #f9f9f9; padding: 30px; border-radius: 10px; margin: 20px 0;">
-                <h2 style="color: #333; margin-top: 0;">Password Reset Request</h2>
+                <h2 style="color: #333; margin-top: 0;">Reset Your Password</h2>
                 <p style="color: #666; line-height: 1.6;">
                   We received a request to reset your password for your kas.coffee account.
                 </p>
                 <p style="color: #666; line-height: 1.6;">
-                  A password reset link has been sent to your email. Please check your inbox and follow the instructions to reset your password.
+                  Click the button below to reset your password. This link will expire in 1 hour.
                 </p>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${resetUrl}" style="background: #70C7BA; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                    Reset Password
+                  </a>
+                </div>
+                
+                <p style="color: #666; line-height: 1.6; font-size: 0.9em;">
+                  If the button doesn't work, copy and paste this link into your browser:<br>
+                  <a href="${resetUrl}" style="color: #70C7BA; word-break: break-all;">${resetUrl}</a>
+                </p>
+                
                 <p style="color: #666; line-height: 1.6;">
                   If you didn't request this password reset, please ignore this email. Your password will remain unchanged.
                 </p>
@@ -71,21 +85,22 @@ export async function POST(request: NextRequest) {
             </div>
           `,
         });
-             } catch {
-         // Don't fail the request if email fails, Directus will send the default email
-       }
+      } catch {
+        // Continue even if email fails
+      }
     }
 
     return NextResponse.json({ 
       success: true, 
-      message: 'If an account with that email exists, a password reset link has been sent.' 
+      message: 'If an account with that email exists, a password reset link has been sent.'
     });
-  } catch (error) {
-    // Log error for debugging but don't expose details to client
-    console.error('Forgot password error:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to process password reset request' },
       { status: 500 }
     );
   }
-} 
+}
+
+// Export the resetTokens for use in reset-password route
+export { resetTokens }; 
