@@ -70,16 +70,22 @@ export async function PUT(request: NextRequest) {
 			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
 
+		console.log('Authenticated user:', { id: user.id, email: user.email });
+
 		const body = await request.json();
 		const { handle, displayName, kaspaAddress, shortDescription, longDescription, profileImage, backgroundImage } = body;
+		
+		console.log('Profile update request:', { handle, displayName, userId: user.id });
 		
 		// Check if user page already exists for this user
 		let userPage;
 		try {
 			const userPages = await DirectusAPI.getUserPageByUserId(user.id);
 			userPage = userPages && userPages.length > 0 ? userPages[0] : null;
+			console.log('Existing user page:', userPage ? userPage.id : 'none');
 		} catch {
 			// User page doesn't exist, that's ok
+			console.log('No existing user page found');
 		}
 		
 		const userPageData = {
@@ -96,6 +102,8 @@ export async function PUT(request: NextRequest) {
 			is_active: true,
 			view_count: 0
 		};
+		
+		console.log('User page data to save:', { ...userPageData, user: `${userPageData.user} (type: ${typeof userPageData.user})` });
 		
 		if (userPage) {
 			// Update existing user page
