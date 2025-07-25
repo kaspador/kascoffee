@@ -23,12 +23,25 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      // Temporarily show message that feature is coming soon
-      setIsSuccess(true);
-      setMessage('Password reset functionality is being updated. Please contact support for password resets.');
-          } catch {
-        setError('An unexpected error occurred. Please try again.');
-      } finally {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setIsSuccess(true);
+        setMessage(data.message);
+      } else {
+        setError(data.error || 'Failed to send password reset email');
+      }
+    } catch {
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
       setIsLoading(false);
     }
   };

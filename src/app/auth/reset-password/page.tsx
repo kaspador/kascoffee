@@ -16,6 +16,7 @@ function ResetPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
   	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const [token, setToken] = useState<string | null>(null);
@@ -53,11 +54,28 @@ function ResetPasswordForm() {
     setIsLoading(true);
 
     try {
-      // Temporarily show message that feature is coming soon
-      setError('Password reset functionality is being updated. Please use the sign-in page or contact support.');
-          } catch {
-        setError('An unexpected error occurred. Please try again.');
-      } finally {
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          token, 
+          password: newPassword 
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setIsSuccess(true);
+        setMessage(data.message);
+      } else {
+        setError(data.error || 'Failed to reset password');
+      }
+    } catch {
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
       setIsLoading(false);
     }
   };
@@ -109,7 +127,7 @@ function ResetPasswordForm() {
 
           <CardContent className="space-y-6">
             						{/* Success Message */}
-						{message && !error && (
+						{isSuccess && message && !error && (
 							<div className="bg-green-500/10 border border-green-500/30 rounded-xl p-3 flex items-center gap-2">
 								<CheckCircle className="w-4 h-4 text-green-400" />
 								<span className="text-green-400 text-sm">{message}</span>
@@ -124,7 +142,7 @@ function ResetPasswordForm() {
               </div>
             )}
 
-            						{!message && token && (
+            						{!isSuccess && !message && token && (
               <form className="space-y-4" onSubmit={handleSubmit}>
                 <div className="space-y-2">
                   <Label htmlFor="newPassword" className="text-white font-medium">New Password</Label>
