@@ -13,33 +13,10 @@ export async function POST(request: NextRequest) {
     }
 
     const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL || 'https://directus-production-09ff.up.railway.app';
-    
-    // Check if user exists
-    const userCheckResponse = await fetch(`${directusUrl}/users?filter[email][_eq]=${encodeURIComponent(email)}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!userCheckResponse.ok) {
-      return NextResponse.json(
-        { error: 'Service temporarily unavailable' },
-        { status: 500 }
-      );
-    }
-
-    const userData = await userCheckResponse.json();
-    
-    if (!userData.data || userData.data.length === 0) {
-      // Don't reveal if user exists or not for security
-      return NextResponse.json({ 
-        success: true, 
-        message: 'If an account with that email exists, a password reset link has been sent.' 
-      });
-    }
 
     // Generate password reset request with Directus
+    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/reset-password`;
+    
     const resetResponse = await fetch(`${directusUrl}/auth/password/request`, {
       method: 'POST',
       headers: {
@@ -47,12 +24,13 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         email,
-        reset_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/reset-password`
+        reset_url: resetUrl
       }),
     });
 
     if (!resetResponse.ok) {
-      throw new Error('Failed to generate reset token');
+      // Don't reveal specific errors to prevent information disclosure
+      throw new Error('Failed to process password reset request');
     }
 
     // Send custom welcome email with Resend if API key is available
@@ -102,7 +80,9 @@ export async function POST(request: NextRequest) {
       success: true, 
       message: 'If an account with that email exists, a password reset link has been sent.' 
     });
-  } catch {
+  } catch (error) {
+    // Log error for debugging but don't expose details to client
+    console.error('Forgot password error:', error);
     return NextResponse.json(
       { error: 'Failed to process password reset request' },
       { status: 500 }
