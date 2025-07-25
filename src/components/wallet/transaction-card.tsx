@@ -43,20 +43,20 @@ export function TransactionCard({ transaction }: TransactionCardProps) {
   };
 
   return (
-    <Card className="bg-zinc-900 border-zinc-800 hover:border-zinc-700 transition-colors">
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-start gap-3">
+    <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/20 hover:border-[#70C7BA]/40 transition-all duration-300 shadow-lg">
+      <CardContent className="p-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
             {/* Transaction Type Icon */}
-            <div className={`p-2 rounded-full ${
+            <div className={`p-1.5 rounded-full ${
               isDonation 
-                ? 'bg-green-500/10 text-green-400' 
-                : 'bg-red-500/10 text-red-400'
+                ? 'bg-[#49EACB]/20 text-[#49EACB]' 
+                : 'bg-orange-400/20 text-orange-400'
             }`}>
               {isDonation ? (
-                <ArrowDownLeft className="w-4 h-4" />
+                <ArrowDownLeft className="w-3 h-3" />
               ) : (
-                <ArrowUpRight className="w-4 h-4" />
+                <ArrowUpRight className="w-3 h-3" />
               )}
             </div>
 
@@ -67,35 +67,28 @@ export function TransactionCard({ transaction }: TransactionCardProps) {
                   variant={isDonation ? 'default' : 'secondary'}
                   className={`text-xs ${
                     isDonation 
-                      ? 'bg-green-500/10 text-green-400 hover:bg-green-500/20' 
-                      : 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
+                      ? 'bg-[#49EACB]/20 text-[#49EACB] hover:bg-[#49EACB]/30 border-[#49EACB]/30' 
+                      : 'bg-orange-400/20 text-orange-400 hover:bg-orange-400/30 border-orange-400/30'
                   }`}
                 >
                   {isDonation ? 'Donation' : 'Send'}
                 </Badge>
                 
                 {!transaction.confirmed && (
-                  <Badge variant="outline" className="text-xs text-yellow-400 border-yellow-400/20">
+                  <Badge variant="outline" className="text-xs text-yellow-400 border-yellow-400/30 bg-yellow-400/10">
                     <Clock className="w-3 h-3 mr-1" />
                     Pending
                   </Badge>
                 )}
               </div>
 
-              <div className="text-sm text-zinc-400">
-                {isDonation ? 'From: ' : 'To: '}
-                <span className="font-mono text-xs">
-                  {truncateAddress(isDonation ? transaction.fromAddress || 'Unknown' : transaction.toAddress || 'Unknown')}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2 mt-1 text-xs text-zinc-500">
+              <div className="flex items-center gap-2 text-xs text-gray-400">
                 <span>{formatDate(transaction.timestamp)}</span>
                 <a
                   href={getKaspaExplorerUrl(transaction.hash)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-blue-400 hover:text-blue-300 transition-colors"
+                  className="flex items-center gap-1 text-[#70C7BA] hover:text-[#49EACB] transition-colors"
                 >
                   View <ExternalLink className="w-3 h-3" />
                 </a>
@@ -105,12 +98,12 @@ export function TransactionCard({ transaction }: TransactionCardProps) {
 
           {/* Amount */}
           <div className="text-right">
-            <div className={`text-lg font-bold ${
-              isDonation ? 'text-green-400' : 'text-red-400'
+            <div className={`text-sm font-bold ${
+              isDonation ? 'text-[#49EACB]' : 'text-orange-400'
             }`}>
               {isDonation ? '+' : '-'}{transaction.formattedAmount} KAS
             </div>
-            <div className="text-xs text-zinc-500">
+            <div className="text-xs text-gray-400">
               ${(transaction.amountKas * 0.15).toFixed(2)} USD
             </div>
           </div>

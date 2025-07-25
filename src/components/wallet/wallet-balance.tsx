@@ -85,16 +85,16 @@ export function WalletBalance({ address }: WalletBalanceProps) {
 
   if (loading) {
     return (
-      <Card className="bg-zinc-900 border-zinc-800">
+      <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
+          <CardTitle className="flex items-center gap-2 text-lg text-white">
             <Wallet className="w-5 h-5 text-[#70C7BA]" />
             Wallet Balance
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
-            <RefreshCw className="w-6 h-6 animate-spin text-zinc-400" />
+            <RefreshCw className="w-6 h-6 animate-spin text-[#70C7BA]" />
           </div>
         </CardContent>
       </Card>
@@ -103,9 +103,9 @@ export function WalletBalance({ address }: WalletBalanceProps) {
 
   if (error) {
     return (
-      <Card className="bg-zinc-900 border-zinc-800">
+      <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
+          <CardTitle className="flex items-center gap-2 text-lg text-white">
             <Wallet className="w-5 h-5 text-[#70C7BA]" />
             Wallet Balance
           </CardTitle>
@@ -115,7 +115,7 @@ export function WalletBalance({ address }: WalletBalanceProps) {
             <p className="text-sm text-red-400">{error}</p>
             <button
               onClick={fetchBalance}
-              className="mt-2 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+              className="mt-2 text-xs text-[#70C7BA] hover:text-[#49EACB] transition-colors"
             >
               Try again
             </button>
@@ -126,29 +126,29 @@ export function WalletBalance({ address }: WalletBalanceProps) {
   }
 
   return (
-    <Card className="bg-zinc-900 border-zinc-800">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg">
+    <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl">
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center gap-2 text-lg text-white">
           <Wallet className="w-5 h-5 text-[#70C7BA]" />
           Wallet Balance
           <button
             onClick={fetchBalance}
-            className="ml-auto p-1 rounded-md hover:bg-zinc-800 transition-colors"
+            className="ml-auto p-1 rounded-md hover:bg-[#70C7BA]/20 transition-colors"
             title="Refresh balance"
           >
-            <RefreshCw className="w-4 h-4 text-zinc-400" />
+            <RefreshCw className="w-4 h-4 text-[#70C7BA]" />
           </button>
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0">
         {balance && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* Current Balance */}
             <div>
-              <div className="text-3xl font-bold text-white mb-1">
+              <div className="text-2xl font-bold text-white mb-1">
                 {balance.formattedBalance} KAS
               </div>
-              <div className="text-sm text-zinc-400">
+              <div className="text-sm text-gray-300">
                 ≈ ${formatUSD(balance.balanceKas)} USD
               </div>
             </div>
@@ -174,15 +174,15 @@ export function WalletBalance({ address }: WalletBalanceProps) {
                   </Badge>
                 )}
                 
-                <span className="text-xs text-zinc-500">since last hour</span>
+                <span className="text-xs text-gray-400">since last hour</span>
               </div>
             )}
 
-            {/* Address */}
-            <div className="pt-2 border-t border-zinc-800">
-              <div className="text-xs text-zinc-500 mb-1">Address</div>
-              <div className="font-mono text-xs text-zinc-400 break-all">
-                {balance.address}
+            {/* Address - Compact */}
+            <div className="pt-2 border-t border-[#70C7BA]/20">
+              <div className="text-xs text-gray-400 mb-1">Address</div>
+              <div className="font-mono text-xs text-gray-300 break-all bg-black/20 p-2 rounded">
+                {balance.address.replace('kaspa:', '')}
               </div>
             </div>
           </div>

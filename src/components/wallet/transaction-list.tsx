@@ -64,16 +64,16 @@ export function TransactionList({ address, limit = 10 }: TransactionListProps) {
 
   if (loading) {
     return (
-      <Card className="bg-zinc-900 border-zinc-800">
+      <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
+          <CardTitle className="flex items-center gap-2 text-lg text-white">
             <History className="w-5 h-5 text-[#70C7BA]" />
             Recent Activity
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
-            <RefreshCw className="w-6 h-6 animate-spin text-zinc-400" />
+            <RefreshCw className="w-6 h-6 animate-spin text-[#70C7BA]" />
           </div>
         </CardContent>
       </Card>
@@ -82,9 +82,9 @@ export function TransactionList({ address, limit = 10 }: TransactionListProps) {
 
   if (error) {
     return (
-      <Card className="bg-zinc-900 border-zinc-800">
+      <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
+          <CardTitle className="flex items-center gap-2 text-lg text-white">
             <History className="w-5 h-5 text-[#70C7BA]" />
             Recent Activity
           </CardTitle>
@@ -96,7 +96,7 @@ export function TransactionList({ address, limit = 10 }: TransactionListProps) {
               onClick={fetchTransactions}
               variant="outline"
               size="sm"
-              className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
+              className="border-[#70C7BA]/50 text-[#70C7BA] hover:bg-[#70C7BA]/10 hover:border-[#70C7BA]"
             >
               Try again
             </Button>
@@ -107,58 +107,58 @@ export function TransactionList({ address, limit = 10 }: TransactionListProps) {
   }
 
   return (
-    <Card className="bg-zinc-900 border-zinc-800">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg">
+    <Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl">
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center gap-2 text-lg text-white">
           <History className="w-5 h-5 text-[#70C7BA]" />
           Recent Activity
           <button
             onClick={fetchTransactions}
-            className="ml-auto p-1 rounded-md hover:bg-zinc-800 transition-colors"
+            className="ml-auto p-1 rounded-md hover:bg-[#70C7BA]/20 transition-colors"
             title="Refresh transactions"
           >
-            <RefreshCw className="w-4 h-4 text-zinc-400" />
+            <RefreshCw className="w-4 h-4 text-[#70C7BA]" />
           </button>
         </CardTitle>
         
         {/* Transaction Summary */}
         {transactions.length > 0 && (
-          <div className="flex items-center gap-4 text-sm text-zinc-400">
+          <div className="flex items-center gap-4 text-sm text-gray-300">
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+              <span className="w-2 h-2 bg-[#49EACB] rounded-full"></span>
               {donations.length} donations
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 bg-red-400 rounded-full"></span>
+              <span className="w-2 h-2 bg-orange-400 rounded-full"></span>
               {sends.length} sends
             </span>
           </div>
         )}
       </CardHeader>
       
-      <CardContent>
+      <CardContent className="pt-0">
         {transactions.length === 0 ? (
-          <div className="text-center py-8">
-            <History className="w-12 h-12 text-zinc-700 mx-auto mb-3" />
-            <p className="text-zinc-400 mb-2">No transactions found</p>
-            <p className="text-xs text-zinc-500">
+          <div className="text-center py-6">
+            <History className="w-8 h-8 text-[#70C7BA]/30 mx-auto mb-2" />
+            <p className="text-gray-300 mb-1 text-sm">No transactions found</p>
+            <p className="text-xs text-gray-400">
               Transactions will appear here once the wallet has activity
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {displayedTransactions.map((transaction) => (
               <TransactionCard key={transaction.id} transaction={transaction} />
             ))}
             
             {/* Show More/Less Button */}
             {transactions.length > limit && (
-              <div className="pt-3 border-t border-zinc-800">
+              <div className="pt-2 border-t border-[#70C7BA]/20">
                 <Button
                   onClick={() => setShowAll(!showAll)}
                   variant="outline"
                   size="sm"
-                  className="w-full border-zinc-700 text-zinc-300 hover:bg-zinc-800"
+                  className="w-full border-[#70C7BA]/50 text-[#70C7BA] hover:bg-[#70C7BA]/10 hover:border-[#70C7BA]"
                 >
                   {showAll ? 'Show Less' : `Show All ${transactions.length} Transactions`}
                 </Button>
