@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Coffee, Lock, ArrowLeft, AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react';
-import { resetPassword } from '@/lib/auth-client';
+// Password reset functionality temporarily disabled - will implement with Directus
 
 function ResetPasswordForm() {
   const [newPassword, setNewPassword] = useState('');
@@ -56,20 +56,8 @@ function ResetPasswordForm() {
     setIsLoading(true);
 
     try {
-      const result = await resetPassword({
-        newPassword,
-        token,
-      });
-
-      if (result.error) {
-        setError(result.error.message || 'Failed to reset password. The token may be invalid or expired.');
-      } else {
-        setIsSuccess(true);
-        setMessage('Password reset successfully! You can now sign in with your new password.');
-        setTimeout(() => {
-          router.push('/auth/signin');
-        }, 2000);
-      }
+      // Temporarily show message that feature is coming soon
+      setError('Password reset functionality is being updated. Please use the sign-in page or contact support.');
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
       console.error('Reset password error:', err);

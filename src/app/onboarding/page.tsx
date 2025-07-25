@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSession } from '@/lib/auth-client';
+// Temporarily disabled - will implement with Directus auth
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,17 +34,13 @@ const onboardingSteps = [
 ];
 
 export default function OnboardingPage() {
-	const { data: session, isPending } = useSession();
 	const router = useRouter();
 	const [completedSteps, setCompletedSteps] = useState<string[]>([]);
 
-	useEffect(() => {
-		if (!isPending && !session) {
-			router.push('/auth/signin');
-		}
-	}, [session, isPending, router]);
+	// Temporarily skip auth check - will implement with Directus
+	const session = { user: { name: 'User', email: 'user@example.com' } };
 
-	if (isPending || !session) {
+	if (false) {
 		return (
 			<div className="min-h-screen flex items-center justify-center">
 				<div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>

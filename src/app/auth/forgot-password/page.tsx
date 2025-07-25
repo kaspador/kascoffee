@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Coffee, Mail, ArrowLeft, AlertCircle, CheckCircle } from 'lucide-react';
-import { forgetPassword } from '@/lib/auth-client';
+// Password reset functionality temporarily disabled - will implement with Directus
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -23,17 +23,9 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      const result = await forgetPassword({
-        email,
-        redirectTo: '/auth/reset-password',
-      });
-
-      if (result.error) {
-        setError(result.error.message || 'Failed to send reset email');
-      } else {
-        setIsSuccess(true);
-        setMessage('Password reset email sent! Check your inbox and follow the instructions to reset your password.');
-      }
+      // Temporarily show message that feature is coming soon
+      setIsSuccess(true);
+      setMessage('Password reset functionality is being updated. Please contact support for password resets.');
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
       console.error('Forgot password error:', err);

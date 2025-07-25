@@ -10,7 +10,7 @@ import { ThemeCustomization } from '@/components/dashboard/theme-customization';
 import { SocialLinksForm } from '@/components/dashboard/social-links-form';
 import { User, Palette, Link as LinkIcon, Settings, Eye, Copy, LogOut, Coffee, Sparkles, TrendingUp, Users } from 'lucide-react';
 import Link from 'next/link';
-import { useSession, signOut } from '@/lib/auth-client';
+// Temporarily disabled - will implement with Directus auth
 
 // Type for API responses
 interface UserProfile {
@@ -32,7 +32,9 @@ interface UserProfile {
 }
 
 export default function DashboardPage() {
-	const { data: session, isPending } = useSession();
+	// Temporarily skip auth check - will implement with Directus
+	const session = { user: { name: 'User' } };
+	const isPending = false;
 	const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 	const [profileLoading, setProfileLoading] = useState(false);
 	const [socials, setSocials] = useState<{socials: Array<{id: string; platform: string; url: string; username: string; isVisible: boolean}>} | null>(null);
@@ -105,7 +107,7 @@ export default function DashboardPage() {
 	};
 
 	const handleLogout = async () => {
-		await signOut();
+		// Temporarily disabled - will implement with Directus
 		router.push('/');
 	};
 
