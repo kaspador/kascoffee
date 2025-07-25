@@ -32,25 +32,31 @@ export default function SignUpPage() {
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({ 
-					email, 
-					password, 
+				body: JSON.stringify({
+					email,
+					password,
 					first_name: firstName,
-					last_name: lastName || undefined 
+					last_name: lastName,
 				}),
 			});
 
-			const result = await response.json();
+			const data = await response.json();
 
 			if (!response.ok) {
-				setError(result.error || "Failed to create account");
-			} else {
-				// Redirect to onboarding on successful signup
-				router.push("/onboarding");
+				throw new Error(data.error || 'Registration failed');
 			}
-		} catch (err) {
-			setError("An unexpected error occurred. Please try again.");
-			console.error("Sign up error:", err);
+
+			// Check if auto-login was successful
+			if (data.autoLogin) {
+				// User is automatically logged in, redirect to dashboard
+				router.push('/dashboard');
+			} else {
+				// Registration successful but need to login manually
+				router.push('/auth/signin?message=Registration successful. Please sign in.');
+			}
+		} catch (error: unknown) {
+			console.error('Registration error:', error);
+			setError(error instanceof Error ? error.message : 'Registration failed');
 		} finally {
 			setIsLoading(false);
 		}
