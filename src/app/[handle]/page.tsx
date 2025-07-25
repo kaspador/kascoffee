@@ -346,25 +346,8 @@ export default function UserProfilePage({ params }: PageProps) {
 						</div>
 					)}
 
-					{/* Wallet Activity Section */}
-					{userPage.kaspaAddress && (
-						<div className="lg:col-span-3 mb-8">
-							<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start align-top">
-								{/* Wallet Balance */}
-								<div className="flex">
-									<WalletBalance address={userPage.kaspaAddress} />
-								</div>
-								
-								{/* Recent Transactions */}
-								<div className="flex">
-									<TransactionList address={userPage.kaspaAddress} limit={5} />
-								</div>
-							</div>
-						</div>
-					)}
-
 					{/* Donation Section */}
-					<div className={userPage.longDescription ? '' : 'lg:col-span-3 max-w-md mx-auto'}>
+					<div className={userPage.longDescription ? 'lg:col-span-1' : 'lg:col-span-3 max-w-md mx-auto'}>
 						<Card className="bg-gradient-to-br from-[#70C7BA]/20 to-[#49EACB]/10 backdrop-blur-xl border border-[#70C7BA]/40 shadow-2xl">
 							<CardContent className="p-8">
 								<div className="text-center mb-8">
@@ -443,6 +426,23 @@ export default function UserProfilePage({ params }: PageProps) {
 							</CardContent>
 						</Card>
 					</div>
+
+					{/* Wallet Activity Section */}
+					{userPage.kaspaAddress && (
+						<div className="lg:col-span-3 mb-8">
+							<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start align-top">
+								{/* Wallet Balance */}
+								<div className="flex">
+									<WalletBalance address={userPage.kaspaAddress} />
+								</div>
+								
+								{/* Recent Transactions */}
+								<div className="flex">
+									<TransactionList address={userPage.kaspaAddress} limit={5} />
+								</div>
+							</div>
+						</div>
+					)}
 				</div>
 			</main>
 		</div>
