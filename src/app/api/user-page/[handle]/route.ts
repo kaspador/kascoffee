@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { userPages, socials } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { DirectusAPI } from '@/lib/directus';
 
 export async function GET(
   request: NextRequest,
@@ -10,43 +8,30 @@ export async function GET(
   try {
     const { handle } = await params;
 
-    // Get user page from database
-    const userPage = await db.query.userPages.findFirst({
-      where: eq(userPages.handle, handle),
-      with: {
-        user: true
-      }
-    });
+    // Get user page from Directus
+    const userPage = await DirectusAPI.getUserPage(handle);
 
-    if (!userPage || !userPage.isActive) {
+    if (!userPage || !userPage.is_active) {
       return NextResponse.json({ error: 'User page not found' }, { status: 404 });
     }
 
     // Get user's social links
-    const userSocials = await db.query.socials.findMany({
-      where: eq(socials.userId, userPage.userId)
-    });
+    const userSocials = await DirectusAPI.getUserSocials(userPage.user);
 
-    // Increment view count
-    await db
-      .update(userPages)
-      .set({ 
-        viewCount: (userPage.viewCount || 0) + 1,
-        updatedAt: new Date()
-      })
-      .where(eq(userPages.id, userPage.id));
+    // TODO: Implement view count increment in Directus
+    // For now, we'll skip this feature until collections are set up
 
     const userData = {
       ...userPage,
-      backgroundColor: userPage.backgroundColor || '#0f172a',
-      foregroundColor: userPage.foregroundColor || '#ffffff',
-      viewCount: userPage.viewCount || 0,
-      socials: userSocials.filter(social => social.isVisible).map(social => ({
+      backgroundColor: userPage.background_color || '#0f172a',
+      foregroundColor: userPage.foreground_color || '#ffffff',
+      viewCount: userPage.view_count || 0,
+      socials: userSocials.filter(social => social.is_visible).map(social => ({
         id: social.id,
         platform: social.platform,
         url: social.url,
         username: social.username || '',
-        isVisible: social.isVisible
+        isVisible: social.is_visible
       }))
     };
 
