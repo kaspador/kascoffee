@@ -1,11 +1,16 @@
-import { createDirectus, rest, authentication, readMe, createUser, readItems, createItem, updateItem, deleteItem } from '@directus/sdk';
+import { createDirectus, rest, authentication, readMe, createUser, readItems, createItem, updateItem, deleteItem, staticToken } from '@directus/sdk';
 
-// Server-side Directus client configuration
-const directus = createDirectus(process.env.NEXT_PUBLIC_DIRECTUS_URL || 'https://directus-production-09ff.up.railway.app')
+// Authenticated Directus client for dashboard/admin operations
+const directusAuth = createDirectus(process.env.NEXT_PUBLIC_DIRECTUS_URL || 'https://directus-production-09ff.up.railway.app')
   .with(rest())
   .with(authentication());
 
-export { directus };
+// Public Directus client for reading public data (user pages)
+const directusPublic = createDirectus(process.env.NEXT_PUBLIC_DIRECTUS_URL || 'https://directus-production-09ff.up.railway.app')
+  .with(rest())
+  .with(staticToken(process.env.DIRECTUS_TOKEN || ''));
+
+export { directusAuth as directus, directusPublic };
 
 // Type definitions for our collections
 export interface User {
@@ -53,24 +58,24 @@ export interface Social {
 export const DirectusAPI = {
   // Authentication (server-side only)
   async login(email: string, password: string) {
-    const result = await directus.login({ email, password });
+    const result = await directusAuth.login({ email, password });
     return result;
   },
 
   async logout() {
-    return await directus.logout();
+    return await directusAuth.logout();
   },
 
   async getCurrentUser() {
-    return await directus.request(readMe());
+    return await directusAuth.request(readMe());
   },
 
   async setToken(token: string) {
-    directus.setToken(token);
+    directusAuth.setToken(token);
   },
 
   async register(email: string, password: string, first_name?: string, last_name?: string) {
-    return await directus.request(createUser({
+    return await directusAuth.request(createUser({
       email,
       password,
       first_name,
@@ -85,7 +90,7 @@ export const DirectusAPI = {
     try {
       console.log(`DirectusAPI.getUserPage: Searching for handle "${handle}"`);
       
-      const pages = await directus.request(readItems('user_pages', {
+      const pages = await directusPublic.request(readItems('user_pages', {
         filter: { handle: { _eq: handle } }, // Use exact match to be explicit
         limit: 1
       })) as unknown[];
@@ -108,7 +113,7 @@ export const DirectusAPI = {
 
   async getUserPageByUserId(userId: string): Promise<UserPage[]> {
     try {
-      const pages = await directus.request(readItems('user_pages', {
+      const pages = await directusPublic.request(readItems('user_pages', {
         filter: { user_id: userId } // Changed from 'user' to 'user_id'
       })) as unknown[];
       return pages as UserPage[];
@@ -119,17 +124,17 @@ export const DirectusAPI = {
   },
 
   async createUserPage(data: Omit<UserPage, 'id' | 'date_created' | 'date_updated'>) {
-    return await directus.request(createItem('user_pages', data));
+    return await directusAuth.request(createItem('user_pages', data));
   },
 
   async updateUserPage(id: string, data: Partial<UserPage>) {
-    return await directus.request(updateItem('user_pages', id, data));
+    return await directusAuth.request(updateItem('user_pages', id, data));
   },
 
   async getAllUserPages(): Promise<UserPage[]> {
     try {
       console.log('DirectusAPI.getAllUserPages: Fetching all user pages');
-      const pages = await directus.request(readItems('user_pages')) as unknown[];
+      const pages = await directusPublic.request(readItems('user_pages')) as unknown[];
       console.log(`DirectusAPI.getAllUserPages: Found ${pages.length} total pages`);
       return pages as UserPage[];
     } catch (error: unknown) {
@@ -141,7 +146,7 @@ export const DirectusAPI = {
   // Socials
   async getUserSocials(userId: string): Promise<Social[]> {
     try {
-      const socials = await directus.request(readItems('socials', {
+      const socials = await directusPublic.request(readItems('socials', {
         filter: { user: userId, is_visible: true } // Use 'user' to match the interface
       })) as unknown[];
       return socials as Social[];
@@ -152,14 +157,14 @@ export const DirectusAPI = {
   },
 
   async createSocial(data: Omit<Social, 'id' | 'date_created' | 'date_updated'>) {
-    return await directus.request(createItem('socials', data));
+    return await directusAuth.request(createItem('socials', data));
   },
 
   async updateSocial(id: string, data: Partial<Social>) {
-    return await directus.request(updateItem('socials', id, data));
+    return await directusAuth.request(updateItem('socials', id, data));
   },
 
   async deleteSocial(id: string) {
-    return await directus.request(deleteItem('socials', id));
+    return await directusAuth.request(deleteItem('socials', id));
   }
 }; 
