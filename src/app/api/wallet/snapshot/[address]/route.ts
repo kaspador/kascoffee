@@ -48,20 +48,19 @@ export async function POST(
     const existingSnapshots = await DirectusAPI.getWalletSnapshots(kaspaAddress, 1);
     const existingHourSnapshot = existingSnapshots.find(s => s.hour_key === hour);
     
-    let snapshot;
     let balanceChange = 0;
     let changePercentage = 0;
     
     if (existingHourSnapshot) {
       // Update existing snapshot
-      snapshot = await DirectusAPI.updateWalletSnapshot(existingHourSnapshot.id, {
+      await DirectusAPI.updateWalletSnapshot(existingHourSnapshot.id, {
         balance: data.balance.toString(),
         balance_kas: balanceInKas,
         timestamp: now.toISOString()
       });
     } else {
       // Create new snapshot
-      snapshot = await DirectusAPI.createWalletSnapshot({
+      await DirectusAPI.createWalletSnapshot({
         kaspa_address: kaspaAddress,
         balance: data.balance.toString(),
         balance_kas: balanceInKas,

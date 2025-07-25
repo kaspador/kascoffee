@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { TransactionCard } from './transaction-card';
@@ -30,7 +30,7 @@ export function TransactionList({ address, limit = 10 }: TransactionListProps) {
   const [error, setError] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -47,7 +47,7 @@ export function TransactionList({ address, limit = 10 }: TransactionListProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [address, showAll, limit]);
 
   useEffect(() => {
     if (address) {
@@ -56,7 +56,7 @@ export function TransactionList({ address, limit = 10 }: TransactionListProps) {
       const interval = setInterval(fetchTransactions, 2 * 60 * 1000);
       return () => clearInterval(interval);
     }
-  }, [address, showAll, limit]);
+  }, [address, showAll, limit, fetchTransactions]);
 
   const displayedTransactions = showAll ? transactions : transactions.slice(0, limit);
   const donations = transactions.filter(tx => tx.type === 'donation');

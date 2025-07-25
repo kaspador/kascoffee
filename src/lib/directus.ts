@@ -227,7 +227,7 @@ export const DirectusAPI = {
       
       // Delete them
       for (const snapshot of oldSnapshots) {
-        await directusPublic.request(deleteItem('wallet_snapshots', (snapshot as any).id));
+        await directusPublic.request(deleteItem('wallet_snapshots', (snapshot as WalletSnapshot).id));
       }
       
       return oldSnapshots.length;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Wallet, TrendingUp, TrendingDown, Minus, RefreshCw } from 'lucide-react';
@@ -27,7 +27,7 @@ export function WalletBalance({ address }: WalletBalanceProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchBalance = async () => {
+  const fetchBalance = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -56,7 +56,7 @@ export function WalletBalance({ address }: WalletBalanceProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [address]);
 
   useEffect(() => {
     if (address) {
@@ -65,7 +65,7 @@ export function WalletBalance({ address }: WalletBalanceProps) {
       const interval = setInterval(fetchBalance, 5 * 60 * 1000);
       return () => clearInterval(interval);
     }
-  }, [address]);
+  }, [address, fetchBalance]);
 
   const formatUSD = (kas: number) => {
     return (kas * 0.15).toFixed(2); // Approximate KAS to USD rate

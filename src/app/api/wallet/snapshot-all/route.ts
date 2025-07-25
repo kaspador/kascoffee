@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { DirectusAPI } from '@/lib/directus';
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     // Get all active user pages with Kaspa addresses
     const userPages = await DirectusAPI.getAllUserPages();
