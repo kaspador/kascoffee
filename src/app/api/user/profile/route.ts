@@ -84,15 +84,19 @@ export async function PUT(request: NextRequest) {
 		
 		console.log('Profile update request:', { handle, displayName, userId: user.id });
 		
-		// Clean up URLs - remove trailing semicolons and whitespace
-		const cleanProfileImage = profileImage ? profileImage.trim().replace(/[;,]+$/, '') : null;
-		const cleanBackgroundImage = backgroundImage ? backgroundImage.trim().replace(/[;,]+$/, '') : null;
+		// Clean up URLs - remove trailing semicolons, commas, and other unwanted characters
+		const cleanProfileImage = profileImage ? 
+			profileImage.toString().trim().replace(/[;,\s]+$/g, '').replace(/;/g, '') : null;
+		const cleanBackgroundImage = backgroundImage ? 
+			backgroundImage.toString().trim().replace(/[;,\s]+$/g, '').replace(/;/g, '') : null;
 		
 		console.log('URL cleaning:', { 
 			originalProfile: profileImage, 
 			cleanedProfile: cleanProfileImage,
 			originalBackground: backgroundImage,
-			cleanedBackground: cleanBackgroundImage
+			cleanedBackground: cleanBackgroundImage,
+			profileType: typeof profileImage,
+			backgroundType: typeof backgroundImage
 		});
 		
 		// Check if user page already exists for this user
@@ -150,6 +154,39 @@ export async function PUT(request: NextRequest) {
 			});
 		} catch (createError) {
 			console.error('CREATE failed:', createError);
+			
+			// If images are causing foreign key issues, try without images
+			if (createError instanceof Error && createError.message.includes('Invalid foreign key')) {
+				console.log('🔄 Retrying CREATE without images due to foreign key error');
+				const userPageDataNoImages = { ...userPageData };
+				delete userPageDataNoImages.profile_image;
+				delete userPageDataNoImages.background_image;
+				
+				try {
+					const newPageNoImages = await DirectusAPI.createUserPage(userPageDataNoImages);
+					console.log('CREATE without images successful:', newPageNoImages.id);
+					return NextResponse.json({ 
+						userPage: {
+							id: newPageNoImages.id,
+							handle: newPageNoImages.handle,
+							displayName: newPageNoImages.display_name,
+							shortDescription: newPageNoImages.short_description,
+							longDescription: newPageNoImages.long_description,
+							kaspaAddress: newPageNoImages.kaspa_address,
+							profileImage: null, // Images couldn't be saved due to Directus config
+							backgroundImage: null,
+							backgroundColor: newPageNoImages.background_color,
+							foregroundColor: newPageNoImages.foreground_color,
+							isActive: newPageNoImages.is_active,
+							updatedAt: new Date().toISOString()
+						}
+					});
+				} catch (retryError) {
+					console.error('Retry CREATE without images also failed:', retryError);
+					return NextResponse.json({ error: retryError instanceof Error ? retryError.message : 'Internal server error' }, { status: 500 });
+				}
+			}
+			
 			return NextResponse.json({ error: createError instanceof Error ? createError.message : 'Internal server error' }, { status: 500 });
 		}
 	} catch (error) {
