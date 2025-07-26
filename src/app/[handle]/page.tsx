@@ -101,14 +101,36 @@ export default function UserProfilePage({ params }: PageProps) {
 				// Track page view with unique IP filtering
 				if (data) {
 					try {
-						await fetch(`/api/track-view/${handle}`, {
+						console.log(`[FRONTEND] Tracking view for handle: ${handle}`);
+						const trackResponse = await fetch(`/api/track-view/${handle}`, {
 							method: 'POST',
 							headers: {
 								'Content-Type': 'application/json',
 							},
 						});
-					} catch {
-						// Silently fail if view tracking fails
+						
+						console.log(`[FRONTEND] Track response status: ${trackResponse.status}`);
+						
+						if (trackResponse.ok) {
+							const trackData = await trackResponse.json();
+							console.log(`[FRONTEND] Track response data:`, trackData);
+							
+							// Update the local view count if the tracking was successful and counted
+							if (trackData.success && trackData.counted && trackData.newViewCount) {
+								console.log(`[FRONTEND] Updating view count from ${data.viewCount || 0} to ${trackData.newViewCount}`);
+								setUserPage(prevData => prevData ? {
+									...prevData,
+									viewCount: trackData.newViewCount
+								} : null);
+							} else {
+								console.log(`[FRONTEND] View not counted or already counted`);
+							}
+						} else {
+							const errorData = await trackResponse.json().catch(() => null);
+							console.error(`[FRONTEND] Track view failed:`, errorData);
+						}
+					} catch (error) {
+						console.error(`[FRONTEND] Error tracking view:`, error);
 					}
 				}
 			} catch {

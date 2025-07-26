@@ -97,26 +97,27 @@ export const DirectusAPI = {
   // User Pages
   async getUserPage(handle: string): Promise<UserPage | null> {
     try {
-      
+      console.log(`[DIRECTUS] Fetching user page for handle: ${handle}`);
       
       const pages = await directusPublic.request(readItems('user_pages', {
         filter: { handle: { _eq: handle } }, // Use exact match to be explicit
         limit: 1
       })) as unknown[];
       
-      
+      console.log(`[DIRECTUS] Found ${pages.length} pages for handle: ${handle}`);
       
       if (pages.length > 0) {
         const page = pages[0] as UserPage;
-        
+        console.log(`[DIRECTUS] User page found:`, { id: page.id, handle: page.handle, view_count: page.view_count });
         return page;
       }
       
-      
+      console.log(`[DIRECTUS] No user page found for handle: ${handle}`);
       return null;
-          } catch {
-        return null;
-      }
+    } catch (error) {
+      console.error(`[DIRECTUS] Error fetching user page for handle ${handle}:`, error);
+      return null;
+    }
   },
 
   async getUserPageByUserId(userId: string): Promise<UserPage[]> {
@@ -135,7 +136,15 @@ export const DirectusAPI = {
   },
 
   async updateUserPage(id: string, data: Partial<UserPage>) {
-    return await directusAuth.request(updateItem('user_pages', id, data));
+    try {
+      console.log(`[DIRECTUS] Updating user page ${id} with data:`, data);
+      const result = await directusAuth.request(updateItem('user_pages', id, data));
+      console.log(`[DIRECTUS] Successfully updated user page ${id}:`, result);
+      return result;
+    } catch (error) {
+      console.error(`[DIRECTUS] Error updating user page ${id}:`, error);
+      throw error;
+    }
   },
 
   async getAllUserPages(): Promise<UserPage[]> {
