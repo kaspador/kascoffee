@@ -398,7 +398,7 @@ export default function UserProfilePage({ params }: PageProps) {
 								borderStyle: 'solid'
 							}}
 						>
-							{userPage.shortDescription}
+							{renderTextWithLinks(userPage.shortDescription, userPage.foregroundColor)}
 						</p>
 					)}
 
@@ -584,4 +584,34 @@ export default function UserProfilePage({ params }: PageProps) {
 			</main>
 		</div>
 	);
+}
+
+// Utility function to convert URLs in text to clickable links
+function renderTextWithLinks(text: string, linkColor: string) {
+	// Enhanced URL regex to match various URL formats
+	const urlRegex = /(https?:\/\/[^\s<>"{}|\\^`[\]]+)/gi;
+	
+	if (!urlRegex.test(text)) {
+		return text;
+	}
+
+	const parts = text.split(urlRegex);
+	
+	return parts.map((part, index) => {
+		if (part.match(urlRegex)) {
+			return (
+				<a 
+					key={index}
+					href={part}
+					target="_blank"
+					rel="noopener noreferrer"
+					className="underline hover:opacity-80 transition-opacity font-medium"
+					style={{ color: linkColor }}
+				>
+					{part}
+				</a>
+			);
+		}
+		return part;
+	});
 } 
