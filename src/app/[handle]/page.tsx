@@ -375,23 +375,33 @@ export default function UserProfilePage({ params }: PageProps) {
 										</TabsTrigger>
 									</TabsList>
 									
-									<TabsContent value="qr" className="space-y-6">
+									<TabsContent value="qr" className="space-y-4 sm:space-y-6">
 										<div className="flex justify-center">
-											<div className="bg-white p-6 rounded-2xl shadow-2xl">
-												<QRCodeDisplay address={userPage.kaspaAddress} size={200} />
+											<div className="bg-white p-3 sm:p-6 rounded-2xl shadow-2xl">
+												<QRCodeDisplay address={userPage.kaspaAddress} responsive={true} />
 											</div>
 										</div>
-										<p className="text-center text-gray-400 text-sm">
+										<p className="text-center text-gray-400 text-xs sm:text-sm">
 											Scan with your Kaspa wallet app
 										</p>
 									</TabsContent>
 									
-									<TabsContent value="address" className="space-y-6">
-										<div className="p-6 rounded-2xl border border-[#70C7BA]/30 bg-slate-800/50 backdrop-blur-sm">
+									<TabsContent value="address" className="space-y-4 sm:space-y-6">
+										<div className="p-4 sm:p-6 rounded-2xl border border-[#70C7BA]/30 bg-slate-800/50 backdrop-blur-sm">
 											<p className="text-xs text-gray-400 mb-2">Kaspa Address:</p>
-											<p className="font-mono text-sm text-white break-all">
-												{userPage.kaspaAddress}
-											</p>
+											<a
+												href={`https://kas.fyi/address/${userPage.kaspaAddress.startsWith('kaspa:') ? userPage.kaspaAddress : 'kaspa:' + userPage.kaspaAddress}`}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="block font-mono text-xs sm:text-sm text-white break-all hover:text-[#70C7BA] transition-colors group cursor-pointer"
+												title="View on kas.fyi explorer"
+											>
+												<span className="group-hover:underline">{userPage.kaspaAddress}</span>
+												<div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+													<ExternalLink className="w-3 h-3 text-[#70C7BA]" />
+													<span className="text-[10px] text-[#70C7BA]">View on kas.fyi</span>
+												</div>
+											</a>
 										</div>
 									</TabsContent>
 								</Tabs>
