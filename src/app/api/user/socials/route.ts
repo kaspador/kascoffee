@@ -101,10 +101,15 @@ export async function PUT(request: NextRequest) {
 		}
 
 		// Build update data
-		const updateData: any = {};
+		const updateData: Partial<{
+			platform: 'twitter' | 'discord' | 'telegram' | 'website';
+			url: string;
+			username?: string;
+			is_visible: boolean;
+		}> = {};
 		if (platform !== undefined) updateData.platform = platform;
 		if (url !== undefined) updateData.url = url;
-		if (username !== undefined) updateData.username = username;
+		if (username !== undefined) updateData.username = username || undefined;
 		if (is_visible !== undefined) updateData.is_visible = is_visible;
 
 		// Update social

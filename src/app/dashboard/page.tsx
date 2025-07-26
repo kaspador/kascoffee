@@ -10,6 +10,7 @@ import { ThemeCustomization } from '@/components/dashboard/theme-customization';
 import { SocialLinksForm } from '@/components/dashboard/social-links-form';
 import { User, Palette, Link as LinkIcon, Eye, LogOut, Coffee, Sparkles, TrendingUp, Users } from 'lucide-react';
 import Link from 'next/link';
+import type { Social } from '@/lib/directus';
 
 // Type for API responses
 interface UserProfile {
@@ -43,7 +44,7 @@ export default function DashboardPage() {
 	const [authLoading, setAuthLoading] = useState(true);
 	const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 	const [profileLoading, setProfileLoading] = useState(false);
-	const [socials, setSocials] = useState<{socials: Array<{id: string; platform: string; url: string; username: string; isVisible: boolean}>} | null>(null);
+	const [socials, setSocials] = useState<{socials: Social[]} | null>(null);
 	const router = useRouter();
 
 	// Check authentication on component mount
