@@ -114,7 +114,24 @@ export const DirectusAPI = {
       
       const pages = await directusPublic.request(readItems('user_pages', {
         filter: { handle: { _eq: handle } }, // Use exact match to be explicit
-        limit: 1
+        limit: 1,
+        fields: [
+          'id',
+          'user_id', 
+          'handle',
+          'display_name',
+          'short_description',
+          'long_description',
+          'kaspa_address',
+          'profile_image',    // EXPLICITLY include profile_image
+          'background_image', // EXPLICITLY include background_image
+          'background_color',
+          'foreground_color',
+          'is_active',
+          'view_count',
+          'date_created',
+          'date_updated'
+        ]
       })) as unknown[];
       
       console.log(`[DIRECTUS] Found ${pages.length} pages for handle: ${handle}`);
@@ -136,12 +153,29 @@ export const DirectusAPI = {
   async getUserPageByUserId(userId: string): Promise<UserPage[]> {
     try {
       const pages = await directusAuth.request(readItems('user_pages', {
-        filter: { user_id: userId } // Changed from 'user' to 'user_id'
-              })) as unknown[];
-        return pages as UserPage[];
-      } catch {
-        return [];
-      }
+        filter: { user_id: userId }, // Changed from 'user' to 'user_id'
+        fields: [
+          'id',
+          'user_id', 
+          'handle',
+          'display_name',
+          'short_description',
+          'long_description',
+          'kaspa_address',
+          'profile_image',    // EXPLICITLY include profile_image
+          'background_image', // EXPLICITLY include background_image
+          'background_color',
+          'foreground_color',
+          'is_active',
+          'view_count',
+          'date_created',
+          'date_updated'
+        ]
+      })) as unknown[];
+      return pages as UserPage[];
+    } catch {
+      return [];
+    }
   },
 
   async createUserPage(data: Omit<UserPage, 'id' | 'date_created' | 'date_updated'>) {
@@ -186,13 +220,29 @@ export const DirectusAPI = {
 
   async getAllUserPages(): Promise<UserPage[]> {
     try {
-      
-      const pages = await directusPublic.request(readItems('user_pages')) as unknown[];
-              
-        return pages as UserPage[];
-      } catch {
-        return [];
-      }
+      const pages = await directusPublic.request(readItems('user_pages', {
+        fields: [
+          'id',
+          'user_id', 
+          'handle',
+          'display_name',
+          'short_description',
+          'long_description',
+          'kaspa_address',
+          'profile_image',    // EXPLICITLY include profile_image
+          'background_image', // EXPLICITLY include background_image
+          'background_color',
+          'foreground_color',
+          'is_active',
+          'view_count',
+          'date_created',
+          'date_updated'
+        ]
+      })) as unknown[];
+      return pages as UserPage[];
+    } catch {
+      return [];
+    }
   },
 
   // Socials
