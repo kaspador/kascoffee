@@ -206,19 +206,19 @@ export default function UserProfilePage({ params }: PageProps) {
 
 			{/* Header */}
 			<header className="relative z-10 border-b border-[#70C7BA]/20 bg-slate-900/80 backdrop-blur-xl">
-				<div className="container mx-auto px-6 py-4">
+				<div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
 					<div className="flex items-center justify-between">
-						<Link href="/" className="flex items-center gap-3 text-[#70C7BA] hover:text-[#49EACB] transition-all duration-300 group">
-							<ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-							<Coffee className="w-6 h-6" />
-							<span className="text-lg font-bold">kas.coffee</span>
+						<Link href="/" className="flex items-center gap-2 sm:gap-3 text-[#70C7BA] hover:text-[#49EACB] transition-all duration-300 group">
+							<ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform" />
+							<Coffee className="w-5 h-5 sm:w-6 sm:h-6" />
+							<span className="text-base sm:text-lg font-bold">kas.coffee</span>
 						</Link>
 						
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
-								<Button variant="outline" size="sm" className="border-[#70C7BA]/50 text-[#70C7BA] hover:bg-[#70C7BA]/10 hover:border-[#70C7BA] rounded-full backdrop-blur-sm">
-									<Share2 className="w-4 h-4 mr-2" />
-									Share
+								<Button variant="outline" size="sm" className="border-[#70C7BA]/50 text-[#70C7BA] hover:bg-[#70C7BA]/10 hover:border-[#70C7BA] rounded-full backdrop-blur-sm text-xs sm:text-sm px-2 sm:px-4">
+									<Share2 className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+									<span className="hidden sm:inline">Share</span>
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent className="w-48 bg-slate-800/90 backdrop-blur-xl border-[#70C7BA]/30">
@@ -245,59 +245,59 @@ export default function UserProfilePage({ params }: PageProps) {
 			</header>
 
 			{/* Main Content */}
-			<main className="relative z-10 container mx-auto px-6 py-12 max-w-6xl">
+			<main className="relative z-10 container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-6xl">
 				{/* Profile Header */}
-				<div className="text-center mb-12">
-					<div className="relative inline-block mb-8">
-						<div className="w-40 h-40 rounded-full bg-gradient-to-br from-[#70C7BA] to-[#49EACB] p-1 shadow-2xl">
+				<div className="text-center mb-8 sm:mb-12">
+					<div className="relative inline-block mb-6 sm:mb-8">
+						<div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-gradient-to-br from-[#70C7BA] to-[#49EACB] p-1 shadow-2xl">
 							<Avatar className="w-full h-full border-4 border-slate-900">
 								<AvatarImage 
 									src={userPage.profileImage || undefined}
 									alt={userPage.displayName || userPage.handle}
 									className="object-cover"
 								/>
-								<AvatarFallback className="text-4xl font-bold bg-gradient-to-br from-[#70C7BA] to-[#49EACB] text-white">
+								<AvatarFallback className="text-2xl sm:text-4xl font-bold bg-gradient-to-br from-[#70C7BA] to-[#49EACB] text-white">
 									{(userPage.displayName || userPage.handle)?.charAt(0)?.toUpperCase() || 'U'}
 								</AvatarFallback>
 							</Avatar>
 						</div>
-						<div className="absolute -bottom-2 -right-2 w-10 h-10 bg-[#49EACB] rounded-full flex items-center justify-center shadow-xl border-4 border-slate-900">
-							<Coffee className="w-5 h-5 text-white" />
+						<div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-8 h-8 sm:w-10 sm:h-10 bg-[#49EACB] rounded-full flex items-center justify-center shadow-xl border-2 sm:border-4 border-slate-900">
+							<Coffee className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
 						</div>
 					</div>
 					
-					<h1 className="text-5xl md:text-6xl font-black text-white mb-4 bg-gradient-to-r from-[#70C7BA] to-[#49EACB] bg-clip-text text-transparent">
+					<h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white mb-3 sm:mb-4 bg-gradient-to-r from-[#70C7BA] to-[#49EACB] bg-clip-text text-transparent px-4">
 						{userPage.displayName || userPage.handle}
 					</h1>
 					
-					<Badge className="mb-6 px-6 py-3 text-lg bg-[#70C7BA]/20 text-[#70C7BA] border border-[#70C7BA]/30 rounded-full backdrop-blur-sm">
+					<Badge className="mb-4 sm:mb-6 px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-lg bg-[#70C7BA]/20 text-[#70C7BA] border border-[#70C7BA]/30 rounded-full backdrop-blur-sm">
 						@{userPage.handle}
 					</Badge>
 					
 					{userPage.shortDescription && (
-						<p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed mb-8 bg-white/5 rounded-2xl p-6 border border-[#70C7BA]/20 backdrop-blur-sm">
+						<p className="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed mb-6 sm:mb-8 bg-white/5 rounded-2xl p-4 sm:p-6 border border-[#70C7BA]/20 backdrop-blur-sm mx-4">
 							{userPage.shortDescription}
 						</p>
 					)}
 
 					{/* Stats */}
-					<div className="flex justify-center items-center gap-8 text-gray-400 mb-8">
+					<div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 text-gray-400 mb-6 sm:mb-8 px-4">
 						<div className="flex items-center gap-2">
-							<Eye className="w-5 h-5 text-[#70C7BA]" />
-							<span className="text-white">{userPage.viewCount || 0} views</span>
+							<Eye className="w-4 h-4 sm:w-5 sm:h-5 text-[#70C7BA]" />
+							<span className="text-white text-sm sm:text-base">{userPage.viewCount || 0} views</span>
 						</div>
-						<div className="w-2 h-2 bg-[#70C7BA]/50 rounded-full"></div>
+						<div className="w-2 h-2 bg-[#70C7BA]/50 rounded-full hidden sm:block"></div>
 						<div className="flex items-center gap-2">
-							<Zap className="w-5 h-5 text-[#49EACB]" />
-							<span className="text-white">Powered by Kaspa</span>
+							<Zap className="w-4 h-4 sm:w-5 sm:h-5 text-[#49EACB]" />
+							<span className="text-white text-sm sm:text-base">Powered by Kaspa</span>
 						</div>
 					</div>
 				</div>
 
 				{/* Social Links */}
 				{userPage.socials && userPage.socials.length > 0 && (
-					<div className="flex justify-center mb-12">
-						<div className="flex flex-wrap justify-center gap-4">
+					<div className="flex justify-center mb-8 sm:mb-12 px-4">
+						<div className="flex flex-wrap justify-center gap-3 sm:gap-4">
 							{userPage.socials.map((social) => {
 								const IconComponent = socialIconMap[social.platform as keyof typeof socialIconMap] || FaGlobe;
 								return (
@@ -311,10 +311,11 @@ export default function UserProfilePage({ params }: PageProps) {
 										<Button
 											variant="outline"
 											size="sm"
-											className="border-[#70C7BA]/30 text-[#70C7BA] hover:bg-[#70C7BA]/20 hover:border-[#70C7BA] transition-all duration-300 rounded-full backdrop-blur-sm group-hover:scale-105"
+											className="border-[#70C7BA]/30 text-[#70C7BA] hover:bg-[#70C7BA]/20 hover:border-[#70C7BA] transition-all duration-300 rounded-full backdrop-blur-sm group-hover:scale-105 text-xs sm:text-sm px-3 sm:px-4"
 										>
-											<IconComponent className="w-4 h-4 mr-2" />
-											{social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}
+											<IconComponent className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+											<span className="hidden sm:inline">{social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}</span>
+											<span className="sm:hidden">{social.platform.charAt(0).toUpperCase()}</span>
 										</Button>
 									</a>
 								);
@@ -324,20 +325,20 @@ export default function UserProfilePage({ params }: PageProps) {
 				)}
 
 				{/* Content Grid */}
-				<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 px-4">
 					{/* About Section */}
 					{userPage.longDescription && (
 						<div className="lg:col-span-2">
 							<Card className="bg-white/5 backdrop-blur-xl border border-[#70C7BA]/30 shadow-2xl">
-								<CardContent className="p-8">
-									<div className="flex items-center gap-3 mb-6">
-										<User className="w-6 h-6 text-[#70C7BA]" />
-										<h2 className="text-2xl font-bold text-white">
+								<CardContent className="p-4 sm:p-6 lg:p-8">
+									<div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+										<User className="w-5 h-5 sm:w-6 sm:h-6 text-[#70C7BA]" />
+										<h2 className="text-xl sm:text-2xl font-bold text-white">
 											About {userPage.displayName || userPage.handle}
 										</h2>
 									</div>
 									<div 
-										className="prose prose-lg max-w-none text-gray-300 leading-relaxed prose-headings:text-white prose-strong:text-white prose-a:text-[#70C7BA]"
+										className="prose prose-sm sm:prose-lg max-w-none text-gray-300 leading-relaxed prose-headings:text-white prose-strong:text-white prose-a:text-[#70C7BA]"
 										dangerouslySetInnerHTML={{ __html: userPage.longDescription }}
 									/>
 								</CardContent>
@@ -346,50 +347,52 @@ export default function UserProfilePage({ params }: PageProps) {
 					)}
 
 					{/* Donation Section */}
-					<div className={userPage.longDescription ? 'lg:col-span-1' : 'lg:col-span-3 max-w-md mx-auto'}>
+					<div className={userPage.longDescription ? 'lg:col-span-1' : 'lg:col-span-3 max-w-md mx-auto w-full'}>
 						<Card className="bg-gradient-to-br from-[#70C7BA]/20 to-[#49EACB]/10 backdrop-blur-xl border border-[#70C7BA]/40 shadow-2xl">
-							<CardContent className="p-8">
+							<CardContent className="p-4 sm:p-6 lg:p-8">
 								<div className="text-center mb-8">
-									<div className="inline-flex items-center gap-3 bg-[#70C7BA]/20 text-[#70C7BA] rounded-full px-6 py-3 mb-6 border border-[#70C7BA]/30">
-										<Heart className="w-5 h-5" />
-										<span className="font-semibold">Support with Kaspa</span>
+									<div className="inline-flex items-center gap-3 bg-[#70C7BA]/20 text-[#70C7BA] rounded-full px-4 py-2 sm:px-6 sm:py-3 mb-6 border border-[#70C7BA]/30">
+										<Heart className="w-4 h-4 sm:w-5 sm:h-5" />
+										<span className="font-semibold text-sm sm:text-base">Support with Kaspa</span>
 									</div>
-									<h2 className="text-3xl font-bold text-white mb-3">
+									<h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
 										Buy me a coffee
 									</h2>
-									<p className="text-gray-300">
+									<p className="text-gray-300 text-sm sm:text-base">
 										Send Kaspa donations to show your support
 									</p>
 								</div>
 								
 								{/* QR Code and Address */}
 								<Tabs defaultValue="qr" className="w-full">
-									<TabsList className="grid w-full grid-cols-2 mb-8 bg-slate-800/50 border border-[#70C7BA]/30">
-										<TabsTrigger value="qr" className="data-[state=active]:bg-[#70C7BA] data-[state=active]:text-white text-gray-300">
-											<QrCode className="w-4 h-4 mr-2" />
-											QR Code
+									<TabsList className="grid w-full grid-cols-2 mb-6 sm:mb-8 bg-slate-800/50 border border-[#70C7BA]/30">
+										<TabsTrigger value="qr" className="data-[state=active]:bg-[#70C7BA] data-[state=active]:text-white text-gray-300 text-sm sm:text-base">
+											<QrCode className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+											<span className="hidden sm:inline">QR Code</span>
+											<span className="sm:hidden">QR</span>
 										</TabsTrigger>
-										<TabsTrigger value="address" className="data-[state=active]:bg-[#70C7BA] data-[state=active]:text-white text-gray-300">
-											<Copy className="w-4 h-4 mr-2" />
-											Address
+										<TabsTrigger value="address" className="data-[state=active]:bg-[#70C7BA] data-[state=active]:text-white text-gray-300 text-sm sm:text-base">
+											<Copy className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+											<span className="hidden sm:inline">Address</span>
+											<span className="sm:hidden">Addr</span>
 										</TabsTrigger>
 									</TabsList>
 									
-									<TabsContent value="qr" className="space-y-6">
+									<TabsContent value="qr" className="space-y-4 sm:space-y-6">
 										<div className="flex justify-center">
-											<div className="bg-white p-6 rounded-2xl shadow-2xl">
-												<QRCodeDisplay address={userPage.kaspaAddress} size={200} />
+											<div className="bg-white p-3 sm:p-6 rounded-2xl shadow-2xl">
+												<QRCodeDisplay address={userPage.kaspaAddress} responsive={true} />
 											</div>
 										</div>
-										<p className="text-center text-gray-400 text-sm">
+										<p className="text-center text-gray-400 text-xs sm:text-sm">
 											Scan with your Kaspa wallet app
 										</p>
 									</TabsContent>
 									
-									<TabsContent value="address" className="space-y-6">
-										<div className="p-6 rounded-2xl border border-[#70C7BA]/30 bg-slate-800/50 backdrop-blur-sm">
+									<TabsContent value="address" className="space-y-4 sm:space-y-6">
+										<div className="p-4 sm:p-6 rounded-2xl border border-[#70C7BA]/30 bg-slate-800/50 backdrop-blur-sm">
 											<p className="text-xs text-gray-400 mb-2">Kaspa Address:</p>
-											<p className="font-mono text-sm text-white break-all">
+											<p className="font-mono text-xs sm:text-sm text-white break-all">
 												{userPage.kaspaAddress}
 											</p>
 										</div>
@@ -397,12 +400,12 @@ export default function UserProfilePage({ params }: PageProps) {
 								</Tabs>
 								
 								{/* Action Buttons */}
-								<div className="space-y-4">
+								<div className="space-y-3 sm:space-y-4">
 									<Button
 										onClick={handleCopyAddress}
-										className="w-full bg-[#70C7BA] hover:bg-[#5ba8a0] text-white font-semibold py-4 rounded-xl shadow-lg hover:shadow-[#70C7BA]/25 transition-all duration-300"
+										className="w-full bg-[#70C7BA] hover:bg-[#5ba8a0] text-white font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:shadow-[#70C7BA]/25 transition-all duration-300 text-sm sm:text-base"
 									>
-										<Copy className="w-5 h-5 mr-2" />
+										<Copy className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
 										{copied ? 'Address Copied!' : 'Copy Kaspa Address'}
 									</Button>
 									
@@ -416,9 +419,9 @@ export default function UserProfilePage({ params }: PageProps) {
 												: `kaspa:${cleanAddress}`;
 											window.open(kaspaUrl, '_blank');
 										}}
-										className="w-full border-[#70C7BA]/50 text-[#70C7BA] hover:bg-[#70C7BA]/10 hover:border-[#70C7BA] py-4 rounded-xl backdrop-blur-sm transition-all duration-300"
+										className="w-full border-[#70C7BA]/50 text-[#70C7BA] hover:bg-[#70C7BA]/10 hover:border-[#70C7BA] py-3 sm:py-4 rounded-xl backdrop-blur-sm transition-all duration-300 text-sm sm:text-base"
 									>
-										<ExternalLink className="w-5 h-5 mr-2" />
+										<ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
 										Open in Wallet
 									</Button>
 								</div>
@@ -428,15 +431,15 @@ export default function UserProfilePage({ params }: PageProps) {
 
 					{/* Wallet Activity Section */}
 					{userPage.kaspaAddress && (
-						<div className="lg:col-span-3 mb-8">
-							<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start align-top">
+						<div className="lg:col-span-3 mb-6 sm:mb-8">
+							<div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-start">
 								{/* Wallet Balance */}
-								<div className="flex">
+								<div className="w-full">
 									<WalletBalance address={userPage.kaspaAddress} />
 								</div>
 								
 								{/* Recent Transactions */}
-								<div className="flex">
+								<div className="w-full">
 									<TransactionList address={userPage.kaspaAddress} limit={5} />
 								</div>
 							</div>

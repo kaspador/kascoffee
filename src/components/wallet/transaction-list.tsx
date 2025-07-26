@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { TransactionCard } from './transaction-card';
 import { History, RefreshCw } from 'lucide-react';
+import { getKaspaPrice } from '@/lib/utils';
 
 interface Transaction {
   id: string;
@@ -26,6 +27,7 @@ interface TransactionListProps {
 
 export function TransactionList({ address, limit = 10 }: TransactionListProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [kaspaPrice, setKaspaPrice] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
@@ -35,19 +37,41 @@ export function TransactionList({ address, limit = 10 }: TransactionListProps) {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`/api/wallet/transactions/${encodeURIComponent(address)}?limit=${showAll ? 50 : limit}`);
-      if (!response.ok) {
+      // Fetch price and transactions in parallel
+      const [pricePromise, transactionsPromise] = await Promise.allSettled([
+        getKaspaPrice(),
+        fetch(`/api/wallet/transactions/${encodeURIComponent(address)}?limit=${showAll ? 50 : limit}`)
+      ]);
+
+      // Handle price fetch result
+      if (pricePromise.status === 'fulfilled') {
+        setKaspaPrice(pricePromise.value);
+      } else {
+        console.error('Failed to fetch Kaspa price:', pricePromise.reason);
+        // Keep the previous price or set a fallback
+        if (kaspaPrice === null) {
+          setKaspaPrice(0.10); // Fallback price
+        }
+      }
+
+      // Handle transactions fetch result
+      if (transactionsPromise.status === 'fulfilled') {
+        const response = transactionsPromise.value;
+        if (!response.ok) {
+          throw new Error('Failed to fetch transactions');
+        }
+        
+        const data = await response.json();
+        setTransactions(data.transactions || []);
+      } else {
         throw new Error('Failed to fetch transactions');
       }
-      
-      const data = await response.json();
-      setTransactions(data.transactions || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch transactions');
     } finally {
       setLoading(false);
     }
-  }, [address, showAll, limit]);
+  }, [address, showAll, limit, kaspaPrice]);
 
   useEffect(() => {
     if (address) {
@@ -148,7 +172,11 @@ export function TransactionList({ address, limit = 10 }: TransactionListProps) {
         ) : (
           <div className="space-y-3">
             {displayedTransactions.map((transaction) => (
-              <TransactionCard key={transaction.id} transaction={transaction} />
+              <TransactionCard 
+                key={transaction.id} 
+                transaction={transaction} 
+                kaspaPrice={kaspaPrice || 0.10} 
+              />
             ))}
             
             {/* Show More/Less Button */}

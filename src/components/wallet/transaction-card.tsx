@@ -3,6 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowDownLeft, ArrowUpRight, Clock, ExternalLink } from 'lucide-react';
+import { formatUSD } from '@/lib/utils';
 
 interface Transaction {
   id: string;
@@ -19,6 +20,7 @@ interface Transaction {
 
 interface TransactionCardProps {
   transaction: Transaction;
+  kaspaPrice?: number;
 }
 
 const formatDate = (timestamp: number) => {
@@ -34,7 +36,10 @@ const getKaspaExplorerUrl = (hash: string) => {
   return `https://explorer.kaspa.org/transactions/${hash}`;
 };
 
-export const TransactionCard: React.FC<TransactionCardProps> = ({ transaction }) => {
+export const TransactionCard: React.FC<TransactionCardProps> = ({ 
+  transaction, 
+  kaspaPrice = 0.10 // Fallback price
+}) => {
   const isDonation = transaction.type === 'donation';
 
   return (
@@ -99,7 +104,7 @@ export const TransactionCard: React.FC<TransactionCardProps> = ({ transaction })
               {isDonation ? '+' : '-'}{transaction.formattedAmount} KAS
             </div>
             <div className="text-xs text-gray-400">
-              ${(transaction.amountKas * 0.15).toFixed(2)} USD
+              ${formatUSD(transaction.amountKas, kaspaPrice)} USD
             </div>
           </div>
         </div>

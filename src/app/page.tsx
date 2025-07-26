@@ -25,12 +25,12 @@ export default function LandingPage() {
 						</div>
 
 						{/* Main Logo */}
-						<div className="flex items-center justify-center gap-6 mb-8">
+						<div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-6 sm:mb-8 px-4">
 							<div className="relative coffee-container">
-								<Coffee className="h-20 w-20 text-[#70C7BA] coffee-icon drop-shadow-lg hover:scale-110 transition-all duration-300 cursor-pointer" />
-								<div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-[#49EACB] to-[#70C7BA] rounded-full animate-bounce"></div>
+								<Coffee className="h-16 w-16 sm:h-20 sm:w-20 text-[#70C7BA] coffee-icon drop-shadow-lg hover:scale-110 transition-all duration-300 cursor-pointer" />
+								<div className="absolute -top-2 -right-2 w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-r from-[#49EACB] to-[#70C7BA] rounded-full animate-bounce"></div>
 							</div>
-							<h1 className="text-7xl md:text-8xl lg:text-9xl font-black leading-tight">
+							<h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black leading-tight text-center sm:text-left">
 								<span className="bg-gradient-to-r from-white via-[#70C7BA] to-[#49EACB] bg-clip-text text-transparent">
 									kas.coffee
 								</span>
@@ -38,7 +38,7 @@ export default function LandingPage() {
 						</div>
 						
 						{/* Hero Description */}
-						<p className="text-2xl md:text-3xl text-gray-300 font-light leading-relaxed max-w-3xl mx-auto">
+						<p className="text-lg sm:text-2xl md:text-3xl text-gray-300 font-light leading-relaxed max-w-3xl mx-auto px-4 text-center">
 							Create your <span className="text-[#70C7BA] font-semibold">personalized donation page</span> and start accepting <span className="text-[#49EACB] font-semibold">Kaspa cryptocurrency</span> in minutes
 						</p>
 						

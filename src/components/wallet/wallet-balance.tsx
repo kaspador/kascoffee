@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Wallet, TrendingUp, TrendingDown, Minus, RefreshCw } from 'lucide-react';
+import { getKaspaPrice, formatUSD } from '@/lib/utils';
 
 interface WalletBalanceProps {
   address: string;
@@ -24,6 +25,7 @@ interface SnapshotData {
 export function WalletBalance({ address }: WalletBalanceProps) {
   const [balance, setBalance] = useState<BalanceData | null>(null);
   const [change, setChange] = useState<SnapshotData | null>(null);
+  const [kaspaPrice, setKaspaPrice] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,31 +34,52 @@ export function WalletBalance({ address }: WalletBalanceProps) {
       setLoading(true);
       setError(null);
       
-      // Fetch current balance
-      const balanceResponse = await fetch(`/api/wallet/balance/${encodeURIComponent(address)}`);
-      if (!balanceResponse.ok) {
-        throw new Error('Failed to fetch balance');
-      }
-      const balanceData = await balanceResponse.json();
-      setBalance(balanceData);
+      // Fetch current price and balance in parallel
+      const [pricePromise, balancePromise] = await Promise.allSettled([
+        getKaspaPrice(),
+        fetch(`/api/wallet/balance/${encodeURIComponent(address)}`)
+      ]);
 
-      // Take a snapshot to get change data
-      const snapshotResponse = await fetch(`/api/wallet/snapshot/${encodeURIComponent(address)}`, {
-        method: 'POST'
-      });
-      if (snapshotResponse.ok) {
-        const snapshotData = await snapshotResponse.json();
-        setChange({
-          balanceChange: snapshotData.balanceChange,
-          changePercentage: snapshotData.changePercentage
+      // Handle price fetch result
+      if (pricePromise.status === 'fulfilled') {
+        setKaspaPrice(pricePromise.value);
+      } else {
+        console.error('Failed to fetch Kaspa price:', pricePromise.reason);
+        // Keep the previous price or set a fallback
+        if (kaspaPrice === null) {
+          setKaspaPrice(0.10); // Fallback price
+        }
+      }
+
+      // Handle balance fetch result
+      if (balancePromise.status === 'fulfilled') {
+        const balanceResponse = balancePromise.value;
+        if (!balanceResponse.ok) {
+          throw new Error('Failed to fetch balance');
+        }
+        const balanceData = await balanceResponse.json();
+        setBalance(balanceData);
+
+        // Take a snapshot to get change data
+        const snapshotResponse = await fetch(`/api/wallet/snapshot/${encodeURIComponent(address)}`, {
+          method: 'POST'
         });
+        if (snapshotResponse.ok) {
+          const snapshotData = await snapshotResponse.json();
+          setChange({
+            balanceChange: snapshotData.balanceChange,
+            changePercentage: snapshotData.changePercentage
+          });
+        }
+      } else {
+        throw new Error('Failed to fetch balance');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch wallet data');
     } finally {
       setLoading(false);
     }
-  }, [address]);
+  }, [address, kaspaPrice]);
 
   useEffect(() => {
     if (address) {
@@ -67,8 +90,9 @@ export function WalletBalance({ address }: WalletBalanceProps) {
     }
   }, [address, fetchBalance]);
 
-  const formatUSD = (kas: number) => {
-    return (kas * 0.15).toFixed(2); // Approximate KAS to USD rate
+  const formatUSDValue = (kas: number) => {
+    const price = kaspaPrice || 0.10; // Use cached price or fallback
+    return formatUSD(kas, price);
   };
 
   const getTrendIcon = () => {
@@ -149,7 +173,12 @@ export function WalletBalance({ address }: WalletBalanceProps) {
                 {balance.formattedBalance} KAS
               </div>
               <div className="text-lg text-gray-300">
-                ≈ ${formatUSD(balance.balanceKas)} USD
+                ≈ ${formatUSDValue(balance.balanceKas)} USD
+                {kaspaPrice && (
+                  <div className="text-xs text-gray-400 mt-1">
+                    @ ${kaspaPrice.toFixed(4)}/KAS
+                  </div>
+                )}
               </div>
             </div>
 
