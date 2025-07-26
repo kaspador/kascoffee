@@ -40,17 +40,24 @@ export async function GET(
     // TODO: Implement view count increment in Directus
     // For now, we'll skip this feature until collections are set up
 
-    // Clean corrupted image URLs that may have trailing semicolons/commas
+    // Clean corrupted image URLs that may have trailing semicolons/commas  
     const cleanImageUrl = (url: string | null): string | null => {
       if (!url) return null;
+      if (typeof url !== 'string') return null;
       
-      const cleaned = url.toString().trim()
+      console.log(`[URL-CLEAN] Original: "${url}"`);
+      
+      const cleaned = url.trim()
         .replace(/[;,\s]+$/g, '') // Remove trailing semicolons, commas, whitespace
         .replace(/;/g, '') // Remove any internal semicolons
         .replace(/,$/, ''); // Remove trailing commas
       
-      // Return the cleaned URL only if it's not empty
-      return cleaned || null;
+      console.log(`[URL-CLEAN] Cleaned: "${cleaned}"`);
+      
+      // Only return null if the cleaned URL is actually empty
+      if (cleaned.length === 0) return null;
+      
+      return cleaned;
     };
 
     // Debug image URLs
@@ -58,7 +65,8 @@ export async function GET(
       raw_profile: userPage.profile_image,
       raw_background: userPage.background_image,
       cleaned_profile: cleanImageUrl(userPage.profile_image),
-      cleaned_background: cleanImageUrl(userPage.background_image)
+      cleaned_background: cleanImageUrl(userPage.background_image),
+      all_userPage_fields: Object.keys(userPage)
     });
 
     const userData = {
@@ -68,8 +76,9 @@ export async function GET(
       shortDescription: userPage.short_description,
       longDescription: userPage.long_description,
       kaspaAddress: userPage.kaspa_address,
-      profileImage: cleanImageUrl(userPage.profile_image),
-      backgroundImage: cleanImageUrl(userPage.background_image),
+      // TEMPORARILY DISABLE CLEANING TO TEST
+      profileImage: userPage.profile_image,
+      backgroundImage: userPage.background_image,
       backgroundColor: userPage.background_color || '#0f172a',
       foregroundColor: userPage.foreground_color || '#ffffff',
       isActive: userPage.is_active,
