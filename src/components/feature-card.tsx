@@ -1,4 +1,4 @@
-import { Component, createElement, FunctionComponent, ReactElement, ReactNode } from "react";
+import { createElement, FunctionComponent } from "react";
 import { Balancer } from 'react-wrap-balancer'
 
 export default function FeatureCard(props: {
