@@ -316,11 +316,11 @@ export default function DashboardPage() {
 
 				{/* Management Tabs - better mobile design */}
 				<Tabs defaultValue="profile" className="space-y-6 sm:space-y-8">
-					<div className="bg-gradient-to-r from-white/5 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-1">
-						<TabsList className="grid w-full grid-cols-3 bg-transparent gap-1">
+					<div className="bg-gradient-to-r from-white/5 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-1.5">
+						<TabsList className="grid w-full grid-cols-3 bg-transparent gap-0.5">
 							<TabsTrigger 
 								value="profile" 
-								className="data-[state=active]:bg-[#70C7BA] data-[state=active]:text-white text-gray-300 rounded-xl font-kaspa-subheader font-bold transition-all duration-300 text-xs sm:text-sm py-2 sm:py-3"
+								className="data-[state=active]:bg-[#70C7BA] data-[state=active]:text-white text-gray-300 rounded-xl font-kaspa-subheader font-bold transition-all duration-300 text-xs sm:text-sm py-2.5 sm:py-3 px-2 sm:px-4 flex-1 justify-center"
 							>
 								<User className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
 								<span className="hidden sm:inline">Profile</span>
@@ -328,7 +328,7 @@ export default function DashboardPage() {
 							</TabsTrigger>
 							<TabsTrigger 
 								value="theme" 
-								className="data-[state=active]:bg-[#49EACB] data-[state=active]:text-white text-gray-300 rounded-xl font-kaspa-subheader font-bold transition-all duration-300 text-xs sm:text-sm py-2 sm:py-3"
+								className="data-[state=active]:bg-[#49EACB] data-[state=active]:text-white text-gray-300 rounded-xl font-kaspa-subheader font-bold transition-all duration-300 text-xs sm:text-sm py-2.5 sm:py-3 px-2 sm:px-4 flex-1 justify-center"
 							>
 								<Palette className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
 								<span className="hidden sm:inline">Theme</span>
@@ -336,7 +336,7 @@ export default function DashboardPage() {
 							</TabsTrigger>
 							<TabsTrigger 
 								value="socials" 
-								className="data-[state=active]:bg-[#70C7BA] data-[state=active]:text-white text-gray-300 rounded-xl font-kaspa-subheader font-bold transition-all duration-300 text-xs sm:text-sm py-2 sm:py-3"
+								className="data-[state=active]:bg-[#70C7BA] data-[state=active]:text-white text-gray-300 rounded-xl font-kaspa-subheader font-bold transition-all duration-300 text-xs sm:text-sm py-2.5 sm:py-3 px-2 sm:px-4 flex-1 justify-center"
 							>
 								<LinkIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
 								<span className="hidden sm:inline">Socials</span>
