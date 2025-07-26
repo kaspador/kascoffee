@@ -40,6 +40,16 @@ export async function GET(
     // TODO: Implement view count increment in Directus
     // For now, we'll skip this feature until collections are set up
 
+    // Clean corrupted image URLs that may have trailing semicolons/commas
+    const cleanImageUrl = (url: string | null): string | null => {
+      if (!url) return null;
+      return url.toString().trim()
+        .replace(/[;,\s]+$/g, '') // Remove trailing semicolons, commas, whitespace
+        .replace(/;/g, '') // Remove any internal semicolons
+        .replace(/,$/, '') // Remove trailing commas
+        || null;
+    };
+
     const userData = {
       ...userPage,
       // Map database field names to frontend expected names
@@ -47,8 +57,8 @@ export async function GET(
       shortDescription: userPage.short_description,
       longDescription: userPage.long_description,
       kaspaAddress: userPage.kaspa_address,
-      profileImage: userPage.profile_image,
-      backgroundImage: userPage.background_image,
+      profileImage: cleanImageUrl(userPage.profile_image),
+      backgroundImage: cleanImageUrl(userPage.background_image),
       backgroundColor: userPage.background_color || '#0f172a',
       foregroundColor: userPage.foreground_color || '#ffffff',
       isActive: userPage.is_active,

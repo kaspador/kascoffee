@@ -219,12 +219,27 @@ export default function UserProfilePage({ params }: PageProps) {
 		github: FaGithub,
 	};
 
+	// Clean and validate background image URL
+	const getBackgroundImageStyle = () => {
+		const cleanBgImage = userPage.backgroundImage?.trim();
+		if (!cleanBgImage) return undefined;
+		
+		try {
+			// Basic URL validation
+			const url = new URL(cleanBgImage);
+			return `url(${cleanBgImage})`;
+		} catch {
+			console.warn('Invalid background image URL:', userPage.backgroundImage);
+			return undefined;
+		}
+	};
+
 	return (
 		<div 
 			className="min-h-screen relative overflow-hidden"
 			style={{ 
 				backgroundColor: userPage.backgroundColor,
-				backgroundImage: userPage.backgroundImage ? `url(${userPage.backgroundImage})` : undefined,
+				backgroundImage: getBackgroundImageStyle(),
 				backgroundSize: 'cover',
 				backgroundPosition: 'center',
 				backgroundRepeat: 'no-repeat'
@@ -323,9 +338,14 @@ export default function UserProfilePage({ params }: PageProps) {
 						<div className="w-40 h-40 rounded-full bg-gradient-to-br from-[#70C7BA] to-[#49EACB] p-1 shadow-2xl">
 							<Avatar className="w-full h-full border-4 border-slate-900">
 								<AvatarImage 
-									src={userPage.profileImage || undefined}
+									src={userPage.profileImage && userPage.profileImage.trim() ? userPage.profileImage.trim() : undefined}
 									alt={userPage.displayName || userPage.handle}
 									className="object-cover"
+									onError={(e) => {
+										console.warn('Profile image failed to load:', userPage.profileImage);
+										// Hide the broken image
+										(e.target as HTMLImageElement).style.display = 'none';
+									}}
 								/>
 								<AvatarFallback className="text-4xl font-bold bg-gradient-to-br from-[#70C7BA] to-[#49EACB] text-white">
 									{(userPage.displayName || userPage.handle)?.charAt(0)?.toUpperCase() || 'U'}
