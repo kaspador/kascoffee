@@ -40,33 +40,8 @@ export async function GET(
     // TODO: Implement view count increment in Directus
     // For now, we'll skip this feature until collections are set up
 
-    // Clean corrupted image URLs that may have trailing semicolons/commas  
-    const cleanImageUrl = (url: string | null): string | null => {
-      if (!url) return null;
-      if (typeof url !== 'string') return null;
-      
-      console.log(`[URL-CLEAN] Original: "${url}"`);
-      
-      const cleaned = url.trim()
-        .replace(/[;,\s]+$/g, '') // Remove trailing semicolons, commas, whitespace
-        .replace(/;/g, '') // Remove any internal semicolons
-        .replace(/,$/, ''); // Remove trailing commas
-      
-      console.log(`[URL-CLEAN] Cleaned: "${cleaned}"`);
-      
-      // Only return null if the cleaned URL is actually empty
-      if (cleaned.length === 0) return null;
-      
-      return cleaned;
-    };
-
-    // Debug EVERYTHING that comes from database
-    console.log(`[USER-PAGE-API] ===== FULL DATABASE RESPONSE FOR ${handle} =====`);
-    console.log(`[USER-PAGE-API] Raw userPage object:`, JSON.stringify(userPage, null, 2));
-    console.log(`[USER-PAGE-API] userPage.profile_image specifically:`, userPage.profile_image);
-    console.log(`[USER-PAGE-API] userPage.background_image specifically:`, userPage.background_image);
-    console.log(`[USER-PAGE-API] All fields present:`, Object.keys(userPage));
-    console.log(`[USER-PAGE-API] ===============================================`);
+        // Simple debug logging
+    console.log(`[USER-PAGE-API] Images for ${handle}: profile="${userPage.profile_image}", background="${userPage.background_image}"`);
 
     const userData = {
       ...userPage,
@@ -75,11 +50,9 @@ export async function GET(
       shortDescription: userPage.short_description,
       longDescription: userPage.long_description,
       kaspaAddress: userPage.kaspa_address,
-      // TEMPORARILY RETURN RAW VALUES TO DEBUG
+      // Simple direct mapping - same as background image that works
       profileImage: userPage.profile_image,
       backgroundImage: userPage.background_image,
-      // DEBUG: Include raw database response  
-      _DEBUG_RAW_DB_RESPONSE: userPage,
       backgroundColor: userPage.background_color || '#0f172a',
       foregroundColor: userPage.foreground_color || '#ffffff',
       isActive: userPage.is_active,
