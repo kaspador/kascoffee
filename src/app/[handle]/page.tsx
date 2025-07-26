@@ -103,6 +103,22 @@ export default function UserProfilePage({ params }: PageProps) {
 		});
 		setUserPage(data);
 
+		// Debug image processing after setting user page
+		if (data?.profileImage) {
+			console.log(`[FRONTEND] Profile image processing:`, {
+				raw: data.profileImage,
+				trimmed: data.profileImage?.trim(),
+				isValidUrl: (() => {
+					try {
+						new URL(data.profileImage?.trim() || '');
+						return true;
+					} catch {
+						return false;
+					}
+				})()
+			});
+		}
+
 				// Track page view with unique IP filtering
 				if (data) {
 					try {
@@ -244,6 +260,27 @@ export default function UserProfilePage({ params }: PageProps) {
 		}
 	};
 
+	// Clean and validate profile image URL (same logic as background)
+	const getCleanProfileImageUrl = () => {
+		const cleanProfileImage = userPage.profileImage?.trim();
+		if (!cleanProfileImage) return undefined;
+		
+		try {
+			// Try to validate as URL first
+			new URL(cleanProfileImage);
+			console.log('Profile image URL valid:', cleanProfileImage);
+			return cleanProfileImage;
+		} catch {
+			// If URL validation fails, still try to use it if it looks like a reasonable URL
+			if (cleanProfileImage.startsWith('http://') || cleanProfileImage.startsWith('https://')) {
+				console.warn('Profile image URL validation failed but using anyway:', cleanProfileImage);
+				return cleanProfileImage;
+			}
+			console.warn('Invalid profile image URL:', userPage.profileImage);
+			return undefined;
+		}
+	};
+
 	return (
 		<div 
 			className="min-h-screen relative overflow-hidden"
@@ -348,11 +385,11 @@ export default function UserProfilePage({ params }: PageProps) {
 						<div className="w-40 h-40 rounded-full bg-gradient-to-br from-[#70C7BA] to-[#49EACB] p-1 shadow-2xl">
 							<Avatar className="w-full h-full border-4 border-slate-900">
 								<AvatarImage 
-									src={userPage.profileImage || undefined}
+									src={getCleanProfileImageUrl()}
 									alt={userPage.displayName || userPage.handle}
 									className="object-cover"
 									onError={(e) => {
-										console.warn('Profile image failed to load:', userPage.profileImage);
+										console.warn('Profile image failed to load. Raw:', userPage.profileImage, 'Cleaned:', getCleanProfileImageUrl());
 										// Hide the broken image
 										(e.target as HTMLImageElement).style.display = 'none';
 									}}
