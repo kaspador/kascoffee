@@ -95,8 +95,13 @@ export default function UserProfilePage({ params }: PageProps) {
 			setLoading(true);
 	
 			try {
-				const data = await fetchUserPage(handle);
-				setUserPage(data);
+						const data = await fetchUserPage(handle);
+		console.log(`[FRONTEND] User page data for ${handle}:`, {
+			profileImage: data?.profileImage,
+			backgroundImage: data?.backgroundImage,
+			handle: data?.handle
+		});
+		setUserPage(data);
 
 				// Track page view with unique IP filtering
 				if (data) {
@@ -225,10 +230,15 @@ export default function UserProfilePage({ params }: PageProps) {
 		if (!cleanBgImage) return undefined;
 		
 		try {
-			// Basic URL validation - will throw if invalid
+			// Try to validate as URL first
 			new URL(cleanBgImage);
 			return `url(${cleanBgImage})`;
 		} catch {
+			// If URL validation fails, still try to use it if it looks like a reasonable URL
+			if (cleanBgImage.startsWith('http://') || cleanBgImage.startsWith('https://')) {
+				console.warn('URL validation failed but using anyway:', cleanBgImage);
+				return `url(${cleanBgImage})`;
+			}
 			console.warn('Invalid background image URL:', userPage.backgroundImage);
 			return undefined;
 		}
@@ -338,7 +348,7 @@ export default function UserProfilePage({ params }: PageProps) {
 						<div className="w-40 h-40 rounded-full bg-gradient-to-br from-[#70C7BA] to-[#49EACB] p-1 shadow-2xl">
 							<Avatar className="w-full h-full border-4 border-slate-900">
 								<AvatarImage 
-									src={userPage.profileImage && userPage.profileImage.trim() ? userPage.profileImage.trim() : undefined}
+									src={userPage.profileImage || undefined}
 									alt={userPage.displayName || userPage.handle}
 									className="object-cover"
 									onError={(e) => {

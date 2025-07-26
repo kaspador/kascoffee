@@ -43,12 +43,23 @@ export async function GET(
     // Clean corrupted image URLs that may have trailing semicolons/commas
     const cleanImageUrl = (url: string | null): string | null => {
       if (!url) return null;
-      return url.toString().trim()
+      
+      const cleaned = url.toString().trim()
         .replace(/[;,\s]+$/g, '') // Remove trailing semicolons, commas, whitespace
         .replace(/;/g, '') // Remove any internal semicolons
-        .replace(/,$/, '') // Remove trailing commas
-        || null;
+        .replace(/,$/, ''); // Remove trailing commas
+      
+      // Return the cleaned URL only if it's not empty
+      return cleaned || null;
     };
+
+    // Debug image URLs
+    console.log(`[USER-PAGE-API] Raw image URLs for ${handle}:`, {
+      raw_profile: userPage.profile_image,
+      raw_background: userPage.background_image,
+      cleaned_profile: cleanImageUrl(userPage.profile_image),
+      cleaned_background: cleanImageUrl(userPage.background_image)
+    });
 
     const userData = {
       ...userPage,

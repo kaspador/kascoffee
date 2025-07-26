@@ -51,6 +51,13 @@ export async function POST(
     let balanceChange = 0;
     let changePercentage = 0;
     
+    // Use admin token for wallet operations (server-side only)
+    if (process.env.DIRECTUS_TOKEN) {
+      await DirectusAPI.setToken(process.env.DIRECTUS_TOKEN);
+    } else {
+      throw new Error('DIRECTUS_TOKEN not configured for wallet operations');
+    }
+
     if (existingHourSnapshot) {
       // Update existing snapshot
       await DirectusAPI.updateWalletSnapshot(existingHourSnapshot.id, {
