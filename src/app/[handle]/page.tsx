@@ -367,25 +367,27 @@ export default function UserProfilePage({ params }: PageProps) {
 						</div>
 					</div>
 					
-					<h1 
-						className="text-5xl md:text-6xl font-black mb-4"
-						style={{ color: userPage.foregroundColor }}
-					>
-						{userPage.displayName || userPage.handle}
-					</h1>
-					
-					<Badge 
-						className="mb-6 px-6 py-3 text-lg rounded-full backdrop-blur-sm"
-						style={{ 
-							backgroundColor: `${userPage.foregroundColor}20`,
-							color: userPage.foregroundColor,
-							borderColor: `${userPage.foregroundColor}30`,
-							borderWidth: '1px',
-							borderStyle: 'solid'
-						}}
-					>
-						@{userPage.handle}
-					</Badge>
+					<div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+						<h1 
+							className="text-5xl md:text-6xl font-black"
+							style={{ color: userPage.foregroundColor }}
+						>
+							{userPage.displayName || userPage.handle}
+						</h1>
+						
+						<Badge 
+							className="px-6 py-3 text-lg rounded-full backdrop-blur-sm flex-shrink-0"
+							style={{ 
+								backgroundColor: `${userPage.foregroundColor}20`,
+								color: userPage.foregroundColor,
+								borderColor: `${userPage.foregroundColor}30`,
+								borderWidth: '1px',
+								borderStyle: 'solid'
+							}}
+						>
+							@{userPage.handle}
+						</Badge>
+					</div>
 					
 					{userPage.shortDescription && (
 						<p 
