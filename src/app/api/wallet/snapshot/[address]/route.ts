@@ -108,7 +108,7 @@ export async function POST(
       changePercentage,
       totalSnapshots: allSnapshots.length
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to create balance snapshot' },
       { status: 500 }
@@ -170,7 +170,7 @@ export async function GET(
         timeRange: hours
       }
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch balance snapshots' },
       { status: 500 }

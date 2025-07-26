@@ -41,14 +41,14 @@ export async function GET(request: NextRequest) {
 					}
 				});
 			}
-		} catch (error) {
+		} catch {
 			// Silent error handling
 		}
 		
 		return NextResponse.json({ 
 			userPage: null // No profile set up yet
 		});
-	} catch (error) {
+	} catch {
 		return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 	}
 }

@@ -138,7 +138,7 @@ export const DirectusAPI = {
       }
       
       return null;
-    } catch (error) {
+    } catch {
       return null;
     }
   },
