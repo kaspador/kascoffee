@@ -44,19 +44,20 @@ export async function POST(
     const now = new Date();
     const hour = now.toISOString().slice(0, 13); // YYYY-MM-DDTHH
     
+    // Use admin token for wallet operations (server-side only)
+    if (process.env.DIRECTUS_TOKEN) {
+      await DirectusAPI.setToken(process.env.DIRECTUS_TOKEN);
+      console.log('[WALLET-SNAPSHOT] Using admin token for operations');
+    } else {
+      throw new Error('DIRECTUS_TOKEN not configured for wallet operations');
+    }
+
     // Check if we already have a snapshot for this hour
     const existingSnapshots = await DirectusAPI.getWalletSnapshots(kaspaAddress, 1);
     const existingHourSnapshot = existingSnapshots.find(s => s.hour_key === hour);
     
     let balanceChange = 0;
     let changePercentage = 0;
-    
-    // Use admin token for wallet operations (server-side only)
-    if (process.env.DIRECTUS_TOKEN) {
-      await DirectusAPI.setToken(process.env.DIRECTUS_TOKEN);
-    } else {
-      throw new Error('DIRECTUS_TOKEN not configured for wallet operations');
-    }
 
     if (existingHourSnapshot) {
       // Update existing snapshot
