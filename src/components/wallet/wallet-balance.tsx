@@ -3,8 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Wallet, TrendingUp, TrendingDown, Minus, RefreshCw, ExternalLink } from 'lucide-react';
-import { getKaspaPrice, formatUSD } from '@/lib/utils';
+import { Wallet, TrendingUp, TrendingDown, Minus, RefreshCw } from 'lucide-react';
 
 interface WalletBalanceProps {
   address: string;
@@ -25,7 +24,6 @@ interface SnapshotData {
 export function WalletBalance({ address }: WalletBalanceProps) {
   const [balance, setBalance] = useState<BalanceData | null>(null);
   const [change, setChange] = useState<SnapshotData | null>(null);
-  const [kaspaPrice, setKaspaPrice] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,52 +32,31 @@ export function WalletBalance({ address }: WalletBalanceProps) {
       setLoading(true);
       setError(null);
       
-      // Fetch current price and balance in parallel
-      const [pricePromise, balancePromise] = await Promise.allSettled([
-        getKaspaPrice(),
-        fetch(`/api/wallet/balance/${encodeURIComponent(address)}`)
-      ]);
-
-      // Handle price fetch result
-      if (pricePromise.status === 'fulfilled') {
-        setKaspaPrice(pricePromise.value);
-      } else {
-        console.error('Failed to fetch Kaspa price:', pricePromise.reason);
-        // Keep the previous price or set a fallback
-        if (kaspaPrice === null) {
-          setKaspaPrice(0.10); // Fallback price
-        }
-      }
-
-      // Handle balance fetch result
-      if (balancePromise.status === 'fulfilled') {
-        const balanceResponse = balancePromise.value;
-        if (!balanceResponse.ok) {
-          throw new Error('Failed to fetch balance');
-        }
-        const balanceData = await balanceResponse.json();
-        setBalance(balanceData);
-
-        // Take a snapshot to get change data
-        const snapshotResponse = await fetch(`/api/wallet/snapshot/${encodeURIComponent(address)}`, {
-          method: 'POST'
-        });
-        if (snapshotResponse.ok) {
-          const snapshotData = await snapshotResponse.json();
-          setChange({
-            balanceChange: snapshotData.balanceChange,
-            changePercentage: snapshotData.changePercentage
-          });
-        }
-      } else {
+      // Fetch current balance
+      const balanceResponse = await fetch(`/api/wallet/balance/${encodeURIComponent(address)}`);
+      if (!balanceResponse.ok) {
         throw new Error('Failed to fetch balance');
+      }
+      const balanceData = await balanceResponse.json();
+      setBalance(balanceData);
+
+      // Take a snapshot to get change data
+      const snapshotResponse = await fetch(`/api/wallet/snapshot/${encodeURIComponent(address)}`, {
+        method: 'POST'
+      });
+      if (snapshotResponse.ok) {
+        const snapshotData = await snapshotResponse.json();
+        setChange({
+          balanceChange: snapshotData.balanceChange,
+          changePercentage: snapshotData.changePercentage
+        });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch wallet data');
     } finally {
       setLoading(false);
     }
-  }, [address, kaspaPrice]);
+  }, [address]);
 
   useEffect(() => {
     if (address) {
@@ -90,9 +67,8 @@ export function WalletBalance({ address }: WalletBalanceProps) {
     }
   }, [address, fetchBalance]);
 
-  const formatUSDValue = (kas: number) => {
-    const price = kaspaPrice || 0.10; // Use cached price or fallback
-    return formatUSD(kas, price);
+  const formatUSD = (kas: number) => {
+    return (kas * 0.15).toFixed(2); // Approximate KAS to USD rate
   };
 
   const getTrendIcon = () => {
@@ -173,12 +149,7 @@ export function WalletBalance({ address }: WalletBalanceProps) {
                 {balance.formattedBalance} KAS
               </div>
               <div className="text-lg text-gray-300">
-                ≈ ${formatUSDValue(balance.balanceKas)} USD
-                {kaspaPrice && (
-                  <div className="text-xs text-gray-400 mt-1">
-                    @ ${kaspaPrice.toFixed(4)}/KAS
-                  </div>
-                )}
+                ≈ ${formatUSD(balance.balanceKas)} USD
               </div>
             </div>
 
@@ -210,19 +181,9 @@ export function WalletBalance({ address }: WalletBalanceProps) {
             {/* Address - Compact */}
             <div className="pt-3 border-t border-[#70C7BA]/20">
               <div className="text-xs text-gray-400 mb-2 text-center">Wallet Address</div>
-              <a
-                href={`https://kas.fyi/address/kaspa:${balance.address.replace(/^kaspa:/, '')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block font-mono text-xs text-gray-300 break-all bg-black/20 p-3 rounded text-center hover:bg-black/40 hover:text-[#70C7BA] transition-all duration-200 cursor-pointer group"
-                title="View on kas.fyi explorer"
-              >
-                <span className="group-hover:underline">{balance.address}</span>
-                <div className="flex items-center justify-center gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="text-[10px] text-[#70C7BA]">View on kas.fyi</span>
-                  <ExternalLink className="w-3 h-3 text-[#70C7BA]" />
-                </div>
-              </a>
+              <div className="font-mono text-xs text-gray-300 break-all bg-black/20 p-3 rounded text-center">
+                {balance.address}
+              </div>
             </div>
           </div>
         )}

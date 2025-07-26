@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Coffee, Heart, Users, Zap, ArrowRight, Star, Github, Twitter } from "lucide-react";
 import { Navbar } from "@/components/navbar";
+import FeatureCard from "@/components/feature-card";
 
 export default function AboutPage() {
 	return (
@@ -11,9 +12,9 @@ export default function AboutPage() {
 			<div className="absolute inset-0 bg-gradient-to-r from-[#70C7BA]/10 via-[#49EACB]/10 to-[#70C7BA]/10 animate-pulse"></div>
 			<div className="absolute top-20 left-20 w-72 h-72 bg-[#70C7BA]/20 rounded-full blur-3xl animate-pulse"></div>
 			<div className="absolute bottom-20 right-20 w-96 h-96 bg-[#49EACB]/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-			
+
 			<Navbar />
-			
+
 			<div className="relative z-10 pt-24 pb-16 px-6">
 				<div className="max-w-6xl mx-auto">
 					{/* Hero Section */}
@@ -75,29 +76,23 @@ export default function AboutPage() {
 							Built for <span className="bg-gradient-to-r from-[#70C7BA] to-[#49EACB] bg-clip-text text-transparent">Modern Creators</span>
 						</h2>
 						<div className="grid md:grid-cols-3 gap-8">
-							<div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-[#70C7BA]/50 transition-all duration-300 group">
-								<div className="w-12 h-12 bg-gradient-to-r from-[#70C7BA] to-[#49EACB] rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-									<Users className="w-6 h-6 text-white" />
-								</div>
-								<h3 className="text-xl font-semibold text-white mb-2">Personalized Pages</h3>
-								<p className="text-gray-400">Custom handles, themes, colors, and rich content to match your brand perfectly.</p>
-							</div>
+							<FeatureCard
+								icon={Users}
+								title="Personalized Pages"
+								description="Custom handles, themes, colors, and rich content to match your brand perfectly."
+							/>
 
-							<div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-[#70C7BA]/50 transition-all duration-300 group">
-								<div className="w-12 h-12 bg-gradient-to-r from-[#70C7BA] to-[#49EACB] rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-									<Zap className="w-6 h-6 text-white" />
-								</div>
-								<h3 className="text-xl font-semibold text-white mb-2">Instant Payments</h3>
-								<p className="text-gray-400">Kaspa&apos;s lightning-fast transactions mean supporters can donate instantly with QR codes.</p>
-							</div>
+							<FeatureCard
+								icon={Zap}
+								title="Instant Payments"
+								description="Kaspa's lightning-fast transactions mean supporters can donate instantly with QR codes."
+							/>
 
-							<div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-[#70C7BA]/50 transition-all duration-300 group">
-								<div className="w-12 h-12 bg-gradient-to-r from-[#70C7BA] to-[#49EACB] rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-									<Star className="w-6 h-6 text-white" />
-								</div>
-								<h3 className="text-xl font-semibold text-white mb-2">Rich Content</h3>
-								<p className="text-gray-400">WYSIWYG editor with rich text, images, and social media integration.</p>
-							</div>
+							<FeatureCard
+								icon={Star}
+								title="Rich Content"
+								description="WYSIWYG editor with rich text, images, and social media integration."
+							/>
 						</div>
 					</div>
 
@@ -112,7 +107,7 @@ export default function AboutPage() {
 									</div>
 									<h3 className="text-2xl font-bold text-white mb-2">kaspador</h3>
 									<p className="text-gray-400 mb-6">
-										Passionate developer and Kaspa enthusiast building the future of cryptocurrency donations. 
+										Passionate developer and Kaspa enthusiast building the future of cryptocurrency donations.
 										Committed to creating tools that make crypto accessible to everyone.
 									</p>
 									<div className="flex gap-4">

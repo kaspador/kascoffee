@@ -3,7 +3,6 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowDownLeft, ArrowUpRight, Clock, ExternalLink } from 'lucide-react';
-import { formatUSD } from '@/lib/utils';
 
 interface Transaction {
   id: string;
@@ -20,7 +19,6 @@ interface Transaction {
 
 interface TransactionCardProps {
   transaction: Transaction;
-  kaspaPrice?: number;
 }
 
 const formatDate = (timestamp: number) => {
@@ -36,16 +34,7 @@ const getKaspaExplorerUrl = (hash: string) => {
   return `https://explorer.kaspa.org/transactions/${hash}`;
 };
 
-const getAddressExplorerUrl = (address: string) => {
-  // Clean address and ensure kaspa: prefix for kas.fyi
-  const cleanAddress = address.replace(/^kaspa:/, '');
-  return `https://kas.fyi/address/kaspa:${cleanAddress}`;
-};
-
-export const TransactionCard: React.FC<TransactionCardProps> = ({ 
-  transaction, 
-  kaspaPrice = 0.10 // Fallback price
-}) => {
+export const TransactionCard: React.FC<TransactionCardProps> = ({ transaction }) => {
   const isDonation = transaction.type === 'donation';
 
   return (
@@ -88,35 +77,16 @@ export const TransactionCard: React.FC<TransactionCardProps> = ({
                 )}
               </div>
 
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2 text-xs text-gray-400">
-                  <span>{formatDate(transaction.timestamp)}</span>
-                  <a
-                    href={getKaspaExplorerUrl(transaction.hash)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-[#70C7BA] hover:text-[#49EACB] transition-colors"
-                  >
-                    View <ExternalLink className="w-3 h-3" />
-                  </a>
-                </div>
-                {/* Address link */}
-                {(isDonation && transaction.fromAddress) || (!isDonation && transaction.toAddress) ? (
-                  <div className="text-xs">
-                    <span className="text-gray-500 mr-1">
-                      {isDonation ? 'From:' : 'To:'}
-                    </span>
-                    <a
-                      href={getAddressExplorerUrl(isDonation ? transaction.fromAddress! : transaction.toAddress!)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#70C7BA] hover:text-[#49EACB] transition-colors hover:underline font-mono"
-                      title="View address on kas.fyi"
-                    >
-                      {(isDonation ? transaction.fromAddress! : transaction.toAddress!).slice(0, 20)}...
-                    </a>
-                  </div>
-                ) : null}
+              <div className="flex items-center gap-2 text-xs text-gray-400">
+                <span>{formatDate(transaction.timestamp)}</span>
+                <a
+                  href={getKaspaExplorerUrl(transaction.hash)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-[#70C7BA] hover:text-[#49EACB] transition-colors"
+                >
+                  View <ExternalLink className="w-3 h-3" />
+                </a>
               </div>
             </div>
           </div>
@@ -129,7 +99,7 @@ export const TransactionCard: React.FC<TransactionCardProps> = ({
               {isDonation ? '+' : '-'}{transaction.formattedAmount} KAS
             </div>
             <div className="text-xs text-gray-400">
-              ${formatUSD(transaction.amountKas, kaspaPrice)} USD
+              ${(transaction.amountKas * 0.15).toFixed(2)} USD
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Coffee, Users, Zap, Globe, ArrowRight, Star } from 'lucide-react';
 import { Navbar } from "@/components/navbar";
+import FeatureCard from "@/components/feature-card";
 
 export default function LandingPage() {
 	return (
@@ -25,12 +26,12 @@ export default function LandingPage() {
 						</div>
 
 						{/* Main Logo */}
-						<div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-6 sm:mb-8 px-4">
+						<div className="flex items-center justify-center gap-6 mb-8">
 							<div className="relative coffee-container">
-								<Coffee className="h-16 w-16 sm:h-20 sm:w-20 text-[#70C7BA] coffee-icon drop-shadow-lg hover:scale-110 transition-all duration-300 cursor-pointer" />
-								<div className="absolute -top-2 -right-2 w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-r from-[#49EACB] to-[#70C7BA] rounded-full animate-bounce"></div>
+								<Coffee className="h-20 w-20 text-[#70C7BA] coffee-icon drop-shadow-lg hover:scale-110 transition-all duration-300 cursor-pointer" />
+								<div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-[#49EACB] to-[#70C7BA] rounded-full animate-bounce"></div>
 							</div>
-							<h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black leading-tight text-center sm:text-left">
+							<h1 className="text-7xl md:text-8xl lg:text-9xl font-black leading-tight">
 								<span className="bg-gradient-to-r from-white via-[#70C7BA] to-[#49EACB] bg-clip-text text-transparent">
 									kas.coffee
 								</span>
@@ -38,15 +39,15 @@ export default function LandingPage() {
 						</div>
 						
 						{/* Hero Description */}
-						<p className="text-lg sm:text-2xl md:text-3xl text-gray-300 font-light leading-relaxed max-w-3xl mx-auto px-4 text-center">
+						<p className="text-2xl md:text-3xl text-gray-300 font-light leading-relaxed max-w-3xl mx-auto">
 							Create your <span className="text-[#70C7BA] font-semibold">personalized donation page</span> and start accepting <span className="text-[#49EACB] font-semibold">Kaspa cryptocurrency</span> in minutes
 						</p>
 						
 						{/* CTA Buttons */}
 						<div className="flex flex-col sm:flex-row gap-6 justify-center mt-12">
-							<Button size="lg" asChild className="bg-gradient-to-r from-[#70C7BA] to-[#49EACB] hover:from-[#49EACB] hover:to-[#70C7BA] text-white font-semibold px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-[#70C7BA]/25 transition-all duration-300 group">
+							<Button size="lg" asChild className="bg-gradient-to-r from-[#70C7BA] to-[#49EACB] hover:from-[#49EACB] hover:to-[#70C7BA] text-black font-semibold px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-[#70C7BA]/25 transition-all duration-300 group">
 								<Link href="/auth/signup" className="flex items-center gap-2">
-									Get Started Free
+									Create your own page
 									<ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
 								</Link>
 							</Button>
@@ -57,29 +58,23 @@ export default function LandingPage() {
 
 						{/* Features Grid */}
 						<div className="grid md:grid-cols-3 gap-8 mt-20 max-w-5xl mx-auto">
-							<div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-[#70C7BA]/50 transition-all duration-300 group">
-								<div className="w-12 h-12 bg-gradient-to-r from-[#70C7BA] to-[#49EACB] rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-									<Users className="w-6 h-6 text-white" />
-								</div>
-								<h3 className="text-xl font-semibold text-white mb-2">Personalized Pages</h3>
-								<p className="text-gray-400">Custom handles, themes, and descriptions for your unique donation page</p>
-							</div>
+							<FeatureCard
+								icon={Users}
+								title="Personalized Pages"
+								description="Custom handles, themes, and descriptions for your unique donation page"
+							/>
 
-							<div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-[#70C7BA]/50 transition-all duration-300 group">
-								<div className="w-12 h-12 bg-gradient-to-r from-[#70C7BA] to-[#49EACB] rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-									<Zap className="w-6 h-6 text-white" />
-								</div>
-								<h3 className="text-xl font-semibold text-white mb-2">Instant Kaspa</h3>
-								<p className="text-gray-400">Fast, secure cryptocurrency donations with QR codes</p>
-							</div>
+							<FeatureCard
+								icon={Zap}
+								title="Instant Kaspa"
+								description="Fast, secure cryptocurrency donations with QR codes"
+							/>
 
-							<div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-[#70C7BA]/50 transition-all duration-300 group">
-								<div className="w-12 h-12 bg-gradient-to-r from-[#70C7BA] to-[#49EACB] rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-									<Globe className="w-6 h-6 text-white" />
-								</div>
-								<h3 className="text-xl font-semibold text-white mb-2">Social Integration</h3>
-								<p className="text-gray-400">Link your social accounts and share your donation page</p>
-							</div>
+							<FeatureCard
+								icon={Globe}
+								title="Social Integration"
+								description="Link your social accounts and share your donation page"
+							/>
 						</div>
 
 						{/* Stats */}
