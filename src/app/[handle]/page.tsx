@@ -225,8 +225,8 @@ export default function UserProfilePage({ params }: PageProps) {
 		if (!cleanBgImage) return undefined;
 		
 		try {
-			// Basic URL validation
-			const url = new URL(cleanBgImage);
+			// Basic URL validation - will throw if invalid
+			new URL(cleanBgImage);
 			return `url(${cleanBgImage})`;
 		} catch {
 			console.warn('Invalid background image URL:', userPage.backgroundImage);
