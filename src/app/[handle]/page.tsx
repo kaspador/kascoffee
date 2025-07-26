@@ -220,17 +220,50 @@ export default function UserProfilePage({ params }: PageProps) {
 	};
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
-			{/* Animated background */}
-			<div className="absolute inset-0 bg-gradient-to-r from-[#70C7BA]/5 via-[#49EACB]/5 to-[#70C7BA]/5 animate-pulse"></div>
-			<div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#70C7BA]/10 rounded-full blur-3xl animate-bounce-gentle"></div>
-			<div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#49EACB]/10 rounded-full blur-3xl animate-bounce-gentle delay-1000"></div>
+		<div 
+			className="min-h-screen relative overflow-hidden"
+			style={{ 
+				backgroundColor: userPage.backgroundColor,
+				backgroundImage: userPage.backgroundImage ? `url(${userPage.backgroundImage})` : undefined,
+				backgroundSize: 'cover',
+				backgroundPosition: 'center',
+				backgroundRepeat: 'no-repeat'
+			}}
+		>
+			{/* Background overlay for better text readability when background image is present */}
+			{userPage.backgroundImage && (
+				<div className="absolute inset-0 bg-black/40"></div>
+			)}
+			
+			{/* Animated background elements - use user colors or defaults */}
+			<div 
+				className="absolute inset-0 animate-pulse"
+				style={{ background: `linear-gradient(to right, ${userPage.backgroundColor}10, ${userPage.foregroundColor}05, ${userPage.backgroundColor}10)` }}
+			></div>
+			<div 
+				className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl animate-bounce-gentle"
+				style={{ backgroundColor: `${userPage.backgroundColor}20` }}
+			></div>
+			<div 
+				className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full blur-3xl animate-bounce-gentle delay-1000"
+				style={{ backgroundColor: `${userPage.foregroundColor}10` }}
+			></div>
 
 			{/* Header */}
-			<header className="relative z-10 border-b border-[#70C7BA]/20 bg-slate-900/80 backdrop-blur-xl">
+			<header 
+				className="relative z-10 border-b backdrop-blur-xl"
+				style={{ 
+					borderBottomColor: `${userPage.foregroundColor}20`,
+					backgroundColor: `${userPage.backgroundColor}90`
+				}}
+			>
 				<div className="container mx-auto px-6 py-4">
 					<div className="flex items-center justify-between">
-						<Link href="/" className="flex items-center gap-3 text-[#70C7BA] hover:text-[#49EACB] transition-all duration-300 group">
+						<Link 
+							href="/" 
+							className="flex items-center gap-3 transition-all duration-300 group"
+							style={{ color: userPage.foregroundColor }}
+						>
 							<ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
 							<Coffee className="w-6 h-6" />
 							<span className="text-lg font-bold">kas.coffee</span>
@@ -238,7 +271,23 @@ export default function UserProfilePage({ params }: PageProps) {
 						
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
-								<Button variant="outline" size="sm" className="border-[#70C7BA]/50 text-[#70C7BA] hover:bg-[#70C7BA]/10 hover:border-[#70C7BA] rounded-full backdrop-blur-sm">
+								<Button 
+									variant="outline" 
+									size="sm" 
+									className="rounded-full backdrop-blur-sm transition-all duration-300"
+									style={{ 
+										borderColor: `${userPage.foregroundColor}50`,
+										color: userPage.foregroundColor,
+									}}
+									onMouseEnter={(e) => {
+										e.currentTarget.style.backgroundColor = `${userPage.foregroundColor}10`;
+										e.currentTarget.style.borderColor = userPage.foregroundColor;
+									}}
+									onMouseLeave={(e) => {
+										e.currentTarget.style.backgroundColor = 'transparent';
+										e.currentTarget.style.borderColor = `${userPage.foregroundColor}50`;
+									}}
+								>
 									<Share2 className="w-4 h-4 mr-2" />
 									Share
 								</Button>
@@ -288,30 +337,57 @@ export default function UserProfilePage({ params }: PageProps) {
 						</div>
 					</div>
 					
-					<h1 className="text-5xl md:text-6xl font-black text-white mb-4 bg-gradient-to-r from-[#70C7BA] to-[#49EACB] bg-clip-text text-transparent">
+					<h1 
+						className="text-5xl md:text-6xl font-black mb-4"
+						style={{ color: userPage.foregroundColor }}
+					>
 						{userPage.displayName || userPage.handle}
 					</h1>
 					
-					<Badge className="mb-6 px-6 py-3 text-lg bg-[#70C7BA]/20 text-[#70C7BA] border border-[#70C7BA]/30 rounded-full backdrop-blur-sm">
+					<Badge 
+						className="mb-6 px-6 py-3 text-lg rounded-full backdrop-blur-sm"
+						style={{ 
+							backgroundColor: `${userPage.foregroundColor}20`,
+							color: userPage.foregroundColor,
+							borderColor: `${userPage.foregroundColor}30`,
+							borderWidth: '1px',
+							borderStyle: 'solid'
+						}}
+					>
 						@{userPage.handle}
 					</Badge>
 					
 					{userPage.shortDescription && (
-						<p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed mb-8 bg-white/5 rounded-2xl p-6 border border-[#70C7BA]/20 backdrop-blur-sm">
+						<p 
+							className="text-xl max-w-2xl mx-auto leading-relaxed mb-8 rounded-2xl p-6 backdrop-blur-sm"
+							style={{ 
+								color: userPage.foregroundColor,
+								backgroundColor: `${userPage.foregroundColor}10`,
+								borderColor: `${userPage.foregroundColor}20`,
+								borderWidth: '1px',
+								borderStyle: 'solid'
+							}}
+						>
 							{userPage.shortDescription}
 						</p>
 					)}
 
 					{/* Stats */}
-					<div className="flex justify-center items-center gap-8 text-gray-400 mb-8">
+					<div 
+						className="flex justify-center items-center gap-8 mb-8"
+						style={{ color: `${userPage.foregroundColor}80` }}
+					>
 						<div className="flex items-center gap-2">
-							<Eye className="w-5 h-5 text-[#70C7BA]" />
-							<span className="text-white">{userPage.viewCount || 0} views</span>
+							<Eye className="w-5 h-5" style={{ color: userPage.foregroundColor }} />
+							<span style={{ color: userPage.foregroundColor }}>{userPage.viewCount || 0} views</span>
 						</div>
-						<div className="w-2 h-2 bg-[#70C7BA]/50 rounded-full"></div>
+						<div 
+							className="w-2 h-2 rounded-full"
+							style={{ backgroundColor: `${userPage.foregroundColor}50` }}
+						></div>
 						<div className="flex items-center gap-2">
-							<Zap className="w-5 h-5 text-[#49EACB]" />
-							<span className="text-white">Powered by Kaspa</span>
+							<Zap className="w-5 h-5" style={{ color: userPage.foregroundColor }} />
+							<span style={{ color: userPage.foregroundColor }}>Powered by Kaspa</span>
 						</div>
 					</div>
 				</div>
