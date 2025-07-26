@@ -138,12 +138,28 @@ export const DirectusAPI = {
   async updateUserPage(id: string, data: Partial<UserPage>) {
     try {
       console.log(`[DIRECTUS] Updating user page ${id} with data:`, data);
+      
+      // For server-side operations, try with token authentication first
+      if (process.env.DIRECTUS_TOKEN) {
+        directusAuth.setToken(process.env.DIRECTUS_TOKEN);
+        console.log(`[DIRECTUS] Using admin token for update operation`);
+      }
+      
       const result = await directusAuth.request(updateItem('user_pages', id, data));
       console.log(`[DIRECTUS] Successfully updated user page ${id}:`, result);
       return result;
     } catch (error) {
       console.error(`[DIRECTUS] Error updating user page ${id}:`, error);
-      throw error;
+      // Try with public client as fallback (though this might not work for writes)
+      try {
+        console.log(`[DIRECTUS] Retrying with public client...`);
+        const result = await directusPublic.request(updateItem('user_pages', id, data));
+        console.log(`[DIRECTUS] Successfully updated with public client:`, result);
+        return result;
+      } catch (fallbackError) {
+        console.error(`[DIRECTUS] Fallback also failed:`, fallbackError);
+        throw error; // Throw the original error
+      }
     }
   },
 
