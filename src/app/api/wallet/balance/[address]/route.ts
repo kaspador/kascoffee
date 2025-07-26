@@ -47,10 +47,7 @@ export async function GET(
       address: data.address,
       balance: data.balance, // Raw balance for storage
       balanceKas: balanceInKas, // Human readable balance
-      formattedBalance: balanceInKas.toLocaleString('en-US', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 8
-      })
+      formattedBalance: Math.floor(balanceInKas).toLocaleString('en-US')
     });
   } catch {
     return NextResponse.json(

@@ -54,7 +54,10 @@ export async function getKaspaPrice(): Promise<number> {
 
 export function formatUSD(kasAmount: number, kasPrice: number): string {
   const usdValue = kasAmount * kasPrice;
-  return usdValue.toFixed(2);
+  return usdValue.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
 }
 
 /**
