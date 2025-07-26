@@ -179,22 +179,22 @@ export const DirectusAPI = {
   },
 
   async createUserPage(data: Omit<UserPage, 'id' | 'date_created' | 'date_updated'>) {
-    return await directusAuth.request(createItem('user_pages', data));
+    try {
+      console.log(`[DIRECTUS] Creating user page for user ${data.user_id}`);
+      const result = await directusAuth.request(createItem('user_pages', data));
+      console.log(`[DIRECTUS] Successfully created user page ${result.id}`);
+      return result;
+    } catch (error) {
+      console.error(`[DIRECTUS] Error creating user page:`, error);
+      throw error;
+    }
   },
 
   async updateUserPage(id: string, data: Partial<UserPage>) {
     try {
-      console.log(`[DIRECTUS] Updating user page ${id} with data:`, data);
+      console.log(`[DIRECTUS] Updating user page ${id}`);
       
-      // Validate admin token exists
-      if (!process.env.DIRECTUS_TOKEN) {
-        throw new Error('DIRECTUS_TOKEN environment variable is not set');
-      }
-      
-      // For server-side operations, try with token authentication first
-      directusAuth.setToken(process.env.DIRECTUS_TOKEN);
-      console.log(`[DIRECTUS] Using admin token for update operation`);
-      
+      // Use the already set token (user's token from the API)
       const result = await directusAuth.request(updateItem('user_pages', id, data));
       console.log(`[DIRECTUS] Successfully updated user page ${id}`);
       return result;
@@ -213,7 +213,6 @@ export const DirectusAPI = {
         }
       }
       
-      // Don't try public client for updates - it won't have permissions
       throw error;
     }
   },

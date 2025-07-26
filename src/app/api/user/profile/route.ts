@@ -183,17 +183,7 @@ export async function PUT(request: NextRequest) {
 					handle: userPageData.handle
 				});
 				
-				// Use admin token for server-side operations
-				if (process.env.DIRECTUS_TOKEN) {
-					console.log('[PROFILE-API] Switching to admin token for update operation');
-					await DirectusAPI.setToken(process.env.DIRECTUS_TOKEN);
-					console.log('[PROFILE-API] Admin token set successfully');
-				} else {
-					console.warn('[PROFILE-API] No admin token found in environment variables');
-					return NextResponse.json({ 
-						error: 'Server configuration error: Admin token not configured' 
-					}, { status: 500 });
-				}
+				// User's token is already set above - no need to switch
 				
 				const updatedPage = await DirectusAPI.updateUserPage(userPage.id, userPageData);
 				console.log('[PROFILE-API] User page updated successfully');
@@ -249,17 +239,7 @@ export async function PUT(request: NextRequest) {
 					return NextResponse.json({ error: 'Kaspa address is required for new profiles' }, { status: 400 });
 				}
 				
-				// Use admin token for server-side operations
-				if (process.env.DIRECTUS_TOKEN) {
-					console.log('[PROFILE-API] Switching to admin token for create operation');
-					await DirectusAPI.setToken(process.env.DIRECTUS_TOKEN);
-					console.log('[PROFILE-API] Admin token set successfully for creation');
-				} else {
-					console.warn('[PROFILE-API] No admin token found for creation');
-					return NextResponse.json({ 
-						error: 'Server configuration error: Admin token not configured' 
-					}, { status: 500 });
-				}
+				// User's token is already set above for new user creation
 				
 				const newPage = await DirectusAPI.createUserPage(userPageData);
 				console.log('[PROFILE-API] New user page created successfully');
