@@ -96,33 +96,11 @@ export default function UserProfilePage({ params }: PageProps) {
 	
 			try {
 						const data = await fetchUserPage(handle);
-		console.log(`[FRONTEND] User page data for ${handle}:`, {
-			profileImage: data?.profileImage,
-			backgroundImage: data?.backgroundImage,
-			handle: data?.handle
-		});
 		setUserPage(data);
-
-		// Debug image processing after setting user page
-		if (data?.profileImage) {
-			console.log(`[FRONTEND] Profile image processing:`, {
-				raw: data.profileImage,
-				trimmed: data.profileImage?.trim(),
-				isValidUrl: (() => {
-					try {
-						new URL(data.profileImage?.trim() || '');
-						return true;
-					} catch {
-						return false;
-					}
-				})()
-			});
-		}
 
 				// Track page view with unique IP filtering
 				if (data) {
 					try {
-						console.log(`[FRONTEND] Tracking view for handle: ${handle}`);
 						const trackResponse = await fetch(`/api/track-view/${handle}`, {
 							method: 'POST',
 							headers: {
@@ -130,28 +108,19 @@ export default function UserProfilePage({ params }: PageProps) {
 							},
 						});
 						
-						console.log(`[FRONTEND] Track response status: ${trackResponse.status}`);
-						
 						if (trackResponse.ok) {
 							const trackData = await trackResponse.json();
-							console.log(`[FRONTEND] Track response data:`, trackData);
 							
 							// Update the local view count if the tracking was successful and counted
 							if (trackData.success && trackData.counted && trackData.newViewCount) {
-								console.log(`[FRONTEND] Updating view count from ${data.viewCount || 0} to ${trackData.newViewCount}`);
 								setUserPage(prevData => prevData ? {
 									...prevData,
 									viewCount: trackData.newViewCount
 								} : null);
-							} else {
-								console.log(`[FRONTEND] View not counted or already counted`);
 							}
-						} else {
-							const errorData = await trackResponse.json().catch(() => null);
-							console.error(`[FRONTEND] Track view failed:`, errorData);
 						}
-					} catch (error) {
-						console.error(`[FRONTEND] Error tracking view:`, error);
+					} catch {
+						// Silent error handling
 					}
 				}
 			} catch {
@@ -252,10 +221,8 @@ export default function UserProfilePage({ params }: PageProps) {
 		} catch {
 			// If URL validation fails, still try to use it if it looks like a reasonable URL
 			if (cleanBgImage.startsWith('http://') || cleanBgImage.startsWith('https://')) {
-				console.warn('URL validation failed but using anyway:', cleanBgImage);
 				return `url(${cleanBgImage})`;
 			}
-			console.warn('Invalid background image URL:', userPage.backgroundImage);
 			return undefined;
 		}
 	};
@@ -268,15 +235,12 @@ export default function UserProfilePage({ params }: PageProps) {
 		try {
 			// Try to validate as URL first
 			new URL(cleanProfileImage);
-			console.log('Profile image URL valid:', cleanProfileImage);
 			return cleanProfileImage;
 		} catch {
 			// If URL validation fails, still try to use it if it looks like a reasonable URL
 			if (cleanProfileImage.startsWith('http://') || cleanProfileImage.startsWith('https://')) {
-				console.warn('Profile image URL validation failed but using anyway:', cleanProfileImage);
 				return cleanProfileImage;
 			}
-			console.warn('Invalid profile image URL:', userPage.profileImage);
 			return undefined;
 		}
 	};
@@ -389,7 +353,6 @@ export default function UserProfilePage({ params }: PageProps) {
 									alt={userPage.displayName || userPage.handle}
 									className="object-cover"
 									onError={(e) => {
-										console.warn('Profile image failed to load. Raw:', userPage.profileImage, 'Cleaned:', getCleanProfileImageUrl());
 										// Hide the broken image
 										(e.target as HTMLImageElement).style.display = 'none';
 									}}

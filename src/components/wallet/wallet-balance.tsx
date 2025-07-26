@@ -44,7 +44,6 @@ export function WalletBalance({ address }: WalletBalanceProps) {
       if (pricePromise.status === 'fulfilled') {
         setKaspaPrice(pricePromise.value);
       } else {
-        console.error('Failed to fetch Kaspa price:', pricePromise.reason);
         // Keep the previous price or set a fallback
         if (kaspaPrice === null) {
           setKaspaPrice(0.10); // Fallback price
