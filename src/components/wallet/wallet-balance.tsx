@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Wallet, TrendingUp, TrendingDown, Minus, RefreshCw } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, Minus, RefreshCw, ExternalLink } from 'lucide-react';
 import { getKaspaPrice, formatUSD } from '@/lib/utils';
 
 interface WalletBalanceProps {
@@ -210,9 +210,19 @@ export function WalletBalance({ address }: WalletBalanceProps) {
             {/* Address - Compact */}
             <div className="pt-3 border-t border-[#70C7BA]/20">
               <div className="text-xs text-gray-400 mb-2 text-center">Wallet Address</div>
-              <div className="font-mono text-xs text-gray-300 break-all bg-black/20 p-3 rounded text-center">
-                {balance.address}
-              </div>
+              <a
+                href={`https://kas.fyi/address/kaspa:${balance.address.replace(/^kaspa:/, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block font-mono text-xs text-gray-300 break-all bg-black/20 p-3 rounded text-center hover:bg-black/40 hover:text-[#70C7BA] transition-all duration-200 cursor-pointer group"
+                title="View on kas.fyi explorer"
+              >
+                <span className="group-hover:underline">{balance.address}</span>
+                <div className="flex items-center justify-center gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="text-[10px] text-[#70C7BA]">View on kas.fyi</span>
+                  <ExternalLink className="w-3 h-3 text-[#70C7BA]" />
+                </div>
+              </a>
             </div>
           </div>
         )}
