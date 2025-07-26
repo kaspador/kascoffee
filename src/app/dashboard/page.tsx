@@ -316,29 +316,29 @@ export default function DashboardPage() {
 
 				{/* Management Tabs - better mobile design */}
 				<Tabs defaultValue="profile" className="space-y-6 sm:space-y-8">
-					<div className="bg-gradient-to-r from-white/5 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-1.5">
-						<TabsList className="grid w-full grid-cols-3 bg-transparent gap-0.5">
+					<div className="bg-gradient-to-r from-white/5 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-2">
+						<TabsList className="grid w-full grid-cols-3 bg-transparent gap-1 h-auto">
 							<TabsTrigger 
 								value="profile" 
-								className="data-[state=active]:bg-[#70C7BA] data-[state=active]:text-white text-gray-300 rounded-xl font-kaspa-subheader font-bold transition-all duration-300 text-xs sm:text-sm py-2.5 sm:py-3 px-2 sm:px-4 flex-1 justify-center"
+								className="data-[state=active]:bg-[#70C7BA] data-[state=active]:text-white text-gray-300 rounded-xl font-kaspa-subheader font-bold transition-all duration-300 text-xs sm:text-sm py-3 sm:py-4 px-3 sm:px-4 flex items-center justify-center min-h-[44px] sm:min-h-[48px]"
 							>
-								<User className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+								<User className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
 								<span className="hidden sm:inline">Profile</span>
 								<span className="sm:hidden">Info</span>
 							</TabsTrigger>
 							<TabsTrigger 
 								value="theme" 
-								className="data-[state=active]:bg-[#49EACB] data-[state=active]:text-white text-gray-300 rounded-xl font-kaspa-subheader font-bold transition-all duration-300 text-xs sm:text-sm py-2.5 sm:py-3 px-2 sm:px-4 flex-1 justify-center"
+								className="data-[state=active]:bg-[#49EACB] data-[state=active]:text-white text-gray-300 rounded-xl font-kaspa-subheader font-bold transition-all duration-300 text-xs sm:text-sm py-3 sm:py-4 px-3 sm:px-4 flex items-center justify-center min-h-[44px] sm:min-h-[48px]"
 							>
-								<Palette className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+								<Palette className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
 								<span className="hidden sm:inline">Theme</span>
 								<span className="sm:hidden">Style</span>
 							</TabsTrigger>
 							<TabsTrigger 
 								value="socials" 
-								className="data-[state=active]:bg-[#70C7BA] data-[state=active]:text-white text-gray-300 rounded-xl font-kaspa-subheader font-bold transition-all duration-300 text-xs sm:text-sm py-2.5 sm:py-3 px-2 sm:px-4 flex-1 justify-center"
+								className="data-[state=active]:bg-[#70C7BA] data-[state=active]:text-white text-gray-300 rounded-xl font-kaspa-subheader font-bold transition-all duration-300 text-xs sm:text-sm py-3 sm:py-4 px-3 sm:px-4 flex items-center justify-center min-h-[44px] sm:min-h-[48px]"
 							>
-								<LinkIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+								<LinkIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
 								<span className="hidden sm:inline">Socials</span>
 								<span className="sm:hidden">Links</span>
 							</TabsTrigger>
