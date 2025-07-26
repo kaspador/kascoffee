@@ -146,9 +146,9 @@ export async function PUT(request: NextRequest) {
 		
 		// Clean up URLs - remove trailing semicolons and unwanted characters
 		const cleanProfileImage = profileImage ? 
-			profileImage.toString().trim().replace(/[;,\s]+$/g, '').replace(/;/g, '') : null;
+			profileImage.toString().trim().replace(/[;,\s]+$/g, '').replace(/;/g, '').replace(/,$/, '') : null;
 		const cleanBackgroundImage = backgroundImage ? 
-			backgroundImage.toString().trim().replace(/[;,\s]+$/g, '').replace(/;/g, '') : null;
+			backgroundImage.toString().trim().replace(/[;,\s]+$/g, '').replace(/;/g, '').replace(/,$/, '') : null;
 		
 		const userPageData = {
 			user_id: user.id,
@@ -176,11 +176,22 @@ export async function PUT(request: NextRequest) {
 			// Update existing user page
 			try {
 				console.log('[PROFILE-API] Updating existing user page:', userPage.id);
+				console.log('[PROFILE-API] Clean data being sent:', {
+					background_color: userPageData.background_color,
+					foreground_color: userPageData.foreground_color,
+					background_image: userPageData.background_image,
+					handle: userPageData.handle
+				});
 				
 				// Use admin token for server-side operations
 				if (process.env.DIRECTUS_TOKEN) {
 					await DirectusAPI.setToken(process.env.DIRECTUS_TOKEN);
 					console.log('[PROFILE-API] Using admin token for update');
+				} else {
+					console.warn('[PROFILE-API] No admin token found in environment variables');
+					return NextResponse.json({ 
+						error: 'Server configuration error: Admin token not configured' 
+					}, { status: 500 });
 				}
 				
 				const updatedPage = await DirectusAPI.updateUserPage(userPage.id, userPageData);
@@ -204,6 +215,24 @@ export async function PUT(request: NextRequest) {
 				});
 			} catch (error) {
 				console.error('[PROFILE-API] Error updating user page:', error);
+				
+				// Provide more specific error details
+				if (error && typeof error === 'object' && 'response' in error) {
+					const directusError = error as any;
+					console.error('[PROFILE-API] Directus error details:', {
+						status: directusError.response?.status,
+						statusText: directusError.response?.statusText,
+						errors: directusError.errors
+					});
+					
+					if (directusError.response?.status === 401) {
+						return NextResponse.json({ 
+							error: 'Authentication failed with Directus. Please check admin token configuration.',
+							details: 'The server admin token is invalid or expired.'
+						}, { status: 500 });
+					}
+				}
+				
 				throw error;
 			}
 		} else {

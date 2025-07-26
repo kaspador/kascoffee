@@ -139,27 +139,35 @@ export const DirectusAPI = {
     try {
       console.log(`[DIRECTUS] Updating user page ${id} with data:`, data);
       
-      // For server-side operations, try with token authentication first
-      if (process.env.DIRECTUS_TOKEN) {
-        directusAuth.setToken(process.env.DIRECTUS_TOKEN);
-        console.log(`[DIRECTUS] Using admin token for update operation`);
+      // Validate admin token exists
+      if (!process.env.DIRECTUS_TOKEN) {
+        throw new Error('DIRECTUS_TOKEN environment variable is not set');
       }
       
+      // For server-side operations, try with token authentication first
+      directusAuth.setToken(process.env.DIRECTUS_TOKEN);
+      console.log(`[DIRECTUS] Using admin token for update operation`);
+      
       const result = await directusAuth.request(updateItem('user_pages', id, data));
-      console.log(`[DIRECTUS] Successfully updated user page ${id}:`, result);
+      console.log(`[DIRECTUS] Successfully updated user page ${id}`);
       return result;
     } catch (error) {
       console.error(`[DIRECTUS] Error updating user page ${id}:`, error);
-      // Try with public client as fallback (though this might not work for writes)
-      try {
-        console.log(`[DIRECTUS] Retrying with public client...`);
-        const result = await directusPublic.request(updateItem('user_pages', id, data));
-        console.log(`[DIRECTUS] Successfully updated with public client:`, result);
-        return result;
-      } catch (fallbackError) {
-        console.error(`[DIRECTUS] Fallback also failed:`, fallbackError);
-        throw error; // Throw the original error
+      
+      // Enhanced error logging
+      if (error && typeof error === 'object') {
+        const err = error as any;
+        if (err.response) {
+          console.error(`[DIRECTUS] Response status: ${err.response.status}`);
+          console.error(`[DIRECTUS] Response headers:`, err.response.headers);
+        }
+        if (err.errors) {
+          console.error(`[DIRECTUS] Directus errors:`, err.errors);
+        }
       }
+      
+      // Don't try public client for updates - it won't have permissions
+      throw error;
     }
   },
 
