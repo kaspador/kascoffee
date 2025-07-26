@@ -31,7 +31,7 @@ const formatDate = (timestamp: number) => {
 };
 
 const getKaspaExplorerUrl = (hash: string) => {
-  return `https://explorer.kaspa.org/transactions/${hash}`;
+  return `https://explorer.kaspa.org/txs/${hash}`;
 };
 
 export const TransactionCard: React.FC<TransactionCardProps> = ({ transaction }) => {
