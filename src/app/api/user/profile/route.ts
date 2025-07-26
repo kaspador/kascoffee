@@ -42,14 +42,13 @@ export async function GET(request: NextRequest) {
 				});
 			}
 		} catch (error) {
-			console.error('[PROFILE-API] Error fetching user page:', error);
+			// Silent error handling
 		}
 		
 		return NextResponse.json({ 
 			userPage: null // No profile set up yet
 		});
 	} catch (error) {
-		console.error('[PROFILE-API] Error in GET:', error);
 		return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 	}
 }

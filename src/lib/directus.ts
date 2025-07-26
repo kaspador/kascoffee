@@ -110,8 +110,6 @@ export const DirectusAPI = {
   // User Pages
   async getUserPage(handle: string): Promise<UserPage | null> {
     try {
-      console.log(`[DIRECTUS] Fetching user page for handle: ${handle}`);
-      
       const pages = await directusPublic.request(readItems('user_pages', {
         filter: { handle: { _eq: handle } }, // Use exact match to be explicit
         limit: 1,
@@ -134,18 +132,13 @@ export const DirectusAPI = {
         ]
       })) as unknown[];
       
-      console.log(`[DIRECTUS] Found ${pages.length} pages for handle: ${handle}`);
-      
       if (pages.length > 0) {
         const page = pages[0] as UserPage;
-        console.log(`[DIRECTUS] User page found:`, { id: page.id, handle: page.handle, view_count: page.view_count });
         return page;
       }
       
-      console.log(`[DIRECTUS] No user page found for handle: ${handle}`);
       return null;
     } catch (error) {
-      console.error(`[DIRECTUS] Error fetching user page for handle ${handle}:`, error);
       return null;
     }
   },
@@ -180,39 +173,19 @@ export const DirectusAPI = {
 
   async createUserPage(data: Omit<UserPage, 'id' | 'date_created' | 'date_updated'>) {
     try {
-      console.log(`[DIRECTUS] Creating user page for user ${data.user_id}`);
       const result = await directusAuth.request(createItem('user_pages', data));
-      console.log(`[DIRECTUS] Successfully created user page ${result.id}`);
       return result;
     } catch (error) {
-      console.error(`[DIRECTUS] Error creating user page:`, error);
       throw error;
     }
   },
 
   async updateUserPage(id: string, data: Partial<UserPage>) {
     try {
-      console.log(`[DIRECTUS] Updating user page ${id}`);
-      
       // Use the already set token (user's token from the API)
       const result = await directusAuth.request(updateItem('user_pages', id, data));
-      console.log(`[DIRECTUS] Successfully updated user page ${id}`);
       return result;
     } catch (error) {
-      console.error(`[DIRECTUS] Error updating user page ${id}:`, error);
-      
-      // Enhanced error logging
-      if (error && typeof error === 'object') {
-        const err = error as DirectusError;
-        if (err.response) {
-          console.error(`[DIRECTUS] Response status: ${err.response.status}`);
-          console.error(`[DIRECTUS] Response headers:`, err.response.headers);
-        }
-        if (err.errors) {
-          console.error(`[DIRECTUS] Directus errors:`, err.errors);
-        }
-      }
-      
       throw error;
     }
   },
@@ -277,7 +250,7 @@ export const DirectusAPI = {
     try {
       const cutoffTime = new Date(Date.now() - (hours * 60 * 60 * 1000)).toISOString();
       
-      const snapshots = await directusPublic.request(readItems('wallet_snapshots', {
+      const snapshots = await directusAuth.request(readItems('wallet_snapshots', {
         filter: { 
           kaspa_address: { _eq: kaspaAddress },
           timestamp: { _gte: cutoffTime }
@@ -294,7 +267,7 @@ export const DirectusAPI = {
 
   async getLatestWalletSnapshot(kaspaAddress: string): Promise<WalletSnapshot | null> {
     try {
-      const snapshots = await directusPublic.request(readItems('wallet_snapshots', {
+      const snapshots = await directusAuth.request(readItems('wallet_snapshots', {
         filter: { kaspa_address: { _eq: kaspaAddress } },
         sort: ['-timestamp'],
         limit: 1

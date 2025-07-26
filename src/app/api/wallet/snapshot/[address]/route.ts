@@ -47,7 +47,6 @@ export async function POST(
     // Use admin token for wallet operations (server-side only)
     if (process.env.DIRECTUS_TOKEN) {
       await DirectusAPI.setToken(process.env.DIRECTUS_TOKEN);
-      console.log('[WALLET-SNAPSHOT] Using admin token for operations');
     } else {
       throw new Error('DIRECTUS_TOKEN not configured for wallet operations');
     }
@@ -110,7 +109,6 @@ export async function POST(
       totalSnapshots: allSnapshots.length
     });
   } catch (error) {
-    console.error('Snapshot creation error:', error);
     return NextResponse.json(
       { error: 'Failed to create balance snapshot' },
       { status: 500 }
@@ -173,7 +171,6 @@ export async function GET(
       }
     });
   } catch (error) {
-    console.error('Snapshot fetch error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch balance snapshots' },
       { status: 500 }

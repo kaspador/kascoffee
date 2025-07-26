@@ -40,8 +40,7 @@ export async function GET(
     // TODO: Implement view count increment in Directus
     // For now, we'll skip this feature until collections are set up
 
-        // Simple debug logging
-    console.log(`[USER-PAGE-API] Images for ${handle}: profile="${userPage.profile_image}", background="${userPage.background_image}"`);
+        // Clean image data mapping
 
     const userData = {
       ...userPage,
