@@ -41,9 +41,7 @@ export async function getKaspaPrice(): Promise<number> {
     lastFetchTime = now;
     
     return data.price;
-  } catch (error) {
-    console.error('Error fetching Kaspa price:', error);
-    
+  } catch {
     // Return cached price if available, otherwise fall back to a default
     if (cachedPrice !== null) {
       return cachedPrice;

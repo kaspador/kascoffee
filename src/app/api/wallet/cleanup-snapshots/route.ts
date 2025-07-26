@@ -22,8 +22,7 @@ export async function POST(request: NextRequest) {
       daysKept: daysToKeep,
       timestamp: new Date().toISOString()
     });
-  } catch (error) {
-    console.error('Snapshot cleanup error:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to cleanup old snapshots' },
       { status: 500 }

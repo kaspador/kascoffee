@@ -55,22 +55,16 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
 	try {
-		console.log('[PROFILE-API] Starting PUT request');
-
 		// Get token from cookies
 		const token = request.cookies.get('directus_token')?.value;
 		if (!token) {
-			console.log('[PROFILE-API] No token found in cookies');
 			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
-
-		console.log('[PROFILE-API] Token found, setting up Directus');
 
 		// Set token for Directus request
 		try {
 			await DirectusAPI.setToken(token);
-		} catch (error) {
-			console.error('[PROFILE-API] Error setting Directus token:', error);
+		} catch {
 			return NextResponse.json({ error: 'Authentication failed' }, { status: 401 });
 		}
 
@@ -79,12 +73,9 @@ export async function PUT(request: NextRequest) {
 		try {
 			user = await DirectusAPI.getCurrentUser();
 			if (!user) {
-				console.log('[PROFILE-API] No user returned from getCurrentUser');
 				return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 			}
-			console.log('[PROFILE-API] User authenticated:', user.id);
-		} catch (error) {
-			console.error('[PROFILE-API] Error getting current user:', error);
+		} catch {
 			return NextResponse.json({ error: 'Authentication failed' }, { status: 401 });
 		}
 
@@ -92,9 +83,7 @@ export async function PUT(request: NextRequest) {
 		let body;
 		try {
 			body = await request.json();
-			console.log('[PROFILE-API] Request body parsed:', Object.keys(body));
-		} catch (error) {
-			console.error('[PROFILE-API] Error parsing request body:', error);
+		} catch {
 			return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
 		}
 
@@ -121,12 +110,9 @@ export async function PUT(request: NextRequest) {
 		// Check if user page already exists for this user
 		let userPage;
 		try {
-			console.log('[PROFILE-API] Fetching existing user page for user:', user.id);
 			const userPages = await DirectusAPI.getUserPageByUserId(user.id);
 			userPage = userPages && userPages.length > 0 ? userPages[0] : null;
-			console.log('[PROFILE-API] Existing user page found:', !!userPage);
-		} catch (error) {
-			console.error('[PROFILE-API] Error fetching existing user page:', error);
+		} catch {
 			// User page doesn't exist, that's ok for new users
 		}
 		
@@ -137,8 +123,7 @@ export async function PUT(request: NextRequest) {
 				if (existingPage && existingPage.user_id !== user.id) {
 					return NextResponse.json({ error: 'This handle is already taken. Please choose a different one.' }, { status: 400 });
 				}
-			} catch (error) {
-				console.error('[PROFILE-API] Error checking handle uniqueness:', error);
+			} catch {
 				// Continue anyway, the error might be that the handle doesn't exist which is fine
 			}
 		}
@@ -164,28 +149,12 @@ export async function PUT(request: NextRequest) {
 			view_count: userPage ? userPage.view_count : 0 // Preserve existing view count
 		};
 
-		console.log('[PROFILE-API] User page data prepared:', {
-			hasExistingPage: !!userPage,
-			backgroundColor: userPageData.background_color,
-			foregroundColor: userPageData.foreground_color,
-			handle: userPageData.handle
-		});
-		
 		if (userPage) {
 			// Update existing user page
 			try {
-				console.log('[PROFILE-API] Updating existing user page:', userPage.id);
-				console.log('[PROFILE-API] Clean data being sent:', {
-					background_color: userPageData.background_color,
-					foreground_color: userPageData.foreground_color,
-					background_image: userPageData.background_image,
-					handle: userPageData.handle
-				});
-				
 				// User's token is already set above - no need to switch
 				
 				const updatedPage = await DirectusAPI.updateUserPage(userPage.id, userPageData);
-				console.log('[PROFILE-API] User page updated successfully');
 				
 				return NextResponse.json({ 
 					userPage: {
@@ -204,16 +173,9 @@ export async function PUT(request: NextRequest) {
 					}
 				});
 			} catch (error) {
-				console.error('[PROFILE-API] Error updating user page:', error);
-				
 				// Provide more specific error details
 				if (error && typeof error === 'object' && 'response' in error) {
 					const directusError = error as DirectusError;
-					console.error('[PROFILE-API] Directus error details:', {
-						status: directusError.response?.status,
-						statusText: directusError.response?.statusText,
-						errors: directusError.errors
-					});
 					
 					if (directusError.response?.status === 401) {
 						return NextResponse.json({ 
@@ -225,11 +187,9 @@ export async function PUT(request: NextRequest) {
 				
 				throw error;
 			}
-		} else {
+				} else {
 			// Create new user page
 			try {
-				console.log('[PROFILE-API] Creating new user page');
-				
 				// Ensure required fields are present for new page creation
 				if (!userPageData.handle) {
 					return NextResponse.json({ error: 'Handle is required for new profiles' }, { status: 400 });
@@ -241,8 +201,7 @@ export async function PUT(request: NextRequest) {
 				// User's token is already set above for new user creation
 				
 				const newPage = await DirectusAPI.createUserPage(userPageData);
-				console.log('[PROFILE-API] New user page created successfully');
-				
+
 				return NextResponse.json({ 
 					userPage: {
 						id: newPage.id,
@@ -260,12 +219,10 @@ export async function PUT(request: NextRequest) {
 					}
 				});
 			} catch (error) {
-				console.error('[PROFILE-API] Error creating user page:', error);
 				throw error;
 			}
 		}
 	} catch (error) {
-		console.error('[PROFILE-API] Unhandled error in PUT:', error);
 		
 		// Provide more detailed error information
 		if (error instanceof Error) {

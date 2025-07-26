@@ -52,8 +52,7 @@ export async function GET(
         maximumFractionDigits: 8
       })
     });
-  } catch (error) {
-    console.error('Balance fetch error:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch wallet balance' },
       { status: 500 }

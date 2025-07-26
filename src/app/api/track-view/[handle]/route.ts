@@ -22,14 +22,17 @@ export async function POST(
     const { handle: rawHandle } = await params;
     const handle = rawHandle.toLowerCase().trim();
 
-    console.log(`[TRACK-VIEW] Tracking view for handle: ${handle}`);
+    // Set admin token for server-side operations
+    if (process.env.DIRECTUS_TOKEN) {
+      await DirectusAPI.setToken(process.env.DIRECTUS_TOKEN);
+    } else {
+      throw new Error('DIRECTUS_TOKEN not configured for view tracking');
+    }
 
     // Get client IP address
     const forwarded = request.headers.get('x-forwarded-for');
     const realIP = request.headers.get('x-real-ip');
     const clientIP = forwarded ? forwarded.split(',')[0] : realIP || 'unknown';
-
-    console.log(`[TRACK-VIEW] Client IP: ${clientIP}`);
 
     // Create a unique key for this handle and current hour
     const currentHour = Math.floor(Date.now() / (60 * 60 * 1000));
@@ -43,7 +46,6 @@ export async function POST(
     const ipSet = recentViews.get(cacheKey)!;
     if (ipSet.has(clientIP)) {
       // IP already viewed this page in the current hour, don't count
-      console.log(`[TRACK-VIEW] View already counted for IP ${clientIP} in current hour`);
       return NextResponse.json({ 
         success: true, 
         counted: false, 
@@ -55,18 +57,15 @@ export async function POST(
     ipSet.add(clientIP);
 
     // Get the user page from Directus
-    console.log(`[TRACK-VIEW] Fetching user page from Directus for handle: ${handle}`);
     const userPage = await DirectusAPI.getUserPage(handle);
     
     if (!userPage) {
-      console.log(`[TRACK-VIEW] User page not found for handle: ${handle}`);
       return NextResponse.json({ 
         error: 'User page not found' 
       }, { status: 404 });
     }
 
     if (!userPage.is_active) {
-      console.log(`[TRACK-VIEW] User page inactive for handle: ${handle}`);
       return NextResponse.json({ 
         error: 'User page inactive' 
       }, { status: 404 });
@@ -75,14 +74,10 @@ export async function POST(
     const oldViewCount = userPage.view_count || 0;
     const newViewCount = oldViewCount + 1;
 
-    console.log(`[TRACK-VIEW] Updating view count from ${oldViewCount} to ${newViewCount} for handle: ${handle}`);
-
     // Increment view count in database
     const updatedPage = await DirectusAPI.updateUserPage(userPage.id, {
       view_count: newViewCount
     });
-
-    console.log(`[TRACK-VIEW] Successfully updated view count. New count: ${updatedPage.view_count}`);
 
     return NextResponse.json({ 
       success: true, 
@@ -92,11 +87,10 @@ export async function POST(
       message: 'View counted successfully'
     });
 
-  } catch (error) {
-    console.error('[TRACK-VIEW] Error tracking view:', error);
+  } catch {
     return NextResponse.json({ 
       error: 'Failed to track view',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: 'Unknown error'
     }, { status: 500 });
   }
 } 

@@ -113,8 +113,7 @@ export async function GET(
       transactions: processedTransactions,
       count: processedTransactions.length
     });
-  } catch (error) {
-    console.error('Transactions fetch error:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch wallet transactions' },
       { status: 500 }

@@ -70,8 +70,7 @@ export async function POST() {
       timestamp: new Date().toISOString(),
       results: results.slice(0, 20) // Limit results to avoid large responses
     });
-  } catch (error) {
-    console.error('Snapshot-all error:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to process snapshots' },
       { status: 500 }
