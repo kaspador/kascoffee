@@ -63,6 +63,19 @@ export interface WalletSnapshot {
   date_created: string;
 }
 
+export interface DirectusError {
+  response?: {
+    status?: number;
+    statusText?: string;
+    headers?: Record<string, unknown>;
+  };
+  errors?: Array<{
+    message: string;
+    extensions?: Record<string, unknown>;
+  }>;
+  message?: string;
+}
+
 // Server-side only helper functions
 export const DirectusAPI = {
   // Authentication (server-side only)
@@ -156,7 +169,7 @@ export const DirectusAPI = {
       
       // Enhanced error logging
       if (error && typeof error === 'object') {
-        const err = error as any;
+        const err = error as DirectusError;
         if (err.response) {
           console.error(`[DIRECTUS] Response status: ${err.response.status}`);
           console.error(`[DIRECTUS] Response headers:`, err.response.headers);

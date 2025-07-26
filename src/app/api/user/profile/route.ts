@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { DirectusAPI } from '@/lib/directus';
+import { DirectusAPI, DirectusError } from '@/lib/directus';
 
 export async function GET(request: NextRequest) {
 	try {
@@ -218,7 +218,7 @@ export async function PUT(request: NextRequest) {
 				
 				// Provide more specific error details
 				if (error && typeof error === 'object' && 'response' in error) {
-					const directusError = error as any;
+					const directusError = error as DirectusError;
 					console.error('[PROFILE-API] Directus error details:', {
 						status: directusError.response?.status,
 						statusText: directusError.response?.statusText,
