@@ -185,8 +185,9 @@ export async function PUT(request: NextRequest) {
 				
 				// Use admin token for server-side operations
 				if (process.env.DIRECTUS_TOKEN) {
+					console.log('[PROFILE-API] Switching to admin token for update operation');
 					await DirectusAPI.setToken(process.env.DIRECTUS_TOKEN);
-					console.log('[PROFILE-API] Using admin token for update');
+					console.log('[PROFILE-API] Admin token set successfully');
 				} else {
 					console.warn('[PROFILE-API] No admin token found in environment variables');
 					return NextResponse.json({ 
@@ -250,8 +251,14 @@ export async function PUT(request: NextRequest) {
 				
 				// Use admin token for server-side operations
 				if (process.env.DIRECTUS_TOKEN) {
+					console.log('[PROFILE-API] Switching to admin token for create operation');
 					await DirectusAPI.setToken(process.env.DIRECTUS_TOKEN);
-					console.log('[PROFILE-API] Using admin token for creation');
+					console.log('[PROFILE-API] Admin token set successfully for creation');
+				} else {
+					console.warn('[PROFILE-API] No admin token found for creation');
+					return NextResponse.json({ 
+						error: 'Server configuration error: Admin token not configured' 
+					}, { status: 500 });
 				}
 				
 				const newPage = await DirectusAPI.createUserPage(userPageData);
