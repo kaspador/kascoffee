@@ -60,14 +60,13 @@ export async function GET(
       return cleaned;
     };
 
-    // Debug image URLs
-    console.log(`[USER-PAGE-API] Raw image URLs for ${handle}:`, {
-      raw_profile: userPage.profile_image,
-      raw_background: userPage.background_image,
-      cleaned_profile: cleanImageUrl(userPage.profile_image),
-      cleaned_background: cleanImageUrl(userPage.background_image),
-      all_userPage_fields: Object.keys(userPage)
-    });
+    // Debug EVERYTHING that comes from database
+    console.log(`[USER-PAGE-API] ===== FULL DATABASE RESPONSE FOR ${handle} =====`);
+    console.log(`[USER-PAGE-API] Raw userPage object:`, JSON.stringify(userPage, null, 2));
+    console.log(`[USER-PAGE-API] userPage.profile_image specifically:`, userPage.profile_image);
+    console.log(`[USER-PAGE-API] userPage.background_image specifically:`, userPage.background_image);
+    console.log(`[USER-PAGE-API] All fields present:`, Object.keys(userPage));
+    console.log(`[USER-PAGE-API] ===============================================`);
 
     const userData = {
       ...userPage,
@@ -76,9 +75,11 @@ export async function GET(
       shortDescription: userPage.short_description,
       longDescription: userPage.long_description,
       kaspaAddress: userPage.kaspa_address,
-      // TEMPORARILY DISABLE CLEANING TO TEST
+      // TEMPORARILY RETURN RAW VALUES TO DEBUG
       profileImage: userPage.profile_image,
       backgroundImage: userPage.background_image,
+      // DEBUG: Include raw database response  
+      _DEBUG_RAW_DB_RESPONSE: userPage,
       backgroundColor: userPage.background_color || '#0f172a',
       foregroundColor: userPage.foreground_color || '#ffffff',
       isActive: userPage.is_active,
