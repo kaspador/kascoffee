@@ -427,6 +427,35 @@ export default function UserProfilePage({ params }: PageProps) {
 							@{userPage.handle}
 						</Badge>
 					</div>
+
+					{/* Social Links */}
+					{userPage.socials && userPage.socials.length > 0 && (
+						<div className="flex justify-center mb-8">
+							<div className="flex flex-wrap justify-center gap-4">
+								{userPage.socials.map((social) => {
+									const IconComponent = socialIconMap[social.platform as keyof typeof socialIconMap] || FaGlobe;
+									return (
+										<a
+											key={social.id}
+											href={social.url}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="group"
+										>
+											<Button
+												variant="outline"
+												size="sm"
+												className="border-[#70C7BA]/30 text-[#70C7BA] hover:bg-[#70C7BA]/20 hover:border-[#70C7BA] transition-all duration-300 rounded-full backdrop-blur-sm group-hover:scale-105"
+											>
+												<IconComponent className="w-4 h-4 mr-2" />
+												{social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}
+											</Button>
+										</a>
+									);
+								})}
+							</div>
+						</div>
+					)}
 					
 					{userPage.shortDescription && (
 						<p 
@@ -527,34 +556,7 @@ export default function UserProfilePage({ params }: PageProps) {
 					)}
 				</div>
 
-				{/* Social Links */}
-				{userPage.socials && userPage.socials.length > 0 && (
-					<div className="flex justify-center mb-12">
-						<div className="flex flex-wrap justify-center gap-4">
-							{userPage.socials.map((social) => {
-								const IconComponent = socialIconMap[social.platform as keyof typeof socialIconMap] || FaGlobe;
-								return (
-									<a
-										key={social.id}
-										href={social.url}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="group"
-									>
-										<Button
-											variant="outline"
-											size="sm"
-											className="border-[#70C7BA]/30 text-[#70C7BA] hover:bg-[#70C7BA]/20 hover:border-[#70C7BA] transition-all duration-300 rounded-full backdrop-blur-sm group-hover:scale-105"
-										>
-											<IconComponent className="w-4 h-4 mr-2" />
-											{social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}
-										</Button>
-									</a>
-								);
-							})}
-						</div>
-					</div>
-				)}
+
 
 				{/* Content Grid */}
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
