@@ -91,7 +91,7 @@ export async function GET(
         
         return {
           id: tx.transaction_id,
-          hash: tx.hash,
+          hash: tx.transaction_id,
           timestamp: tx.accepting_block_time || tx.block_time,
           type: 'donation' as const,
           amount: outputToUser.amount,
