@@ -21,6 +21,7 @@ interface UserProfile {
 	shortDescription: string;
 	longDescription: string;
 	kaspaAddress: string;
+	donationGoal: number | null;
 	profileImage: string | null;
 	backgroundImage: string | null;
 	backgroundColor: string;
@@ -124,6 +125,7 @@ export default function DashboardPage() {
 			backgroundImage: profile.backgroundImage || null,
 			shortDescription: profile.shortDescription || null,
 			longDescription: profile.longDescription || null,
+			donationGoal: profile.donationGoal || null,
 			viewCount: profile.viewCount || null,
 			createdAt: new Date(profile.createdAt),
 			updatedAt: new Date(profile.updatedAt),

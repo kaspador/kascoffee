@@ -36,6 +36,7 @@ export interface UserPage {
   background_image: string | null;
   background_color: string;
   foreground_color: string;
+  donation_goal: number | null; // Goal amount in KAS
   is_active: boolean;
   view_count: number;
   date_created?: string;
@@ -125,6 +126,7 @@ export const DirectusAPI = {
           'background_image', // EXPLICITLY include background_image
           'background_color',
           'foreground_color',
+          'donation_goal',
           'is_active',
           'view_count',
           'date_created',
@@ -159,6 +161,7 @@ export const DirectusAPI = {
           'background_image', // EXPLICITLY include background_image
           'background_color',
           'foreground_color',
+          'donation_goal',
           'is_active',
           'view_count',
           'date_created',
@@ -205,6 +208,7 @@ export const DirectusAPI = {
           'background_image', // EXPLICITLY include background_image
           'background_color',
           'foreground_color',
+          'donation_goal',
           'is_active',
           'view_count',
           'date_created',

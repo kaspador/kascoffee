@@ -26,6 +26,11 @@ const profileFormSchema = z.object({
 		(address) => validateKaspaAddress(address),
 		'Please enter a valid Kaspa address'
 	),
+	donationGoal: z.string().optional().refine((value) => {
+		if (!value || value.trim() === '') return true;
+		const num = parseFloat(value);
+		return !isNaN(num) && num > 0;
+	}, 'Please enter a valid amount greater than 0'),
 	shortDescription: z.string().max(300, 'Short description must be less than 300 characters').optional(),
 	profileImage: z.string().optional(),
 	backgroundImage: z.string().optional()
@@ -44,6 +49,7 @@ interface ProfileFormProps {
 		shortDescription: string | null;
 		longDescription: string | null;
 		kaspaAddress: string;
+		donationGoal: number | null;
 		profileImage: string | null;
 		backgroundImage: string | null;
 		backgroundColor: string;
@@ -75,6 +81,7 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 			handle: userPage?.handle || '',
 			displayName: userPage?.displayName || '',
 			kaspaAddress: userPage?.kaspaAddress || '',
+			donationGoal: userPage?.donationGoal ? userPage.donationGoal.toString() : '',
 			shortDescription: userPage?.shortDescription || '',
 			profileImage: userPage?.profileImage || '',
 			backgroundImage: userPage?.backgroundImage || ''
@@ -129,6 +136,7 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 				handle: userPage.handle,
 				displayName: userPage.displayName,
 				kaspaAddress: userPage.kaspaAddress,
+				donationGoal: userPage.donationGoal ? userPage.donationGoal.toString() : '',
 				shortDescription: userPage.shortDescription || '',
 				profileImage: userPage.profileImage || '',
 				backgroundImage: userPage.backgroundImage || ''
@@ -141,6 +149,7 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 				handle: '',
 				displayName: '',
 				kaspaAddress: '',
+				donationGoal: '',
 				shortDescription: '',
 				profileImage: '',
 				backgroundImage: ''
@@ -150,7 +159,7 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 	}, [userPage, reset]);
 
 	const updateProfileMutation = useMutation({
-		mutationFn: async (data: ProfileFormData & { longDescription: string }) => {
+		mutationFn: async (data: Omit<ProfileFormData, 'donationGoal'> & { longDescription: string; donationGoal: number | null }) => {
 			const response = await fetch('/api/user/profile', {
 				method: 'PUT',
 				headers: { 
@@ -181,7 +190,19 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 			return;
 		}
 
-		updateProfileMutation.mutate({ ...data, longDescription });
+		// Convert donation goal from string to number
+		const donationGoalNumber = data.donationGoal && data.donationGoal.trim() !== '' 
+			? parseFloat(data.donationGoal) 
+			: null;
+
+		// Exclude donationGoal from data and add it back as a number
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { donationGoal: _donationGoalString, ...restData } = data;
+		updateProfileMutation.mutate({ 
+			...restData, 
+			donationGoal: donationGoalNumber,
+			longDescription 
+		});
 	};
 
 	const shortDescriptionLength = watch('shortDescription')?.length || 0;
@@ -313,6 +334,27 @@ export function ProfileForm({ userPage, isLoading, onSuccess }: ProfileFormProps
 							)}
 							<p className="text-xs text-gray-500 font-kaspa-body">
 								Your Kaspa wallet address where donations will be sent
+							</p>
+						</div>
+
+						<div className="space-y-2 md:col-span-2">
+							<Label htmlFor="donationGoal" className="text-gray-300 font-kaspa-body font-semibold">
+								Donation Goal (KAS)
+							</Label>
+							<Input
+								id="donationGoal"
+								{...register('donationGoal')}
+								placeholder="1000"
+								type="number"
+								step="0.00000001"
+								min="0"
+								className="bg-slate-800/50 border-[#70C7BA]/30 text-white placeholder:text-gray-500 focus:border-[#70C7BA] focus:ring-[#70C7BA]/20 rounded-xl font-kaspa-body transition-all duration-300"
+							/>
+							{errors.donationGoal && (
+								<p className="text-red-400 text-sm font-kaspa-body">{errors.donationGoal.message}</p>
+							)}
+							<p className="text-xs text-gray-500 font-kaspa-body">
+								Set a fundraising goal to show progress on your donation page
 							</p>
 						</div>
 					</div>

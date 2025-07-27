@@ -14,6 +14,7 @@ import QRCodeDisplay from '@/components/qr-code-display';
 import { WalletBalance } from '@/components/wallet/wallet-balance';
 import { TransactionList } from '@/components/wallet/transaction-list';
 import { useEffect, useState } from 'react';
+import { getKaspaPrice, formatUSD } from '@/lib/utils';
 
 interface UserPageData {
 	id: string;
@@ -23,6 +24,7 @@ interface UserPageData {
 	shortDescription: string | null;
 	longDescription: string | null;
 	kaspaAddress: string;
+	donationGoal: number | null;
 	profileImage: string | null;
 	backgroundImage: string | null;
 	backgroundColor: string;
@@ -79,6 +81,8 @@ export default function UserProfilePage({ params }: PageProps) {
 	const [loading, setLoading] = useState(true);
 	const [handle, setHandle] = useState<string>('');
 	const [copied, setCopied] = useState(false);
+	const [walletBalance, setWalletBalance] = useState<number>(0);
+	const [kaspaPrice, setKaspaPrice] = useState<number>(0.10);
 
 	useEffect(() => {
 		async function loadParams() {
@@ -132,6 +136,41 @@ export default function UserProfilePage({ params }: PageProps) {
 
 		loadUserPage();
 	}, [handle]);
+
+	// Fetch wallet balance and price for goal progress
+	useEffect(() => {
+		if (!userPage?.kaspaAddress || !userPage?.donationGoal) return;
+
+		async function fetchWalletData() {
+			if (!userPage) return; // Additional null check for TypeScript
+			
+			try {
+				// Fetch price and balance in parallel
+				const [pricePromise, balancePromise] = await Promise.allSettled([
+					getKaspaPrice(),
+					fetch(`/api/wallet/balance/${encodeURIComponent(userPage.kaspaAddress)}`)
+				]);
+
+				// Handle price
+				if (pricePromise.status === 'fulfilled') {
+					setKaspaPrice(pricePromise.value);
+				}
+
+				// Handle balance
+				if (balancePromise.status === 'fulfilled') {
+					const balanceResponse = balancePromise.value;
+					if (balanceResponse.ok) {
+						const balanceData = await balanceResponse.json();
+						setWalletBalance(balanceData.balanceKas || 0);
+					}
+				}
+			} catch {
+				// Silent error handling
+			}
+		}
+
+		fetchWalletData();
+	}, [userPage]);
 
 	const handleCopyAddress = async () => {
 		if (!userPage) return;
@@ -422,6 +461,70 @@ export default function UserProfilePage({ params }: PageProps) {
 							<span style={{ color: userPage.foregroundColor }}>Powered by Kaspa</span>
 						</div>
 					</div>
+
+					{/* Donation Goal Progress */}
+					{userPage.donationGoal && userPage.donationGoal > 0 && (
+						<div className="max-w-2xl mx-auto mb-8">
+							<Card 
+								className="backdrop-blur-xl border shadow-2xl"
+								style={{ 
+									backgroundColor: `${userPage.foregroundColor}08`,
+									borderColor: `${userPage.foregroundColor}30`
+								}}
+							>
+								<CardContent className="p-6">
+									<div className="text-center mb-4">
+										<div className="flex items-center justify-center gap-2 mb-2">
+											<Heart className="w-5 h-5" style={{ color: userPage.foregroundColor }} />
+											<h3 
+												className="text-xl font-bold"
+												style={{ color: userPage.foregroundColor }}
+											>
+												Donation Goal
+											</h3>
+										</div>
+										<div 
+											className="text-3xl font-black mb-2"
+											style={{ color: userPage.foregroundColor }}
+										>
+											{walletBalance.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} KAS
+											<span className="text-lg font-normal opacity-60">
+												 / {userPage.donationGoal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} KAS
+											</span>
+										</div>
+										<div 
+											className="text-lg opacity-80"
+											style={{ color: userPage.foregroundColor }}
+										>
+											${formatUSD(walletBalance, kaspaPrice)} / ${formatUSD(userPage.donationGoal, kaspaPrice)} USD
+										</div>
+									</div>
+									
+									{/* Progress Bar */}
+									<div className="w-full bg-gray-700 rounded-full h-4 mb-4 overflow-hidden">
+										<div 
+											className="h-full rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-[#70C7BA] to-[#49EACB] relative"
+											style={{ 
+												width: `${Math.min((walletBalance / userPage.donationGoal) * 100, 100)}%`
+											}}
+										>
+											<div className="absolute inset-0 bg-white opacity-20 animate-pulse"></div>
+										</div>
+									</div>
+									
+									{/* Progress Percentage */}
+									<div className="text-center">
+										<span 
+											className="text-lg font-bold"
+											style={{ color: userPage.foregroundColor }}
+										>
+											{((walletBalance / userPage.donationGoal) * 100).toFixed(1)}% Complete
+										</span>
+									</div>
+								</CardContent>
+							</Card>
+						</div>
+					)}
 				</div>
 
 				{/* Social Links */}
