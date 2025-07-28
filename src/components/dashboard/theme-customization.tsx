@@ -33,6 +33,7 @@ interface ThemeCustomizationProps {
 		shortDescription: string | null;
 		longDescription: string | null;
 		kaspaAddress: string;
+		donationGoal: number | null;
 		profileImage: string | null;
 		backgroundImage: string | null;
 		backgroundColor: string;
@@ -74,7 +75,15 @@ export function ThemeCustomization({ userPage, isLoading, onSuccess }: ThemeCust
 	});
 
 	const updateThemeMutation = useMutation({
-		mutationFn: async (data: ThemeFormData) => {
+		mutationFn: async (data: ThemeFormData & { 
+			handle?: string;
+			displayName?: string;
+			kaspaAddress?: string;
+			donationGoal?: number | null;
+			shortDescription?: string | null;
+			longDescription?: string | null;
+			profileImage?: string | null;
+		}) => {
 			const response = await fetch('/api/user/profile', {
 				method: 'PUT',
 				headers: { 
@@ -96,7 +105,19 @@ export function ThemeCustomization({ userPage, isLoading, onSuccess }: ThemeCust
 	});
 
 	const onSubmit = (data: ThemeFormData) => {
-		updateThemeMutation.mutate(data);
+		// Preserve all existing profile data when updating theme
+		const preservedData = {
+			handle: userPage?.handle,
+			displayName: userPage?.displayName,
+			kaspaAddress: userPage?.kaspaAddress,
+			donationGoal: userPage?.donationGoal,
+			shortDescription: userPage?.shortDescription,
+			longDescription: userPage?.longDescription,
+			profileImage: userPage?.profileImage, // This was getting erased!
+			...data // Theme data overwrites only the theme fields
+		};
+		
+		updateThemeMutation.mutate(preservedData);
 	};
 
 	const currentBg = watch('backgroundColor');
