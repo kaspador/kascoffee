@@ -46,6 +46,7 @@ export default function DashboardPage() {
 	const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 	const [profileLoading, setProfileLoading] = useState(false);
 	const [socials, setSocials] = useState<{socials: Social[]} | null>(null);
+	const [supporterCount, setSupporterCount] = useState<number>(0);
 	const router = useRouter();
 
 	// Check authentication on component mount
@@ -108,12 +109,35 @@ export default function DashboardPage() {
 		}
 	}, []);
 
+	// Function to fetch supporter count (donations)
+	const fetchSupporters = useCallback(async () => {
+		if (!userProfile?.kaspaAddress) return;
+		
+		try {
+			const response = await fetch(`/api/wallet/transactions/${encodeURIComponent(userProfile.kaspaAddress)}?limit=100`);
+			
+			if (response.ok) {
+				const data = await response.json();
+				const donations = data.transactions?.filter((tx: { type: string }) => tx.type === 'donation') || [];
+				setSupporterCount(donations.length);
+			}
+		} catch {
+			// Handle error silently
+		}
+	}, [userProfile?.kaspaAddress]);
+
 	// Fetch profile when user is authenticated
 	useEffect(() => {
 		if (!authUser) return;
 		fetchProfile();
 		fetchSocials();
 	}, [authUser, fetchProfile, fetchSocials]); // Dependencies optimized to prevent infinite loops
+
+	// Fetch supporters when profile is loaded
+	useEffect(() => {
+		if (!userProfile?.kaspaAddress) return;
+		fetchSupporters();
+	}, [userProfile?.kaspaAddress, fetchSupporters]);
 
 	// Convert UserProfile to the format expected by components
 	const convertProfileForComponents = (profile: UserProfile | null) => {
@@ -259,8 +283,8 @@ export default function DashboardPage() {
 							<div className="flex items-start justify-between">
 								<div className="flex-1">
 									<p className="text-purple-400 text-xs sm:text-sm font-kaspa-subheader font-bold uppercase tracking-wider mb-1 sm:mb-2">SUPPORTERS</p>
-									<p className="text-2xl sm:text-3xl font-kaspa-header font-black text-white mb-1 sm:mb-2">0</p>
-									<p className="text-gray-300 text-xs sm:text-sm font-kaspa-body">This month</p>
+									<p className="text-2xl sm:text-3xl font-kaspa-header font-black text-white mb-1 sm:mb-2">{supporterCount}</p>
+									<p className="text-gray-300 text-xs sm:text-sm font-kaspa-body">Total donations</p>
 								</div>
 								<div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-purple-500/20 rounded-2xl flex items-center justify-center group-hover:bg-purple-500/30 transition-all duration-300">
 									<Users className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-purple-400" />
