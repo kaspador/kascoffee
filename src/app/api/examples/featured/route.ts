@@ -29,7 +29,7 @@ export async function GET() {
           const donations = data.transactions || [];
           
           // Sum up all donations
-          totalRaised = donations.reduce((sum: number, tx: any) => sum + (tx.amountKas || 0), 0);
+          totalRaised = donations.reduce((sum: number, tx: { amountKas?: number }) => sum + (tx.amountKas || 0), 0);
           supporterCount = donations.length;
         }
         
@@ -51,7 +51,7 @@ export async function GET() {
             viewCount: page.view_count
           });
         }
-      } catch (error) {
+      } catch {
         // Continue with other pages
       }
     }
@@ -66,7 +66,7 @@ export async function GET() {
       total: pagesWithStats.length
     });
     
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch featured examples' },
       { status: 500 }

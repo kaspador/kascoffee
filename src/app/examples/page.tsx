@@ -2,6 +2,7 @@ import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight, Code, Eye, Heart, Users, TrendingUp, Zap } from 'lucide-react';
+import Image from 'next/image';
 
 interface Stats {
 	totalRaised: number;
@@ -33,7 +34,7 @@ async function getStats(): Promise<Stats> {
 		if (response.ok) {
 			return await response.json();
 		}
-	} catch (error) {
+	} catch {
 		// Failed to fetch stats, will use fallback
 	}
 	
@@ -56,7 +57,7 @@ async function getFeaturedExamples(): Promise<Example[]> {
 			const data = await response.json();
 			return data.examples || [];
 		}
-	} catch (error) {
+	} catch {
 		// Failed to fetch examples, will use fallback
 	}
 	
@@ -155,16 +156,17 @@ export default async function ExamplesPage() {
 
 						{examples.length > 0 ? (
 							<div className="grid lg:grid-cols-3 gap-8">
-								{examples.map((example, index) => (
+								{examples.map((example) => (
 									<div key={example.id} className="group">
 										<div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-6 hover:border-[#70C7BA]/50 transition-all duration-500 hover:transform hover:scale-105">
 											{/* Image Placeholder */}
 											<div className={`w-full h-48 bg-gradient-to-r ${example.color} rounded-2xl mb-6 flex items-center justify-center relative overflow-hidden`}>
 												{example.backgroundImage || example.profileImage ? (
-													<img 
-														src={example.backgroundImage || example.profileImage} 
+													<Image 
+														src={(example.backgroundImage || example.profileImage)!} 
 														alt={example.title}
-														className="w-full h-full object-cover"
+														fill
+														className="object-cover"
 													/>
 												) : (
 													<>
@@ -238,7 +240,6 @@ export default async function ExamplesPage() {
 								</Button>
 							</div>
 						)}
-						</div>
 					</div>
 				</section>
 

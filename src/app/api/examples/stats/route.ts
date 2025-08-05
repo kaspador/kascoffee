@@ -28,13 +28,13 @@ export async function GET() {
           const donations = data.transactions || [];
           
           // Sum up all donations for this page
-          const pageTotalKas = donations.reduce((sum: number, tx: any) => sum + (tx.amountKas || 0), 0);
+          const pageTotalKas = donations.reduce((sum: number, tx: { amountKas?: number }) => sum + (tx.amountKas || 0), 0);
           totalRaised += pageTotalKas;
           
           // Count unique supporters (transactions) for this page
           totalSupporters += donations.length;
         }
-      } catch (error) {
+      } catch {
         // Continue processing other pages even if one fails
       }
     }
@@ -46,7 +46,7 @@ export async function GET() {
       uptime: 99.9 // Static for now, could be calculated from monitoring
     });
     
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch stats' },
       { status: 500 }
