@@ -1,23 +1,59 @@
 import { NextResponse } from 'next/server';
 import { DirectusAPI } from '@/lib/directus';
 
+// In-memory cache for featured examples
+interface ExampleItem {
+  id: string;
+  handle: string;
+  title: string;
+  description: string;
+  category: string;
+  raised: string;
+  raisedNumber: number;
+  supporters: number;
+  tags: string[];
+  color: string;
+  profileImage: string | null;
+  backgroundImage: string | null;
+  viewCount: number;
+}
+
+interface FeaturedCache {
+  examples: ExampleItem[];
+  total: number;
+}
+
+let cachedFeatured: FeaturedCache | null = null;
+let lastFeaturedCacheTime = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 export async function GET() {
   try {
+    // Check if we have valid cached data
+    const now = Date.now();
+    if (cachedFeatured && (now - lastFeaturedCacheTime) < CACHE_DURATION) {
+      return NextResponse.json(cachedFeatured);
+    }
+
     // Get all active user pages
     const allPages = await DirectusAPI.getAllUserPages();
     const activePages = allPages.filter(page => page.is_active);
     
-    // Process pages to get donation data and create featured examples
-    const pagesWithStats = [];
+    // Pre-filter and limit pages for better performance
+    // Prioritize pages with higher view counts or existing donation goals
+    const candidatePages = activePages
+      .filter(page => page.view_count > 0 || page.donation_goal || page.profile_image)
+      .sort((a, b) => (b.view_count || 0) - (a.view_count || 0))
+      .slice(0, 8); // Reduce to 8 most promising pages
     
-    for (const page of activePages.slice(0, 12)) { // Limit to 12 pages for performance
+    // Process pages in parallel for faster execution
+    const pagePromises = candidatePages.map(async (page) => {
       try {
-        // Get transactions for this page's Kaspa address
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/wallet/transactions/${encodeURIComponent(page.kaspa_address)}?limit=50`,
+          `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/wallet/transactions/${encodeURIComponent(page.kaspa_address)}?limit=25`,
           { 
             headers: { 'accept': 'application/json' },
-            next: { revalidate: 300 } // Cache for 5 minutes
+            cache: 'force-cache'
           }
         );
         
@@ -28,14 +64,13 @@ export async function GET() {
           const data = await response.json();
           const donations = data.transactions || [];
           
-          // Sum up all donations
           totalRaised = donations.reduce((sum: number, tx: { amountKas?: number }) => sum + (tx.amountKas || 0), 0);
           supporterCount = donations.length;
         }
         
-        // Only include pages with actual donations or interesting profiles
-        if (totalRaised > 0 || page.view_count > 10) {
-          pagesWithStats.push({
+        // Include page if it has donations, views, or looks interesting
+        if (totalRaised > 0 || page.view_count > 5 || page.profile_image) {
+          return {
             id: page.id,
             handle: page.handle,
             title: page.display_name,
@@ -49,22 +84,33 @@ export async function GET() {
             profileImage: page.profile_image,
             backgroundImage: page.background_image,
             viewCount: page.view_count
-          });
+          };
         }
+        return null;
       } catch {
-        // Continue with other pages
+        return null;
       }
-    }
+    });
+
+    // Wait for all pages to be processed in parallel
+    const pageResults = await Promise.all(pagePromises);
+    const pagesWithStats = pageResults.filter(page => page !== null);
     
     // Sort by total raised (descending) and take top 6 for featured
     const featuredPages = pagesWithStats
       .sort((a, b) => b.raisedNumber - a.raisedNumber)
       .slice(0, 6);
-    
-    return NextResponse.json({
+
+    const result = {
       examples: featuredPages,
       total: pagesWithStats.length
-    });
+    };
+
+    // Cache the results
+    cachedFeatured = result;
+    lastFeaturedCacheTime = now;
+    
+    return NextResponse.json(result);
     
   } catch {
     return NextResponse.json(
