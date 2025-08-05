@@ -1,8 +1,11 @@
+'use client';
+
 import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight, Code, Eye, Heart, Users, TrendingUp, Zap } from 'lucide-react';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 interface Stats {
 	totalRaised: number;
@@ -25,51 +28,43 @@ interface Example {
 	backgroundImage?: string;
 }
 
-async function getStats(): Promise<Stats> {
-	try {
-		const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/examples/stats`, {
-			next: { revalidate: 300 } // Cache for 5 minutes
-		});
-		
-		if (response.ok) {
-			return await response.json();
-		}
-	} catch {
-		// Failed to fetch stats, will use fallback
-	}
-	
-	// Fallback to default stats if API fails
-	return {
+export default function ExamplesPage() {
+	const [stats, setStats] = useState<Stats>({
 		totalRaised: 0,
 		activePages: 0,
 		supporters: 0,
 		uptime: 99.9
-	};
-}
+	});
+	const [examples, setExamples] = useState<Example[]>([]);
+	const [loading, setLoading] = useState(true);
 
-async function getFeaturedExamples(): Promise<Example[]> {
-	try {
-		const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/examples/featured`, {
-			next: { revalidate: 300 } // Cache for 5 minutes
-		});
-		
-		if (response.ok) {
-			const data = await response.json();
-			return data.examples || [];
+	useEffect(() => {
+		async function fetchData() {
+			try {
+				// Fetch stats and examples in parallel
+				const [statsResponse, examplesResponse] = await Promise.all([
+					fetch('/api/examples/stats'),
+					fetch('/api/examples/featured')
+				]);
+
+				if (statsResponse.ok) {
+					const statsData = await statsResponse.json();
+					setStats(statsData);
+				}
+
+				if (examplesResponse.ok) {
+					const examplesData = await examplesResponse.json();
+					setExamples(examplesData.examples || []);
+				}
+			} catch {
+				// Failed to fetch examples data
+			} finally {
+				setLoading(false);
+			}
 		}
-	} catch {
-		// Failed to fetch examples, will use fallback
-	}
-	
-	// Fallback to empty array if API fails
-	return [];
-}
 
-export default async function ExamplesPage() {
-	const [stats, examples] = await Promise.all([
-		getStats(),
-		getFeaturedExamples()
-	]);
+		fetchData();
+	}, []);
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 dark:from-black dark:via-gray-900 dark:to-black relative">
@@ -115,21 +110,33 @@ export default async function ExamplesPage() {
 							<div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 text-center hover:bg-white/10 transition-all duration-300">
 								<TrendingUp className="w-8 h-8 text-[#70C7BA] mx-auto mb-3" />
 								<div className="text-2xl font-black text-white mb-1">
-									{stats.totalRaised > 0 ? `${stats.totalRaised.toLocaleString()}` : '0'}
+									{loading ? (
+										<div className="animate-pulse bg-gray-600 h-8 w-16 mx-auto rounded"></div>
+									) : (
+										stats.totalRaised > 0 ? `${stats.totalRaised.toLocaleString()}` : '0'
+									)}
 								</div>
 								<div className="text-gray-400 font-medium text-sm">Total Raised (KAS)</div>
 							</div>
 							<div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 text-center hover:bg-white/10 transition-all duration-300">
 								<Users className="w-8 h-8 text-[#49EACB] mx-auto mb-3" />
 								<div className="text-2xl font-black text-white mb-1">
-									{stats.activePages > 0 ? stats.activePages.toLocaleString() : '0'}
+									{loading ? (
+										<div className="animate-pulse bg-gray-600 h-8 w-12 mx-auto rounded"></div>
+									) : (
+										stats.activePages > 0 ? stats.activePages.toLocaleString() : '0'
+									)}
 								</div>
 								<div className="text-gray-400 font-medium text-sm">Active Pages</div>
 							</div>
 							<div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 text-center hover:bg-white/10 transition-all duration-300">
 								<Heart className="w-8 h-8 text-[#70C7BA] mx-auto mb-3" />
 								<div className="text-2xl font-black text-white mb-1">
-									{stats.supporters > 0 ? stats.supporters.toLocaleString() : '0'}
+									{loading ? (
+										<div className="animate-pulse bg-gray-600 h-8 w-16 mx-auto rounded"></div>
+									) : (
+										stats.supporters > 0 ? stats.supporters.toLocaleString() : '0'
+									)}
 								</div>
 								<div className="text-gray-400 font-medium text-sm">Supporters</div>
 							</div>
@@ -154,7 +161,30 @@ export default async function ExamplesPage() {
 							</p>
 						</div>
 
-						{examples.length > 0 ? (
+						{loading ? (
+							<div className="grid lg:grid-cols-3 gap-8">
+								{[1, 2, 3, 4, 5, 6].map((i) => (
+									<div key={i} className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-6">
+										<div className="w-full h-48 bg-gray-600 animate-pulse rounded-2xl mb-6"></div>
+										<div className="w-20 h-6 bg-gray-600 animate-pulse rounded-full mb-4"></div>
+										<div className="w-full h-6 bg-gray-600 animate-pulse rounded mb-3"></div>
+										<div className="w-3/4 h-4 bg-gray-600 animate-pulse rounded mb-6"></div>
+										<div className="flex justify-between mb-6">
+											<div className="w-16 h-8 bg-gray-600 animate-pulse rounded"></div>
+											<div className="w-12 h-8 bg-gray-600 animate-pulse rounded"></div>
+										</div>
+										<div className="flex gap-2 mb-6">
+											<div className="w-16 h-6 bg-gray-600 animate-pulse rounded"></div>
+											<div className="w-20 h-6 bg-gray-600 animate-pulse rounded"></div>
+										</div>
+										<div className="flex gap-3">
+											<div className="flex-1 h-8 bg-gray-600 animate-pulse rounded"></div>
+											<div className="w-24 h-8 bg-gray-600 animate-pulse rounded"></div>
+										</div>
+									</div>
+								))}
+							</div>
+						) : examples.length > 0 ? (
 							<div className="grid lg:grid-cols-3 gap-8">
 								{examples.map((example) => (
 									<div key={example.id} className="group">
