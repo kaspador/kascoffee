@@ -13,8 +13,8 @@ export async function POST(request: NextRequest) {
 
     const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL || 'https://directus-production-09ff.up.railway.app';
     
-    // First, get the "Registered User" role ID
-    const rolesResponse = await fetch(`${directusUrl}/roles?filter[name][_eq]=Registered User`, {
+    // First, get the "Registered Users" role ID
+    const rolesResponse = await fetch(`${directusUrl}/roles?filter[name][_eq]=Registered Users`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
