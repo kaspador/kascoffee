@@ -13,11 +13,12 @@ export async function POST(request: NextRequest) {
 
     const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL || 'https://directus-production-09ff.up.railway.app';
     
-    // First, get the "Registered Users" role ID
+    // First, get the "Registered Users" role ID using admin token
     const rolesResponse = await fetch(`${directusUrl}/roles?filter[name][_eq]=Registered Users`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.DIRECTUS_TOKEN}`,
       },
     });
     
@@ -49,6 +50,7 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.DIRECTUS_TOKEN}`,
       },
       body: JSON.stringify(userData),
     });
