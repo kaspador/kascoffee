@@ -250,7 +250,15 @@ export const DirectusAPI = {
   },
 
   async createSocial(data: Omit<Social, 'id' | 'date_created' | 'date_updated'>) {
-    return await directusAuth.request(createItem('socials', data));
+    try {
+      console.log('[DEBUG] DirectusAPI.createSocial - Creating social with data:', data);
+      const result = await directusAuth.request(createItem('socials', data));
+      console.log('[DEBUG] DirectusAPI.createSocial - Social created successfully:', result);
+      return result;
+    } catch (error) {
+      console.error('[ERROR] DirectusAPI.createSocial - Error creating social:', error);
+      throw error;
+    }
   },
 
   async updateSocial(id: string, data: Partial<Social>) {

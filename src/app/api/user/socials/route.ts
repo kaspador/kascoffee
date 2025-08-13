@@ -29,11 +29,15 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
 	try {
+		console.log('[DEBUG] /api/user/socials POST - Starting request');
+		
 		// Get token from cookies
 		const token = request.cookies.get('directus_token')?.value;
 		if (!token) {
+			console.log('[DEBUG] /api/user/socials POST - No token found');
 			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
+		console.log('[DEBUG] /api/user/socials POST - Token found:', !!token);
 
 		// Set token for Directus request
 		await DirectusAPI.setToken(token);
@@ -41,23 +45,36 @@ export async function POST(request: NextRequest) {
 		// Get current authenticated user
 		const user = await DirectusAPI.getCurrentUser();
 		if (!user) {
+			console.log('[DEBUG] /api/user/socials POST - User not authenticated');
 			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
+		console.log('[DEBUG] /api/user/socials POST - Current user:', { id: user.id, email: user.email });
 
 		// Parse request body
 		const body = await request.json();
 		const { platform, url, username, is_visible = true } = body;
+		console.log('[DEBUG] /api/user/socials POST - Request body:', { platform, url, username, is_visible });
 
 		// Validate required fields
 		if (!platform || !url) {
+			console.log('[DEBUG] /api/user/socials POST - Missing required fields');
 			return NextResponse.json({ error: 'Platform and URL are required' }, { status: 400 });
 		}
 
 		// Validate platform type
 		const validPlatforms = ['twitter', 'discord', 'telegram', 'website'];
 		if (!validPlatforms.includes(platform)) {
+			console.log('[DEBUG] /api/user/socials POST - Invalid platform:', platform);
 			return NextResponse.json({ error: 'Invalid platform' }, { status: 400 });
 		}
+
+		console.log('[DEBUG] /api/user/socials POST - About to create social with data:', {
+			user: user.id,
+			platform,
+			url,
+			username: username || null,
+			is_visible
+		});
 
 		// Create social
 		const social = await DirectusAPI.createSocial({
@@ -68,8 +85,10 @@ export async function POST(request: NextRequest) {
 			is_visible
 		});
 		
+		console.log('[DEBUG] /api/user/socials POST - Social created successfully:', social);
 		return NextResponse.json({ social });
-	} catch {
+	} catch (error) {
+		console.error('[ERROR] /api/user/socials POST - Error:', error);
 		return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 	}
 }
