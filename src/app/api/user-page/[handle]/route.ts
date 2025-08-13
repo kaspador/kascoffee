@@ -11,18 +11,23 @@ export async function GET(
     // Normalize handle to match how it's stored (lowercase)
     const handle = rawHandle.toLowerCase().trim();
     
-    
+    console.log(`[DEBUG] /api/user-page/${handle} - Starting request`);
 
     // Get user page from Directus
     const userPage = await DirectusAPI.getUserPage(handle);
     
-    
+    console.log(`[DEBUG] /api/user-page/${handle} - Directus response:`, userPage ? 'Found user page' : 'No user page found');
     if (userPage) {
-      
+      console.log(`[DEBUG] /api/user-page/${handle} - User page data:`, {
+        id: userPage.id,
+        handle: userPage.handle,
+        is_active: userPage.is_active,
+        display_name: userPage.display_name
+      });
     }
 
     if (!userPage || !userPage.is_active) {
-      
+      console.log(`[DEBUG] /api/user-page/${handle} - Returning 404: userPage=${!!userPage}, is_active=${userPage?.is_active}`);
       return NextResponse.json({ error: 'User page not found' }, { status: 404 });
     }
 

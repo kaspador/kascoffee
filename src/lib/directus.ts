@@ -111,6 +111,9 @@ export const DirectusAPI = {
   // User Pages
   async getUserPage(handle: string): Promise<UserPage | null> {
     try {
+      console.log(`[DEBUG] DirectusAPI.getUserPage - Searching for handle: "${handle}"`);
+      console.log(`[DEBUG] DirectusAPI.getUserPage - Using directusPublic client`);
+      
       const pages = await directusPublic.request(readItems('user_pages', {
         filter: { handle: { _eq: handle } }, // Use exact match to be explicit
         limit: 1,
@@ -134,13 +137,27 @@ export const DirectusAPI = {
         ]
       })) as unknown[];
       
+      console.log(`[DEBUG] DirectusAPI.getUserPage - Raw response from Directus:`, pages);
+      console.log(`[DEBUG] DirectusAPI.getUserPage - Found ${pages.length} pages`);
+      
       if (pages.length > 0) {
         const page = pages[0] as UserPage;
+        console.log(`[DEBUG] DirectusAPI.getUserPage - Returning page:`, {
+          id: page.id,
+          handle: page.handle,
+          is_active: page.is_active
+        });
         return page;
       }
       
+      console.log(`[DEBUG] DirectusAPI.getUserPage - No pages found, returning null`);
       return null;
-    } catch {
+    } catch (error) {
+      console.error(`[ERROR] DirectusAPI.getUserPage - Error occurred:`, error);
+      console.error(`[ERROR] DirectusAPI.getUserPage - Error details:`, {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      });
       return null;
     }
   },

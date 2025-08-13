@@ -56,8 +56,11 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
 	try {
+		console.log(`[DEBUG] /api/user/profile PUT - Starting request`);
+		
 		// Get token from cookies
 		const token = request.cookies.get('directus_token')?.value;
+		console.log(`[DEBUG] /api/user/profile PUT - Token found:`, !!token);
 		if (!token) {
 			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
@@ -65,7 +68,9 @@ export async function PUT(request: NextRequest) {
 		// Set token for Directus request
 		try {
 			await DirectusAPI.setToken(token);
-		} catch {
+			console.log(`[DEBUG] /api/user/profile PUT - Token set successfully`);
+		} catch (error) {
+			console.error(`[ERROR] /api/user/profile PUT - Token set failed:`, error);
 			return NextResponse.json({ error: 'Authentication failed' }, { status: 401 });
 		}
 
@@ -73,10 +78,12 @@ export async function PUT(request: NextRequest) {
 		let user;
 		try {
 			user = await DirectusAPI.getCurrentUser();
+			console.log(`[DEBUG] /api/user/profile PUT - Current user:`, user ? { id: user.id, email: user.email } : 'null');
 			if (!user) {
 				return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 			}
-		} catch {
+		} catch (error) {
+			console.error(`[ERROR] /api/user/profile PUT - Get current user failed:`, error);
 			return NextResponse.json({ error: 'Authentication failed' }, { status: 401 });
 		}
 
@@ -112,9 +119,12 @@ export async function PUT(request: NextRequest) {
 		// Check if user page already exists for this user
 		let userPage;
 		try {
+			console.log(`[DEBUG] /api/user/profile PUT - Checking existing user page for user ID: ${user.id}`);
 			const userPages = await DirectusAPI.getUserPageByUserId(user.id);
 			userPage = userPages && userPages.length > 0 ? userPages[0] : null;
-		} catch {
+			console.log(`[DEBUG] /api/user/profile PUT - Existing user page:`, userPage ? { id: userPage.id, handle: userPage.handle } : 'null');
+		} catch (error) {
+			console.error(`[ERROR] /api/user/profile PUT - Error checking existing user page:`, error);
 			// User page doesn't exist, that's ok for new users
 		}
 		
