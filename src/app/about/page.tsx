@@ -111,13 +111,17 @@ export default function AboutPage() {
 										Committed to creating tools that make crypto accessible to everyone.
 									</p>
 									<div className="flex gap-4">
-										<Button variant="outline" size="sm" className="border-[#70C7BA] text-[#70C7BA] hover:bg-[#70C7BA]/10">
-											<Github className="w-4 h-4 mr-2" />
-											GitHub
+										<Button asChild variant="outline" size="sm" className="border-[#70C7BA] text-[#70C7BA] hover:bg-[#70C7BA]/10">
+											<Link href="https://github.com/kaspador" target="_blank" rel="noopener noreferrer">
+												<Github className="w-4 h-4 mr-2" />
+												GitHub
+											</Link>
 										</Button>
-										<Button variant="outline" size="sm" className="border-[#70C7BA] text-[#70C7BA] hover:bg-[#70C7BA]/10">
-											<Twitter className="w-4 h-4 mr-2" />
-											Twitter
+										<Button asChild variant="outline" size="sm" className="border-[#70C7BA] text-[#70C7BA] hover:bg-[#70C7BA]/10">
+											<Link href="https://x.com/kaspador_" target="_blank" rel="noopener noreferrer">
+												<Twitter className="w-4 h-4 mr-2" />
+												Twitter
+											</Link>
 										</Button>
 									</div>
 								</div>
