@@ -131,9 +131,8 @@ export const DirectusAPI = {
           'foreground_color',
           'donation_goal',
           'is_active',
-          'view_count',
-          'date_created',
-          'date_updated'
+          'view_count'
+          // Removed date_created and date_updated - not needed for public viewing
         ]
       })) as unknown[];
       
