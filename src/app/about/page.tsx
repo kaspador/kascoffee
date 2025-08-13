@@ -4,8 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Coffee, Heart, Users, Zap, ArrowRight, Star, Github, Twitter } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 import FeatureCard from "@/components/feature-card";
+import { DirectusAPI } from "@/lib/directus";
 
-export default function AboutPage() {
+export default async function AboutPage() {
+	// Fetch kaspador's profile for the creator section
+	let kaspadorProfile = null;
+	try {
+		kaspadorProfile = await DirectusAPI.getUserPage('kaspador');
+	} catch (error) {
+		console.error('Failed to fetch kaspador profile:', error);
+	}
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative">
 			{/* Animated background with Kaspa colors */}
@@ -102,9 +110,19 @@ export default function AboutPage() {
 						<Card className="bg-white/5 backdrop-blur-xl border border-white/20 max-w-2xl mx-auto">
 							<CardContent className="p-8">
 								<div className="flex flex-col items-center text-center">
-									<div className="w-24 h-24 bg-gradient-to-r from-[#70C7BA] to-[#49EACB] rounded-full flex items-center justify-center text-2xl font-bold text-white mb-4">
-										K
-									</div>
+									{kaspadorProfile?.profile_image ? (
+										<div className="w-24 h-24 rounded-full overflow-hidden mb-4 ring-4 ring-[#70C7BA]/50">
+											<img 
+												src={kaspadorProfile.profile_image} 
+												alt="kaspador" 
+												className="w-full h-full object-cover"
+											/>
+										</div>
+									) : (
+										<div className="w-24 h-24 bg-gradient-to-r from-[#70C7BA] to-[#49EACB] rounded-full flex items-center justify-center text-2xl font-bold text-white mb-4">
+											K
+										</div>
+									)}
 									<h3 className="text-2xl font-bold text-white mb-2">kaspador</h3>
 									<p className="text-gray-400 mb-6">
 										Passionate developer and Kaspa enthusiast building the future of cryptocurrency donations.
