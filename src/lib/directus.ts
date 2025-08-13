@@ -163,6 +163,7 @@ export const DirectusAPI = {
 
   async getUserPageByUserId(userId: string): Promise<UserPage[]> {
     try {
+      console.log('[DEBUG] DirectusAPI.getUserPageByUserId - Searching for user ID:', userId);
       const pages = await directusAuth.request(readItems('user_pages', {
         filter: { user_id: userId }, // Changed from 'user' to 'user_id'
         fields: [
@@ -184,8 +185,10 @@ export const DirectusAPI = {
           'date_updated'
         ]
       })) as unknown[];
+      console.log('[DEBUG] DirectusAPI.getUserPageByUserId - Found pages:', pages);
       return pages as UserPage[];
-    } catch {
+    } catch (error) {
+      console.error('[ERROR] DirectusAPI.getUserPageByUserId - Error fetching user page by user ID:', error);
       return [];
     }
   },
