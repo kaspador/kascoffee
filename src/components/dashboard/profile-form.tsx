@@ -50,6 +50,7 @@ interface ProfileFormProps {
 		longDescription: string | null;
 		kaspaAddress: string;
 		donationGoal: number | null;
+		donationsPaused: boolean;
 		profileImage: string | null;
 		backgroundImage: string | null;
 		backgroundColor: string;

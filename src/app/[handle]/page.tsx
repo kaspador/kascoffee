@@ -25,6 +25,7 @@ interface UserPageData {
 	longDescription: string | null;
 	kaspaAddress: string;
 	donationGoal: number | null;
+	donationsPaused: boolean;
 	profileImage: string | null;
 	backgroundImage: string | null;
 	backgroundColor: string;
@@ -491,8 +492,8 @@ export default function UserProfilePage({ params }: PageProps) {
 						</div>
 					</div>
 
-					{/* Donation Goal Progress */}
-					{userPage.donationGoal && userPage.donationGoal > 0 && (
+					{/* Donation Goal Progress - Only show when donations are not paused */}
+					{userPage.donationGoal && userPage.donationGoal > 0 && !userPage.donationsPaused && (
 						<div className="max-w-2xl mx-auto mb-8">
 							<Card 
 								className="backdrop-blur-xl border shadow-2xl"
@@ -580,99 +581,147 @@ export default function UserProfilePage({ params }: PageProps) {
 						</div>
 					)}
 
-					{/* Donation Section */}
+					{/* Donation Section OR Paused Message */}
 					<div className={userPage.longDescription ? 'lg:col-span-1' : 'lg:col-span-3 max-w-md mx-auto'}>
-						<Card className="bg-gradient-to-br from-[#70C7BA]/20 to-[#49EACB]/10 backdrop-blur-xl border border-[#70C7BA]/40 shadow-2xl">
-							<CardContent className="p-8">
-								<div className="text-center mb-8">
-									<div className="inline-flex items-center gap-3 bg-[#70C7BA]/20 text-[#70C7BA] rounded-full px-6 py-3 mb-6 border border-[#70C7BA]/30">
-										<Heart className="w-5 h-5" />
-										<span className="font-semibold">Support with Kaspa</span>
+						{userPage.donationsPaused ? (
+							/* Donations Paused Message */
+							<Card className="bg-gradient-to-br from-gray-600/20 to-gray-700/10 backdrop-blur-xl border border-gray-500/40 shadow-2xl">
+								<CardContent className="p-8 text-center">
+									<div className="mb-8">
+										<div className="inline-flex items-center gap-3 bg-gray-500/20 text-gray-400 rounded-full px-6 py-3 mb-6 border border-gray-500/30">
+											<Coffee className="w-5 h-5" />
+											<span className="font-semibold">Donations Paused</span>
+										</div>
+										<h2 className="text-3xl font-bold text-white mb-3">
+											Support Currently Unavailable
+										</h2>
+										<p className="text-gray-300 text-lg mb-4">
+											{userPage.displayName} has temporarily paused donations.
+										</p>
+										<p className="text-gray-400 text-sm">
+											Check back later or follow their social links for updates!
+										</p>
 									</div>
-									<h2 className="text-3xl font-bold text-white mb-3">
-										Buy me a coffee
-									</h2>
-									<p className="text-gray-300">
-										Send Kaspa donations to show your support
-									</p>
-								</div>
-								
-								{/* QR Code and Address */}
-								<Tabs defaultValue="qr" className="w-full">
-									<TabsList className="grid w-full grid-cols-2 mb-8 bg-slate-800/50 border border-[#70C7BA]/30">
-										<TabsTrigger value="qr" className="data-[state=active]:bg-[#70C7BA] data-[state=active]:text-white text-gray-300">
-											<QrCode className="w-4 h-4 mr-2" />
-											QR Code
-										</TabsTrigger>
-										<TabsTrigger value="address" className="data-[state=active]:bg-[#70C7BA] data-[state=active]:text-white text-gray-300">
-											<Copy className="w-4 h-4 mr-2" />
-											Address
-										</TabsTrigger>
-									</TabsList>
 									
-									<TabsContent value="qr" className="space-y-4 sm:space-y-6">
-										<div className="flex justify-center">
-											<div className="bg-white p-3 sm:p-6 rounded-2xl shadow-2xl">
-												<QRCodeDisplay address={userPage.kaspaAddress} responsive={true} />
+									{/* Social Links Preview */}
+									{userPage.socials && userPage.socials.length > 0 && (
+										<div className="mt-8">
+											<p className="text-gray-400 text-sm mb-4">Stay connected:</p>
+											<div className="flex justify-center gap-4">
+												{userPage.socials.slice(0, 3).map((social) => (
+													<Link
+														key={social.id}
+														href={social.url}
+														target="_blank"
+														rel="noopener noreferrer"
+														className="flex items-center gap-2 px-4 py-2 bg-gray-700/30 hover:bg-gray-600/30 rounded-xl transition-colors border border-gray-600/30"
+													>
+														{social.platform === 'twitter' && <FaTwitter className="w-4 h-4 text-blue-400" />}
+														{social.platform === 'discord' && <FaDiscord className="w-4 h-4 text-purple-400" />}
+														{social.platform === 'telegram' && <FaTelegram className="w-4 h-4 text-blue-500" />}
+														{social.platform === 'website' && <FaGlobe className="w-4 h-4 text-green-400" />}
+														<span className="text-sm text-gray-300">{social.platform}</span>
+													</Link>
+												))}
 											</div>
 										</div>
-										<p className="text-center text-gray-400 text-xs sm:text-sm">
-											Scan with your Kaspa wallet app
-										</p>
-									</TabsContent>
-									
-									<TabsContent value="address" className="space-y-4 sm:space-y-6">
-										<div className="p-4 sm:p-6 rounded-2xl border border-[#70C7BA]/30 bg-slate-800/50 backdrop-blur-sm">
-											<p className="text-xs text-gray-400 mb-2">Kaspa Address:</p>
-											<a
-												href={`https://kas.fyi/address/${userPage.kaspaAddress.startsWith('kaspa:') ? userPage.kaspaAddress : 'kaspa:' + userPage.kaspaAddress}`}
-												target="_blank"
-												rel="noopener noreferrer"
-												className="block font-mono text-xs sm:text-sm text-white break-all hover:text-[#70C7BA] transition-colors group cursor-pointer"
-												title="View on kas.fyi explorer"
-											>
-												<span className="group-hover:underline">{userPage.kaspaAddress}</span>
-												<div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-													<ExternalLink className="w-3 h-3 text-[#70C7BA]" />
-													<span className="text-[10px] text-[#70C7BA]">View on kas.fyi</span>
-												</div>
-											</a>
+									)}
+								</CardContent>
+							</Card>
+						) : (
+							/* Normal Donation Section */
+							<Card className="bg-gradient-to-br from-[#70C7BA]/20 to-[#49EACB]/10 backdrop-blur-xl border border-[#70C7BA]/40 shadow-2xl">
+								<CardContent className="p-8">
+									<div className="text-center mb-8">
+										<div className="inline-flex items-center gap-3 bg-[#70C7BA]/20 text-[#70C7BA] rounded-full px-6 py-3 mb-6 border border-[#70C7BA]/30">
+											<Heart className="w-5 h-5" />
+											<span className="font-semibold">Support with Kaspa</span>
 										</div>
-									</TabsContent>
-								</Tabs>
-								
-								{/* Action Buttons */}
-								<div className="space-y-4">
-									<Button
-										onClick={handleCopyAddress}
-										className="w-full bg-[#70C7BA] hover:bg-[#5ba8a0] text-white font-semibold py-4 rounded-xl shadow-lg hover:shadow-[#70C7BA]/25 transition-all duration-300"
-									>
-										<Copy className="w-5 h-5 mr-2" />
-										{copied ? 'Address Copied!' : 'Copy Kaspa Address'}
-									</Button>
+										<h2 className="text-3xl font-bold text-white mb-3">
+											Buy me a coffee
+										</h2>
+										<p className="text-gray-300">
+											Send Kaspa donations to show your support
+										</p>
+									</div>
 									
-									<Button
-										variant="outline"
-										onClick={() => {
-											const cleanAddress = userPage.kaspaAddress.replace('kaspa:', '');
-											const amount = prompt('Enter Kaspa amount (optional):');
-											const kaspaUrl = amount 
-												? `kaspa:${cleanAddress}?amount=${amount}`
-												: `kaspa:${cleanAddress}`;
-											window.open(kaspaUrl, '_blank');
-										}}
-										className="w-full border-[#70C7BA]/50 text-[#70C7BA] hover:bg-[#70C7BA]/10 hover:border-[#70C7BA] py-4 rounded-xl backdrop-blur-sm transition-all duration-300"
-									>
-										<ExternalLink className="w-5 h-5 mr-2" />
-										Open in Wallet
-									</Button>
-								</div>
-							</CardContent>
-						</Card>
+									{/* QR Code and Address */}
+									<Tabs defaultValue="qr" className="w-full">
+										<TabsList className="grid w-full grid-cols-2 mb-8 bg-slate-800/50 border border-[#70C7BA]/30">
+											<TabsTrigger value="qr" className="data-[state=active]:bg-[#70C7BA] data-[state=active]:text-white text-gray-300">
+												<QrCode className="w-4 h-4 mr-2" />
+												QR Code
+											</TabsTrigger>
+											<TabsTrigger value="address" className="data-[state=active]:bg-[#70C7BA] data-[state=active]:text-white text-gray-300">
+												<Copy className="w-4 h-4 mr-2" />
+												Address
+											</TabsTrigger>
+										</TabsList>
+										
+										<TabsContent value="qr" className="space-y-4 sm:space-y-6">
+											<div className="flex justify-center">
+												<div className="bg-white p-3 sm:p-6 rounded-2xl shadow-2xl">
+													<QRCodeDisplay address={userPage.kaspaAddress} responsive={true} />
+												</div>
+											</div>
+											<p className="text-center text-gray-400 text-xs sm:text-sm">
+												Scan with your Kaspa wallet app
+											</p>
+										</TabsContent>
+										
+										<TabsContent value="address" className="space-y-4 sm:space-y-6">
+											<div className="p-4 sm:p-6 rounded-2xl border border-[#70C7BA]/30 bg-slate-800/50 backdrop-blur-sm">
+												<p className="text-xs text-gray-400 mb-2">Kaspa Address:</p>
+												<a
+													href={`https://kas.fyi/address/${userPage.kaspaAddress.startsWith('kaspa:') ? userPage.kaspaAddress : 'kaspa:' + userPage.kaspaAddress}`}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="block font-mono text-xs sm:text-sm text-white break-all hover:text-[#70C7BA] transition-colors group cursor-pointer"
+													title="View on kas.fyi explorer"
+												>
+													<span className="group-hover:underline">{userPage.kaspaAddress}</span>
+													<div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+														<ExternalLink className="w-3 h-3 text-[#70C7BA]" />
+														<span className="text-[10px] text-[#70C7BA]">View on kas.fyi</span>
+													</div>
+												</a>
+											</div>
+										</TabsContent>
+									</Tabs>
+									
+									{/* Action Buttons */}
+									<div className="space-y-4">
+										<Button
+											onClick={handleCopyAddress}
+											className="w-full bg-[#70C7BA] hover:bg-[#5ba8a0] text-white font-semibold py-4 rounded-xl shadow-lg hover:shadow-[#70C7BA]/25 transition-all duration-300"
+										>
+											<Copy className="w-5 h-5 mr-2" />
+											{copied ? 'Address Copied!' : 'Copy Kaspa Address'}
+										</Button>
+										
+										<Button
+											variant="outline"
+											onClick={() => {
+												const cleanAddress = userPage.kaspaAddress.replace('kaspa:', '');
+												const amount = prompt('Enter Kaspa amount (optional):');
+												const kaspaUrl = amount 
+													? `kaspa:${cleanAddress}?amount=${amount}`
+													: `kaspa:${cleanAddress}`;
+												window.open(kaspaUrl, '_blank');
+											}}
+											className="w-full border-[#70C7BA]/50 text-[#70C7BA] hover:bg-[#70C7BA]/10 hover:border-[#70C7BA] py-4 rounded-xl backdrop-blur-sm transition-all duration-300"
+										>
+											<ExternalLink className="w-5 h-5 mr-2" />
+											Open in Wallet
+										</Button>
+									</div>
+								</CardContent>
+							</Card>
+						)}
 					</div>
 
-					{/* Wallet Activity Section */}
-					{userPage.kaspaAddress && (
+					{/* Wallet Activity Section - Only show when donations are not paused */}
+					{userPage.kaspaAddress && !userPage.donationsPaused && (
 						<div className="lg:col-span-3 mb-8">
 							<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start align-top">
 								{/* Wallet Balance */}

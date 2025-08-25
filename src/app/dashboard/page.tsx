@@ -22,6 +22,7 @@ interface UserProfile {
 	longDescription: string;
 	kaspaAddress: string;
 	donationGoal: number | null;
+	donationsPaused: boolean;
 	profileImage: string | null;
 	backgroundImage: string | null;
 	backgroundColor: string;
@@ -150,6 +151,7 @@ export default function DashboardPage() {
 			shortDescription: profile.shortDescription || null,
 			longDescription: profile.longDescription || null,
 			donationGoal: profile.donationGoal || null,
+			donationsPaused: profile.donationsPaused || false,
 			viewCount: profile.viewCount || null,
 			createdAt: new Date(profile.createdAt),
 			updatedAt: new Date(profile.updatedAt),
@@ -390,6 +392,66 @@ export default function DashboardPage() {
 								/>
 							</CardContent>
 						</Card>
+
+						{/* Donations Control Card */}
+						{userProfile && (
+							<Card className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 shadow-xl">
+								<CardHeader className="pb-4 sm:pb-6">
+									<CardTitle className="text-xl sm:text-2xl font-kaspa-header font-bold text-white flex items-center gap-2 sm:gap-3">
+										<Coffee className="w-5 h-5 sm:w-6 sm:h-6 text-[#70C7BA]" />
+										Donations Control
+									</CardTitle>
+								</CardHeader>
+								<CardContent className="p-4 sm:p-6">
+									<div className="flex items-center justify-between p-6 bg-slate-800/50 rounded-xl border border-[#70C7BA]/30">
+										<div className="flex-1">
+											<h3 className="text-lg font-kaspa-header font-bold text-white mb-2">
+												{userProfile.donationsPaused ? 'Donations Paused' : 'Donations Active'}
+											</h3>
+											<p className="text-gray-400 text-sm font-kaspa-body">
+												{userProfile.donationsPaused 
+													? 'Your donation page is currently hidden from visitors. Your wallet address and QR code are not visible.' 
+													: 'Your donation page is active and visible to visitors. People can send you donations using your Kaspa address.'
+												}
+											</p>
+										</div>
+										<Button
+											onClick={async () => {
+												try {
+													const response = await fetch('/api/user/profile', {
+														method: 'PUT',
+														headers: { 'Content-Type': 'application/json' },
+														body: JSON.stringify({
+															handle: userProfile.handle,
+															displayName: userProfile.displayName,
+															kaspaAddress: userProfile.kaspaAddress,
+															donationGoal: userProfile.donationGoal,
+															donationsPaused: !userProfile.donationsPaused,
+															shortDescription: userProfile.shortDescription,
+															longDescription: userProfile.longDescription,
+															profileImage: userProfile.profileImage,
+															backgroundImage: userProfile.backgroundImage
+														})
+													});
+													if (response.ok) {
+														fetchProfile();
+													}
+												} catch (error) {
+													console.error('Failed to toggle donations:', error);
+												}
+											}}
+											className={`ml-6 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+												userProfile.donationsPaused
+													? 'bg-[#70C7BA] hover:bg-[#5ba8a0] text-white'
+													: 'bg-red-500 hover:bg-red-600 text-white'
+											}`}
+										>
+											{userProfile.donationsPaused ? 'Resume Donations' : 'Pause Donations'}
+										</Button>
+									</div>
+								</CardContent>
+							</Card>
+						)}
 					</TabsContent>
 
 					<TabsContent value="theme" className="space-y-6">

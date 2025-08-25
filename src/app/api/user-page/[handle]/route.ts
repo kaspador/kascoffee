@@ -55,6 +55,7 @@ export async function GET(
       longDescription: userPage.long_description,
       kaspaAddress: userPage.kaspa_address,
       donationGoal: userPage.donation_goal,
+      donationsPaused: userPage.donations_paused,
       // Simple direct mapping - same as background image that works
       profileImage: userPage.profile_image,
       backgroundImage: userPage.background_image,

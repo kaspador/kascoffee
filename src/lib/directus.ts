@@ -37,6 +37,7 @@ export interface UserPage {
   background_color: string;
   foreground_color: string;
   donation_goal: number | null; // Goal amount in KAS
+  donations_paused: boolean; // New field for pausing donations
   is_active: boolean;
   view_count: number;
   date_created?: string;
@@ -130,6 +131,7 @@ export const DirectusAPI = {
           'background_color',
           'foreground_color',
           'donation_goal',
+          'donations_paused', // Include donations_paused field
           'is_active',
           'view_count'
           // Removed date_created and date_updated - not needed for public viewing
@@ -179,6 +181,7 @@ export const DirectusAPI = {
           'background_color',
           'foreground_color',
           'donation_goal',
+          'donations_paused', // Include donations_paused field
           'is_active',
           'view_count',
           'date_created',
@@ -228,6 +231,7 @@ export const DirectusAPI = {
           'background_color',
           'foreground_color',
           'donation_goal',
+          'donations_paused', // Include donations_paused field
           'is_active',
           'view_count',
           'date_created',
